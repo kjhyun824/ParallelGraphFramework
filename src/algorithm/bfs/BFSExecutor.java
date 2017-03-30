@@ -10,11 +10,13 @@ public class BFSExecutor implements GraphAlgorithmInterface {
 
     DirectedGraph graph;
     GraphPartition graphPartition;
+    NodePartition partition;
     static int currentLevel;
-    int numActiveNodes;
+    int numActivatedNodes;
 
     BFSExecutor(DirectedGraph graph) {
         this.graph = graph;
+
         graphPartition = graph.getPartitionInstance();
     }
 
@@ -22,33 +24,32 @@ public class BFSExecutor implements GraphAlgorithmInterface {
         currentLevel = level;
     }
 
+    public static int getLevel() {
+        return currentLevel;
+    }
+
     @Override
     public void execute(int partitionId) {
-        System.out.print("LEVEL : " + currentLevel + "   ");
-        NodePartition partition = graphPartition.getPartition(partitionId);
-        int expOfPartitionSize = graphPartition.getExpOfPartitionSize();
+        partition = graphPartition.getPartition(partitionId);
         int partitionSize = partition.getSize();
+        int expOfPartitionSize = graphPartition.getExpOfPartitionSize();
         int offset = partitionId << expOfPartitionSize;
-        numActiveNodes = 0;
 
-
+        numActivatedNodes = 0;
         for (int i = 0; i < partitionSize; i++) {
-            //xxx
-            int srcNodeId = offset + i;
-            int srcIdPositionInPart = graphPartition.getNodePositionInPart(srcNodeId);
-            double srcCurrentLevel = partition.getVertexValue(srcIdPositionInPart);
+            int nodeId = offset + i;
+            int nodePositionInPart = graphPartition.getNodePositionInPart(nodeId);
 
-            if (srcCurrentLevel == currentLevel) {
-                Node srcNode = graph.getNode(srcNodeId);
+            if (partition.getVertexValue(nodePositionInPart) == currentLevel) {
+                Node srcNode = graph.getNode(nodeId);
 
                 if (srcNode != null) {
                     update(srcNode);
                 }
             }
         }
-        System.out.println(numActiveNodes);
-        currentLevel++;
 
+        BFSDriver.addTotalActiveNodes(numActivatedNodes);
     }
 
     public void update(Node srcNode) {
@@ -57,18 +58,18 @@ public class BFSExecutor implements GraphAlgorithmInterface {
         for (int j = 0; j < neighborListSize; j++) {
             int destId = srcNode.getNeighbor(j);
             int destPartitionId = graphPartition.getPartitionId(destId);
-
             NodePartition destPartition = graphPartition.getPartition(destPartitionId);
+            int destPosition = graphPartition.getNodePositionInPart(destId);
+            double destLevel = destPartition.getVertexValue(destPosition);    //vertexValue is level
 
-            int destIdPositionInPart = graphPartition.getNodePositionInPart(destId);
-            double destCurrentLevel = destPartition.getVertexValue(destIdPositionInPart);
-
-            // xxx
-            if (destCurrentLevel == 0 || destCurrentLevel > currentLevel + 1) {
-                destPartition.update(destIdPositionInPart, currentLevel + 1);
-                numActiveNodes++;
+            if (destLevel == 0) {
+                //Activate Node
+                destPartition.update(destPosition, currentLevel + 1);
+                numActivatedNodes++;
             }
         }
+
+        //System.out.println("[DEBUG] NumActivated = " + numActivatedNodes);
     }
 
     @Override
