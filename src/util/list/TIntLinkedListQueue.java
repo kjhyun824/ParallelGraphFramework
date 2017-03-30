@@ -12,7 +12,7 @@ public class TIntLinkedListQueue extends TIntLinkedList {
         if (super.size() == 0) {
             return -1;
         } else {
-            return super.removeAt(size() - 1);
+            return super.removeAt(0);
         }
     }
 
