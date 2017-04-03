@@ -1,10 +1,10 @@
 package algorithm.pagerank;
 
 import graph.DirectedGraph;
-import graph.GraphPartition;
-import graph.NodePartition;
+import graph.partition.DoubleNodePartition;
+import graph.partition.GraphPartition;
 import task.*;
-import thread.TaskWaitngRunnable;
+import thread.TaskWaitingRunnable;
 import thread.ThreadUtil;
 
 import java.util.ArrayList;
@@ -25,13 +25,13 @@ public class PageRankDriver {
     DirectedGraph graph;
     GraphPartition graphPartition;
     DoubleBinaryOperator updateFunction;
-    LinkedBlockingQueue<DoubleTask> taskQueue;
-    TaskWaitngRunnable runnable;
+    LinkedBlockingQueue<Task> taskQueue;
+    TaskWaitingRunnable runnable;
     CyclicBarrier barriers;
 
-    DoubleTask[] initTasks;
-    DoubleTask[] workTasks;
-    DoubleTask[] barrierTasks;
+    Task[] initTasks;
+    Task[] workTasks;
+    Task[] barrierTasks;
 
     public PageRankDriver(DirectedGraph graph, double dampingFactor, int iteration, int numThreads) {
         this.graph = graph;
@@ -50,25 +50,25 @@ public class PageRankDriver {
         double pageRankPartValue = getInitPageRankValue(dampingFactor, (double) numNodes);
 
         updateFunction = getUpdateFunction();
-        NodePartition.setUpdateFunction(updateFunction);
+        DoubleNodePartition.setUpdateFunction(updateFunction);
 
-        initTasks = new DoubleTask[numPartitions];
-        workTasks = new DoubleTask[numPartitions];
-        barrierTasks = new DoubleTask[numThreads];
+        initTasks = new Task[numPartitions];
+        workTasks = new Task[numPartitions];
+        barrierTasks = new Task[numThreads];
         barriers = new CyclicBarrier(numThreads);
 
         taskQueue = new LinkedBlockingQueue<>();
-        runnable = new TaskWaitngRunnable(taskQueue);
+        runnable = new TaskWaitingRunnable(taskQueue);
 
         ThreadUtil.createAndStartThreads(numThreads, runnable);
 
         for (int i = 0; i < numPartitions; i++) {
-            initTasks[i] = new DoubleTask(i, new PageRankInit(graph, dampingFactor));
-            workTasks[i] = new DoubleTask(i, new PageRankExecutor(graph, dampingFactor));
+            initTasks[i] = new Task(i, new PageRankInit(graph, dampingFactor));
+            workTasks[i] = new Task(i, new PageRankExecutor(graph, dampingFactor));
         }
 
         for (int i = 0; i < numThreads; i++) {
-            barrierTasks[i] = new DoubleTask(i, new TaskBarrier(i, barriers));
+            barrierTasks[i] = new Task(i, new TaskBarrier(i, barriers));
         }
     }
 
@@ -93,7 +93,7 @@ public class PageRankDriver {
         }
     }
 
-    public void runOnce(DoubleTask[] tasks) {
+    public void runOnce(Task[] tasks) {
         for (int i = 0; i < tasks.length; i++) {
             taskQueue.add(tasks[i]);
         }
@@ -116,7 +116,7 @@ public class PageRankDriver {
     }
 
     public void _printPageRankSum() {
-        NodePartition[] partitions = graphPartition.getPartitions();
+        DoubleNodePartition[] partitions = (DoubleNodePartition[]) graphPartition.getPartitions();
         ArrayList<Double> pagerank = new ArrayList<>();
         double sum = 0.0d;
 
@@ -143,11 +143,11 @@ public class PageRankDriver {
 
         for (int i = 0; i < sampleData.length; i++) {
             int node = sampleData[i];
-            int partitionNumber = graphPartition.getPartitionNumber(node);
+            int partitionNumber = graphPartition.getPartitionId(node);
             int nodePosition = graphPartition.getNodePositionInPart(node);
 
-            NodePartition partition = graphPartition.getPartition(partitionNumber);
-            pageRank[i] = partition.getVertexValue(nodePosition);
+            DoubleNodePartition doubleNodePartition = (DoubleNodePartition) graphPartition.getPartition(partitionNumber);
+            pageRank[i] = doubleNodePartition.getVertexValue(nodePosition);
 
 //            System.out.println(sampleData[i] + " : " + graph.getNode(node).getInDegree() + " : " + graph.getNode(node).getOutDegree());
         }

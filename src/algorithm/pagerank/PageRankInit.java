@@ -1,7 +1,7 @@
 package algorithm.pagerank;
 
 import graph.DirectedGraph;
-import graph.NodePartition;
+import graph.partition.DoubleNodePartition;
 
 public class PageRankInit extends PageRank {
     double initialValue;
@@ -24,34 +24,34 @@ public class PageRankInit extends PageRank {
             initNextTable(partitionId);
         }
 
-        NodePartition partition = graphPartition.getPartition(partitionId);
-        int partitionSize = partition.getSize();
+        doubleNodePartition = (DoubleNodePartition) graphPartition.getPartition(partitionId);
+        int partitionSize = doubleNodePartition.getSize();
 
         for (int i = 0; i < partitionSize; i++) {
             int nodeId = graphPartition.getNodeNumberInPart(partitionId, i);
             srcNode = graph.getNode(nodeId);
 
             if (srcNode != null) {
-                partition.setVertexValue(i, initialValue);
+                doubleNodePartition.setVertexValue(i, initialValue);
             }
         }
 
         if (!isFirst) {
-            partition.initializedCallback();
+            doubleNodePartition.initializedCallback();
         }
         isFirst = false;
     }
 
     public void initNextTable(int partitionId) {
-        NodePartition partition = graphPartition.getPartition(partitionId);
-        int partitionSize = partition.getSize();
+        DoubleNodePartition doubleNodePartition = (DoubleNodePartition) graphPartition.getPartition(partitionId);
+        int partitionSize = doubleNodePartition.getSize();
 
         for (int i = 0; i < partitionSize; i++) {
             int nodeId = graphPartition.getNodeNumberInPart(partitionId, i);
             srcNode = graph.getNode(nodeId);
 
             if (srcNode != null) {
-                partition.setNextVertexValue(i, stopSurfValue);
+                doubleNodePartition.setNextVertexValue(i, stopSurfValue);
             }
         }
     }
@@ -63,6 +63,8 @@ public class PageRankInit extends PageRank {
     public void reset(int taskId) {
         isFirst = true;
         initialValue = getInitPageRankValue(0);
-        partition.reset();
+        if (doubleNodePartition != null) {
+            doubleNodePartition.reset();
+        }
     }
 }

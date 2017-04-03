@@ -1,7 +1,7 @@
 package algorithm.pagerank;
 
 import graph.DirectedGraph;
-import graph.NodePartition;
+import graph.partition.DoubleNodePartition;
 
 public class PageRankExecutor
         extends PageRank {
@@ -12,8 +12,8 @@ public class PageRankExecutor
 
     @Override
     public void execute(int partitionId) {
-        partition = graphPartition.getPartition(partitionId);
-        int partitionLength = partition.getSize();
+        doubleNodePartition = (DoubleNodePartition) graphPartition.getPartition(partitionId);
+        int partitionLength = doubleNodePartition.getSize();
 
 		for (int i = 0; i < partitionLength; i++) {
 			int nodeId = graphPartition.getNodeNumberInPart(partitionId, i);
@@ -27,22 +27,22 @@ public class PageRankExecutor
 
     public void update(int entry) {
         int neighborListSize = srcNode.neighborListSize();
-        double scatteredPageRank = getScatteredPageRank(partition, entry, neighborListSize);
+        double scatteredPageRank = getScatteredPageRank(doubleNodePartition, entry, neighborListSize);
 
         for (int j = 0; j < neighborListSize; j++) {
             int dest = srcNode.getNeighbor(j);
-            int destPartitionNumber = graphPartition.getPartitionNumber(dest);
+            int destPartitionNumber = graphPartition.getPartitionId(dest);
 
-            NodePartition destPartition = graphPartition.getPartition(destPartitionNumber);
+            DoubleNodePartition destDoubleNodePartition = (DoubleNodePartition) graphPartition.getPartition(destPartitionNumber);
 
             int destPosition = graphPartition.getNodePositionInPart(dest);
 
-            destPartition.updateNextTable(destPosition, scatteredPageRank);
+            destDoubleNodePartition.updateNextTable(destPosition, scatteredPageRank);
         }
     }
 
-    public double getScatteredPageRank(NodePartition partition, int index, int neighborListSize) {
-        return dampingFactor * partition.getVertexValue(index) / (double) neighborListSize;
+    public double getScatteredPageRank(DoubleNodePartition doubleNodePartition, int index, int neighborListSize) {
+        return dampingFactor * doubleNodePartition.getVertexValue(index) / (double) neighborListSize;
     }
 
     @Override

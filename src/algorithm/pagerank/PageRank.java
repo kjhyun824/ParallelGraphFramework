@@ -1,15 +1,16 @@
 package algorithm.pagerank;
 
-import graph.GraphPartition;
+import graph.partition.DoubleGraphPartition;
+import graph.partition.DoubleNodePartition;
+import graph.partition.GraphPartition;
 import graph.Node;
 import graph.DirectedGraph;
 import graph.GraphAlgorithmInterface;
-import graph.NodePartition;
 
 public abstract class PageRank implements GraphAlgorithmInterface {
 	DirectedGraph graph;
-	GraphPartition graphPartition;
-    NodePartition partition;
+	DoubleGraphPartition graphPartition;
+    DoubleNodePartition doubleNodePartition;
 
 	Node srcNode;
 

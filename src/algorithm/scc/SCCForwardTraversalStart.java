@@ -2,14 +2,14 @@ package algorithm.scc;
 
 import graph.DirectedGraph;
 import graph.GraphAlgorithmInterface;
-import graph.GraphPartition;
-import graph.NodePartition;
+import graph.partition.IntegerGraphPartition;
+import graph.partition.IntegerNodePartition;
 
 public class SCCForwardTraversalStart implements GraphAlgorithmInterface {
     DirectedGraph graph;
-    GraphPartition graphPartition;
+    IntegerGraphPartition graphPartition;
 
-    public SCCForwardTraversalStart(DirectedGraph graph) {
+    public SCCForwardTraversalStart(DirectedGraph<IntegerGraphPartition> graph) {
         this.graph = graph;
         graphPartition = graph.getPartitionInstance();
     }
@@ -18,7 +18,7 @@ public class SCCForwardTraversalStart implements GraphAlgorithmInterface {
     public void execute(int partitionId) {
         int partitionSize = graphPartition.getPartition(partitionId).getSize();
         int offset = partitionId * partitionSize;
-        NodePartition partition = graphPartition.getPartition(partitionId);       // partition 안에 table이 있는게 의미상 이상함
+        IntegerNodePartition partition = graphPartition.getPartition(partitionId);       // partition 안에 table이 있는게 의미상 이상함
 
         for (int i = 0; i < partitionSize; i++) {
             int nodeId = offset + i;

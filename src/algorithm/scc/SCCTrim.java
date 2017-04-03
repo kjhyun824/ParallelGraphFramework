@@ -2,15 +2,15 @@ package algorithm.scc;
 
 import graph.DirectedGraph;
 import graph.GraphAlgorithmInterface;
-import graph.GraphPartition;
 import graph.Node;
+import graph.partition.IntegerGraphPartition;
 
 public class SCCTrim implements GraphAlgorithmInterface {
     DirectedGraph graph;
-    GraphPartition graphPartition;
+    IntegerGraphPartition graphPartition;
     boolean[] isInActive;
 
-    public SCCTrim(DirectedGraph graph, boolean[] isInActive) {
+    public SCCTrim(DirectedGraph<IntegerGraphPartition> graph, boolean[] isInActive) {
         this.graph = graph;
         this.isInActive = isInActive;
         graphPartition = graph.getPartitionInstance();
