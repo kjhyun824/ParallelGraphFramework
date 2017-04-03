@@ -33,7 +33,7 @@ public class GraphUtil {
     }
 
     public static DirectedGraph transposeGraph(DirectedGraph graph) {
-        DirectedGraph graphT = new DirectedGraph();
+        DirectedGraph graphT = new DirectedGraph(graph.getExpOfPartitionSize());
         int maxNodeId = graph.getMaxNodeId();
 
         for (int i = 0; i <= maxNodeId; i++) {
@@ -75,36 +75,3 @@ public class GraphUtil {
     }
 }
 
-/*
-
-각 vertex별로 각 파티션이 가리키는 개수 각각을 테스트
-
-public static void printPartitionDistribution(DirectedGraph graph, GraphPartition graphPartition) {
-        int maxNodeId = graph.getMaxNodeId();
-        Node[] partitionAdjListOfNode = new Node[maxNodeId + 1];
-
-        getPartititonAdjListOfNode(partitionAdjListOfNode, graph, graphPartition);
-
-
-
-        int numPartitions = graphPartition.getNumPartitions();
-        int partitionCapacity = graphPartition.getPartitionCapacity();
-
-        for (int i = 0; i < numPartitions; i++) {
-            System.out.print("DoubleNodePartition " + i + " / ");
-            int[] partitionAdjListSizes = new int[numPartitions];
-            int offset = i * partitionCapacity;
-            DoubleNodePartition partition = graphPartition.getPartition(i);
-
-            for (int j = 0; j < partition.getSize(); j++) {
-                int partitionAdjListSize = partitionAdjListOfNode[offset + j].inNeighborListSize();
-                partitionAdjListSizes[partitionAdjListSize]++;
-            }
-
-            for (int j = 0; j < partitionAdjListSizes.length; j++) {
-                System.out.print(partitionAdjListSizes[j] + " / ");
-            }
-            System.out.println();
-        }
-    }
- */

@@ -4,7 +4,7 @@ import atomic.AtomicIntegerArray;
 
 import java.util.function.IntBinaryOperator;
 
-public class IntegerNodePartition extends NodePartition {
+public class IntegerPartition extends Partition {
     public static IntBinaryOperator updateFunction;
 
     public static void setUpdateFunction(IntBinaryOperator function) {
@@ -14,7 +14,7 @@ public class IntegerNodePartition extends NodePartition {
     AtomicIntegerArray[] tables;
     byte[] activeCheckArray;
 
-    IntegerNodePartition(int partitionId, int maxNodeId, int partitionSize, int numValuesPerNode, int asyncRangeSize) {
+    public IntegerPartition(int partitionId, int maxNodeId, int partitionSize, int numValuesPerNode, int asyncRangeSize) {
         super(partitionId, maxNodeId, partitionSize, numValuesPerNode, asyncRangeSize);
     }
 
@@ -44,10 +44,6 @@ public class IntegerNodePartition extends NodePartition {
     }
 
     public final void update(int entry, int value) {
-//        if(level != (byte) value) {
-//            level = (byte) value;
-//        }
-
         update(tablePos, entry, value);
     }
 
@@ -68,26 +64,5 @@ public class IntegerNodePartition extends NodePartition {
         AtomicIntegerArray tmp = tables[tablePos];
         tables[tablePos] = tables[tablePos + 1];
         tables[tablePos + 1] = tmp;
-    }
-
-    public int getSize() {
-        return partitionSize;
-    }
-
-    public byte getLevel() {
-        return level;
-    }
-
-    public boolean checkIsActive(int nodeId, byte compareValue) {
-        return activeCheckArray[nodeId] == compareValue;
-    }
-
-    public void setIsActive(int nodeId, byte value) {
-        activeCheckArray[nodeId] = value;
-    }
-
-    public void reset() {
-        initializeTable();
-        level = 1;
     }
 }

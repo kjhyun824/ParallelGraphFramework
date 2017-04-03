@@ -1,9 +1,13 @@
 package graph;
 
-public class DirectedGraph <T> {
+import graph.partition.DoublePartition;
+import graph.partition.IntegerPartition;
+
+import java.lang.reflect.Array;
+
+public class DirectedGraph<T> {
     final static int defaultSize = 10;
     static DirectedGraph instance = null;
-    T graphPartition = null;
 
     Node[] tmpNodes;
     Node[] nodes;
@@ -12,14 +16,25 @@ public class DirectedGraph <T> {
     int numEdges;
     int maxNodeId;
 
-    public static DirectedGraph getInstance() {
+    // related to partition
+    T[] partitions;
+    final int expOfPartitionSize;
+    final int partitionCapacity;
+    final int bitMaskForRemain;
+
+    int numPartitions;
+
+    public static DirectedGraph getInstance(int expOfPartitionSize) {
         if (instance == null) {
-            instance = new DirectedGraph();
+            instance = new DirectedGraph(expOfPartitionSize);
         }
         return instance;
     }
 
-    DirectedGraph() {
+    DirectedGraph(int expOfPartitionSize) {
+        this.expOfPartitionSize = expOfPartitionSize;
+        partitionCapacity = 1 << expOfPartitionSize;
+        bitMaskForRemain = (1 << expOfPartitionSize) - 1;
         nodes = new Node[defaultSize];
     }
 
@@ -97,19 +112,60 @@ public class DirectedGraph <T> {
         return maxNodeId;
     }
 
-    public T getPartitionInstance () {
-        if (graphPartition == null) {
-            //TODO : if graphPartition is null, we have some action.
-        }
-        return graphPartition;
-    }
-
-    public void setGraphPartition(T graphPartition) {
-        this.graphPartition = graphPartition;
-    }
-
     public void finalizeLoading() {
         tmpNodes = null;
+    }
+
+
+
+
+    // The following part is related to Partiton
+
+    public void generatePartition(int numValuesPerNode, int asyncRangeSize, Class<T> partitionClass) {
+        int nodeCapacity = maxNodeId + 1; // TODO : Change Capacity to the number of node
+        numPartitions = (nodeCapacity + (partitionCapacity - 1)) / partitionCapacity;
+        partitions = (T[]) Array.newInstance(partitionClass, numPartitions);
+
+        if (partitionClass == IntegerPartition.class) {
+            for (int i = 0; i < numPartitions; i++) {
+                partitions[i] = (T) new IntegerPartition(i, maxNodeId, partitionCapacity, numValuesPerNode, asyncRangeSize);
+            }
+        }
+        else if (partitionClass == DoublePartition.class) {
+            for (int i = 0; i < numPartitions; i++) {
+                partitions[i] = (T) new DoublePartition(i, maxNodeId, partitionCapacity, numValuesPerNode, asyncRangeSize);
+            }
+        }
+    }
+
+    public T[] getPartitions() {
+        return partitions;
+    }
+
+    public T getPartition(int partitionId) {
+        return partitions[partitionId];
+    }
+
+    public int getExpOfPartitionSize() {
+        return expOfPartitionSize;
+    }
+
+    public int getNumPartitions() {
+        return partitions.length;
+    }
+
+    public int getPartitionId(int nodeId) {
+        //  = nodeNumber / partitionCapacity
+        return nodeId >> expOfPartitionSize;
+    }
+
+    public int getNodePositionInPart(int nodeId) {
+        //  = nodeNumber % partitionCapacity
+        return nodeId & bitMaskForRemain;
+    }
+
+    public int getNodeNumberInPart(int partitionNumber, int position) {
+        return (partitionNumber << expOfPartitionSize) + position;
     }
 }
 
