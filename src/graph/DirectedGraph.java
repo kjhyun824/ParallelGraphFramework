@@ -1,9 +1,9 @@
 package graph;
 
-public class DirectedGraph {
+public class DirectedGraph <T> {
     final static int defaultSize = 10;
     static DirectedGraph instance = null;
-    GraphPartition graphPartition = null;
+    T graphPartition = null;
 
     Node[] tmpNodes;
     Node[] nodes;
@@ -97,15 +97,15 @@ public class DirectedGraph {
         return maxNodeId;
     }
 
-    public GraphPartition getPartitionInstance() {
+    public T getPartitionInstance () {
+        if (graphPartition == null) {
+            //TODO : if graphPartition is null, we have some action.
+        }
         return graphPartition;
     }
 
-    public GraphPartition createPartitionInstance(int expOfPartitionSize) {
-        if (graphPartition == null) {
-            graphPartition = new GraphPartition(this, expOfPartitionSize);
-        }
-        return graphPartition;
+    public void setGraphPartition(T graphPartition) {
+        this.graphPartition = graphPartition;
     }
 
     public void finalizeLoading() {

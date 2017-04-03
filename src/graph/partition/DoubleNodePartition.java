@@ -1,33 +1,20 @@
-package graph;
+package graph.partition;
 
 import atomic.AtomicDoubleArray;
 
 import java.util.function.DoubleBinaryOperator;
 
-public class NodePartition {
+public class DoubleNodePartition extends NodePartition {
     public static DoubleBinaryOperator updateFunction;
+
     public static void setUpdateFunction(DoubleBinaryOperator function) {
         updateFunction = function;
     }
 
     AtomicDoubleArray[] tables;
-    final int numValuesPerNode;
-    final int asyncRangeSize;
 
-    int partitionId;
-    int partitionSize;
-    int tablePos;
-
-    NodePartition(int partitionId, int maxNodeId, int partitionSize, int numValuesPerNode, int asyncRangeSize) {
-        this.partitionId = partitionId;
-        this.partitionSize = partitionSize;
-        if ((partitionId + 1) * this.partitionSize > maxNodeId) {
-            this.partitionSize = (maxNodeId % partitionSize) + 1;
-        }
-        this.numValuesPerNode = numValuesPerNode;
-        this.asyncRangeSize = asyncRangeSize;
-
-        initializeTable();
+    DoubleNodePartition(int partitionId, int maxNodeId, int partitionSize, int numValuesPerNode, int asyncRangeSize) {
+        super(partitionId, maxNodeId, partitionSize, numValuesPerNode, asyncRangeSize);
     }
 
     public final void initializeTable() {
@@ -46,7 +33,7 @@ public class NodePartition {
     }
 
     public final void setNextVertexValue(int entry, double value) {
-        tables[tablePos+1].asyncSet(entry, value);
+        tables[tablePos + 1].asyncSet(entry, value);
     }
 
     public final double getVertexValue(int entry) {
@@ -54,6 +41,10 @@ public class NodePartition {
     }
 
     public final void update(int entry, double value) {
+        if(level != (byte) value) {
+            level = (byte) value;
+        }
+
         update(tablePos, entry, value);
     }
 
@@ -77,9 +68,14 @@ public class NodePartition {
 
     public void reset() {
         initializeTable();
+        level = 1;
     }
+
     public int getSize() {
         return partitionSize;
     }
-}
 
+    public byte getLevel() {
+        return level;
+    }
+}

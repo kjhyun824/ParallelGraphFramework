@@ -1,18 +1,17 @@
-package graph;
+package graph.partition;
 
-import gnu.trove.list.array.TIntArrayList;
+import graph.DirectedGraph;
 
-import java.util.HashMap;
-
-public class GraphPartition {
+public class DoubleGraphPartition {
+    static DoubleGraphPartition instance = null;
     DirectedGraph graph;
-    NodePartition[] partitions;
+    DoubleNodePartition [] partitions;
     final int expOfPartitionSize;
     final int partitionCapacity;
     final int bitMaskForRemain;
     final int numPartitions;
 
-    protected GraphPartition(DirectedGraph graph, int expOfPartitionSize) {
+    DoubleGraphPartition(DirectedGraph graph, int expOfPartitionSize) {
         this.graph = graph;
         this.expOfPartitionSize = expOfPartitionSize;
         this.partitionCapacity = 1 << expOfPartitionSize;
@@ -20,27 +19,31 @@ public class GraphPartition {
 
         int nodeCapacity = graph.getMaxNodeId() + 1; // TODO : Change Capacity to the number of node
         numPartitions = (nodeCapacity + partitionCapacity - 1) / partitionCapacity;
+    }
 
-        partitions = new NodePartition[numPartitions];
+    public static DoubleGraphPartition getInstance(DirectedGraph graph, int expOfPartitionSize) {
+        if (instance == null) {
+            instance = new DoubleGraphPartition(graph, expOfPartitionSize);
+        }
+        return instance;
     }
 
     public void generate(int numValuesPerNode, int asyncRangeSize) {
+        partitions = new DoubleNodePartition[numPartitions];
         for (int i = 0; i < numPartitions; i++) {
-            partitions[i] = new NodePartition(i, graph.getMaxNodeId(), partitionCapacity, numValuesPerNode, asyncRangeSize);
+            partitions[i] = new DoubleNodePartition(i, graph.getMaxNodeId(), partitionCapacity, numValuesPerNode, asyncRangeSize);
         }
     }
 
-
-
-    public int getPartitionCapacity() {
-        return partitionCapacity;
+    public int getExpOfPartitionSize() {
+        return expOfPartitionSize;
     }
 
-    public NodePartition[] getPartitions() {
+    public DoubleNodePartition[] getPartitions() {
         return partitions;
     }
 
-    public NodePartition getPartition(int partitionId) {
+    public DoubleNodePartition getPartition(int partitionId) {
         return partitions[partitionId];
     }
 
@@ -48,7 +51,7 @@ public class GraphPartition {
         return partitions.length;
     }
 
-    public int getPartitionNumber(int nodeId) {
+    public int getPartitionId(int nodeId) {
 //  = nodeNumber / partitionCapacity
         return nodeId >> expOfPartitionSize;
     }

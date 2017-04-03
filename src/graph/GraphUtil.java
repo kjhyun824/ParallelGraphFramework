@@ -91,10 +91,10 @@ public static void printPartitionDistribution(DirectedGraph graph, GraphPartitio
         int partitionCapacity = graphPartition.getPartitionCapacity();
 
         for (int i = 0; i < numPartitions; i++) {
-            System.out.print("Partition " + i + " / ");
+            System.out.print("DoubleNodePartition " + i + " / ");
             int[] partitionAdjListSizes = new int[numPartitions];
             int offset = i * partitionCapacity;
-            NodePartition partition = graphPartition.getPartition(i);
+            DoubleNodePartition partition = graphPartition.getPartition(i);
 
             for (int j = 0; j < partition.getSize(); j++) {
                 int partitionAdjListSize = partitionAdjListOfNode[offset + j].inNeighborListSize();
