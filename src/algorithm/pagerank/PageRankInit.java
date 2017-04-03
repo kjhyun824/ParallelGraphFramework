@@ -1,14 +1,14 @@
 package algorithm.pagerank;
 
 import graph.DirectedGraph;
-import graph.partition.DoubleNodePartition;
+import graph.partition.DoublePartition;
 
 public class PageRankInit extends PageRank {
     double initialValue;
     double stopSurfValue;
     boolean isFirst;
 
-    PageRankInit(DirectedGraph graph, double dampingFactor) {
+    PageRankInit(DirectedGraph<DoublePartition> graph, double dampingFactor) {
         super(graph, dampingFactor);
         initialValue = getInitPageRankValue(0); //initial PageRank Value
         stopSurfValue = getInitPageRankValue(dampingFactor);
@@ -24,34 +24,34 @@ public class PageRankInit extends PageRank {
             initNextTable(partitionId);
         }
 
-        doubleNodePartition = (DoubleNodePartition) graphPartition.getPartition(partitionId);
-        int partitionSize = doubleNodePartition.getSize();
+        doublePartition = graph.getPartition(partitionId);
+        int partitionSize = doublePartition.getSize();
 
         for (int i = 0; i < partitionSize; i++) {
-            int nodeId = graphPartition.getNodeNumberInPart(partitionId, i);
+            int nodeId = graph.getNodeNumberInPart(partitionId, i);
             srcNode = graph.getNode(nodeId);
 
             if (srcNode != null) {
-                doubleNodePartition.setVertexValue(i, initialValue);
+                doublePartition.setVertexValue(i, initialValue);
             }
         }
 
         if (!isFirst) {
-            doubleNodePartition.initializedCallback();
+            doublePartition.initializedCallback();
         }
         isFirst = false;
     }
 
     public void initNextTable(int partitionId) {
-        DoubleNodePartition doubleNodePartition = (DoubleNodePartition) graphPartition.getPartition(partitionId);
-        int partitionSize = doubleNodePartition.getSize();
+        DoublePartition doublePartition = graph.getPartition(partitionId);
+        int partitionSize = doublePartition.getSize();
 
         for (int i = 0; i < partitionSize; i++) {
-            int nodeId = graphPartition.getNodeNumberInPart(partitionId, i);
+            int nodeId = graph.getNodeNumberInPart(partitionId, i);
             srcNode = graph.getNode(nodeId);
 
             if (srcNode != null) {
-                doubleNodePartition.setNextVertexValue(i, stopSurfValue);
+                doublePartition.setNextVertexValue(i, stopSurfValue);
             }
         }
     }
@@ -63,8 +63,8 @@ public class PageRankInit extends PageRank {
     public void reset(int taskId) {
         isFirst = true;
         initialValue = getInitPageRankValue(0);
-        if (doubleNodePartition != null) {
-            doubleNodePartition.reset();
+        if (doublePartition != null) {
+            doublePartition.reset();
         }
     }
 }

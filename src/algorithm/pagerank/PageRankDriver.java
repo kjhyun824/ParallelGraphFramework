@@ -1,8 +1,7 @@
 package algorithm.pagerank;
 
 import graph.DirectedGraph;
-import graph.partition.DoubleNodePartition;
-import graph.partition.GraphPartition;
+import graph.partition.DoublePartition;
 import task.*;
 import thread.TaskWaitingRunnable;
 import thread.ThreadUtil;
@@ -22,8 +21,7 @@ public class PageRankDriver {
     int iteration;
     double dampingFactor;
 
-    DirectedGraph graph;
-    GraphPartition graphPartition;
+    DirectedGraph<DoublePartition> graph;
     DoubleBinaryOperator updateFunction;
     LinkedBlockingQueue<Task> taskQueue;
     TaskWaitingRunnable runnable;
@@ -33,24 +31,21 @@ public class PageRankDriver {
     Task[] workTasks;
     Task[] barrierTasks;
 
-    public PageRankDriver(DirectedGraph graph, double dampingFactor, int iteration, int numThreads) {
+    public PageRankDriver(DirectedGraph<DoublePartition> graph, double dampingFactor, int iteration, int numThreads) {
         this.graph = graph;
         this.dampingFactor = dampingFactor;
         this.iteration = iteration;
         this.numThreads = numThreads;
-
-        graphPartition = graph.getPartitionInstance();
         init();
     }
 
     public void init() {
-        GraphPartition graphPartition = graph.getPartitionInstance();
         int numNodes = graph.getNumNodes();
-        int numPartitions = graphPartition.getNumPartitions();
+        int numPartitions = graph.getNumPartitions();
         double pageRankPartValue = getInitPageRankValue(dampingFactor, (double) numNodes);
 
         updateFunction = getUpdateFunction();
-        DoubleNodePartition.setUpdateFunction(updateFunction);
+        DoublePartition.setUpdateFunction(updateFunction);
 
         initTasks = new Task[numPartitions];
         workTasks = new Task[numPartitions];
@@ -116,7 +111,7 @@ public class PageRankDriver {
     }
 
     public void _printPageRankSum() {
-        DoubleNodePartition[] partitions = (DoubleNodePartition[]) graphPartition.getPartitions();
+        DoublePartition[] partitions = graph.getPartitions();
         ArrayList<Double> pagerank = new ArrayList<>();
         double sum = 0.0d;
 
@@ -143,11 +138,11 @@ public class PageRankDriver {
 
         for (int i = 0; i < sampleData.length; i++) {
             int node = sampleData[i];
-            int partitionNumber = graphPartition.getPartitionId(node);
-            int nodePosition = graphPartition.getNodePositionInPart(node);
+            int partitionNumber = graph.getPartitionId(node);
+            int nodePosition = graph.getNodePositionInPart(node);
 
-            DoubleNodePartition doubleNodePartition = (DoubleNodePartition) graphPartition.getPartition(partitionNumber);
-            pageRank[i] = doubleNodePartition.getVertexValue(nodePosition);
+            DoublePartition doublePartition = graph.getPartition(partitionNumber);
+            pageRank[i] = doublePartition.getVertexValue(nodePosition);
 
 //            System.out.println(sampleData[i] + " : " + graph.getNode(node).getInDegree() + " : " + graph.getNode(node).getOutDegree());
         }

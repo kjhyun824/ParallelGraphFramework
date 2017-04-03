@@ -3,26 +3,23 @@ package algorithm.wcc;
 import graph.DirectedGraph;
 import graph.GraphAlgorithmInterface;
 import graph.Node;
-import graph.partition.IntegerGraphPartition;
-import graph.partition.IntegerNodePartition;
+import graph.partition.IntegerPartition;
 
 public class WCCForwardTraversalStart implements GraphAlgorithmInterface {
     static final byte ACTIVE = 1;
 
-    DirectedGraph graph;
-    IntegerGraphPartition graphPartition;
-    IntegerNodePartition partition;
+    DirectedGraph<IntegerPartition> graph;
+    IntegerPartition partition;
 
-    public WCCForwardTraversalStart(DirectedGraph<IntegerGraphPartition> graph) {
+    public WCCForwardTraversalStart(DirectedGraph<IntegerPartition> graph) {
         this.graph = graph;
-        graphPartition = graph.getPartitionInstance();
     }
 
     @Override
     public void execute(int partitionId) {
-        partition = graphPartition.getPartition(partitionId);
+        partition = graph.getPartition(partitionId);
         int partitionSize = partition.getSize();
-        int expOfPartitionSize = graphPartition.getExpOfPartitionSize();
+        int expOfPartitionSize = graph.getExpOfPartitionSize();
         int offset = partitionId << expOfPartitionSize;
 
         for (int i = 0; i < partitionSize; i++) {

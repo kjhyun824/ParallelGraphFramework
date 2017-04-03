@@ -1,17 +1,30 @@
-package algorithm.wcc;
+package algorithm.bfs;
 
 import graph.DirectedGraph;
 import graph.GraphAlgorithmInterface;
 import graph.Node;
 import graph.partition.IntegerPartition;
 
-public class WCCExecutor implements GraphAlgorithmInterface{
+public class BFSExecutor implements GraphAlgorithmInterface {
 
     DirectedGraph<IntegerPartition> graph;
     IntegerPartition partition;
+    static int currentLevel;
 
-    WCCExecutor(DirectedGraph<IntegerPartition> graph) {
+    BFSExecutor(DirectedGraph<IntegerPartition> graph) {
         this.graph = graph;
+    }
+
+    public static void updateLevel() {
+        currentLevel++;
+    }
+
+    public static void setLevel(int level) {
+        currentLevel = level;
+    }
+
+    public static int getLevel() {
+        return currentLevel;
     }
 
     @Override
@@ -23,16 +36,19 @@ public class WCCExecutor implements GraphAlgorithmInterface{
 
         for (int i = 0; i < partitionSize; i++) {
             int nodeId = offset + i;
+            int nodePositionInPart = graph.getNodePositionInPart(nodeId);
 
-            Node srcNode = graph.getNode(nodeId);
+            if (partition.getVertexValue(nodePositionInPart) == currentLevel) {
+                Node srcNode = graph.getNode(nodeId);
 
-            if(srcNode != null) {
-                update(srcNode,nodeId);
+                if (srcNode != null) {
+                    update(srcNode);
+                }
             }
         }
     }
 
-    public void update(Node srcNode,int nodeId) {
+    public void update(Node srcNode) {
         int neighborListSize = srcNode.neighborListSize();
 
         for (int j = 0; j < neighborListSize; j++) {
@@ -40,8 +56,13 @@ public class WCCExecutor implements GraphAlgorithmInterface{
             int destPartitionId = graph.getPartitionId(destId);
             IntegerPartition destPartition = graph.getPartition(destPartitionId);
             int destPosition = graph.getNodePositionInPart(destId);
+            double destLevel = destPartition.getVertexValue(destPosition);    //vertexValue is level
 
-            destPartition.update(destPosition,nodeId);
+            if (destLevel == 0) {
+                int updateLevel = currentLevel + 1;
+                destPartition.update(destPosition, updateLevel);
+                destPartition.setPartitionActiveValue((byte) (updateLevel));
+            }
         }
     }
 

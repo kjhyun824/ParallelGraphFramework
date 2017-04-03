@@ -3,25 +3,22 @@ package algorithm.scc;
 import graph.DirectedGraph;
 import graph.GraphAlgorithmInterface;
 import graph.Node;
-import graph.partition.IntegerGraphPartition;
-import graph.partition.IntegerNodePartition;
+import graph.partition.IntegerPartition;
 
 public class SCCForwardTraversalRest implements GraphAlgorithmInterface {
-    DirectedGraph graph;
-    IntegerGraphPartition graphPartition;
+    DirectedGraph<IntegerPartition> graph;
     boolean[] isInActive;
 
-    public SCCForwardTraversalRest(DirectedGraph<IntegerGraphPartition> graph, boolean[] isInActive) {
+    public SCCForwardTraversalRest(DirectedGraph<IntegerPartition> graph, boolean[] isInActive) {
         this.graph = graph;
         this.isInActive = isInActive;
-        graphPartition = graph.getPartitionInstance();
     }
 
     @Override
     public void execute(int partitionId) {
-        int partitionSize = graphPartition.getPartition(partitionId).getSize();
+        int partitionSize = graph.getPartition(partitionId).getSize();
         int offset = partitionId * partitionSize;
-        IntegerNodePartition partition = graphPartition.getPartition(partitionId);
+        IntegerPartition partition = graph.getPartition(partitionId);
 
         for (int i = 0; i < partitionSize; i++) {
             int nodeId = offset + i;
@@ -37,7 +34,7 @@ public class SCCForwardTraversalRest implements GraphAlgorithmInterface {
                         int neighborId = node.getNeighbor(j);
 
                         if (!isInActive[neighborId]) {
-                            int nodeIdPositionInPart = graphPartition.getNodePositionInPart(neighborId);
+                            int nodeIdPositionInPart = graph.getNodePositionInPart(neighborId);
                             partition.update(nodeIdPositionInPart, colorId);
                         }
                     }

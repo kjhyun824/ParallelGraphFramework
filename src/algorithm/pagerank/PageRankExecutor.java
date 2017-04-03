@@ -1,22 +1,22 @@
 package algorithm.pagerank;
 
 import graph.DirectedGraph;
-import graph.partition.DoubleNodePartition;
+import graph.partition.DoublePartition;
 
 public class PageRankExecutor
         extends PageRank {
 
-    PageRankExecutor(DirectedGraph graph, double dampingFactor) {
+    PageRankExecutor(DirectedGraph<DoublePartition> graph, double dampingFactor) {
         super(graph, dampingFactor);
     }
 
     @Override
     public void execute(int partitionId) {
-        doubleNodePartition = (DoubleNodePartition) graphPartition.getPartition(partitionId);
-        int partitionLength = doubleNodePartition.getSize();
+        doublePartition = graph.getPartition(partitionId);
+        int partitionLength = doublePartition.getSize();
 
 		for (int i = 0; i < partitionLength; i++) {
-			int nodeId = graphPartition.getNodeNumberInPart(partitionId, i);
+			int nodeId = graph.getNodeNumberInPart(partitionId, i);
 			srcNode = graph.getNode(nodeId);
 
 			if (srcNode != null) {
@@ -27,22 +27,22 @@ public class PageRankExecutor
 
     public void update(int entry) {
         int neighborListSize = srcNode.neighborListSize();
-        double scatteredPageRank = getScatteredPageRank(doubleNodePartition, entry, neighborListSize);
+        double scatteredPageRank = getScatteredPageRank(doublePartition, entry, neighborListSize);
 
         for (int j = 0; j < neighborListSize; j++) {
             int dest = srcNode.getNeighbor(j);
-            int destPartitionNumber = graphPartition.getPartitionId(dest);
+            int destPartitionNumber = graph.getPartitionId(dest);
 
-            DoubleNodePartition destDoubleNodePartition = (DoubleNodePartition) graphPartition.getPartition(destPartitionNumber);
+            DoublePartition destDoublePartition = graph.getPartition(destPartitionNumber);
 
-            int destPosition = graphPartition.getNodePositionInPart(dest);
+            int destPosition = graph.getNodePositionInPart(dest);
 
-            destDoubleNodePartition.updateNextTable(destPosition, scatteredPageRank);
+            destDoublePartition.updateNextTable(destPosition, scatteredPageRank);
         }
     }
 
-    public double getScatteredPageRank(DoubleNodePartition doubleNodePartition, int index, int neighborListSize) {
-        return dampingFactor * doubleNodePartition.getVertexValue(index) / (double) neighborListSize;
+    public double getScatteredPageRank(DoublePartition doublePartition, int index, int neighborListSize) {
+        return dampingFactor * doublePartition.getVertexValue(index) / (double) neighborListSize;
     }
 
     @Override

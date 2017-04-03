@@ -3,22 +3,20 @@ package algorithm.scc;
 import graph.DirectedGraph;
 import graph.GraphAlgorithmInterface;
 import graph.Node;
-import graph.partition.IntegerGraphPartition;
+import graph.partition.IntegerPartition;
 
 public class SCCTrim implements GraphAlgorithmInterface {
-    DirectedGraph graph;
-    IntegerGraphPartition graphPartition;
+    DirectedGraph<IntegerPartition> graph;
     boolean[] isInActive;
 
-    public SCCTrim(DirectedGraph<IntegerGraphPartition> graph, boolean[] isInActive) {
+    public SCCTrim(DirectedGraph<IntegerPartition> graph, boolean[] isInActive) {
         this.graph = graph;
         this.isInActive = isInActive;
-        graphPartition = graph.getPartitionInstance();
     }
 
     @Override
     public void execute(int partitionId) {
-        int partitionSize = graphPartition.getPartition(partitionId).getSize();
+        int partitionSize = graph.getPartition(partitionId).getSize();
         int offset = partitionId * partitionSize;
 
         for (int i = 0; i < partitionSize; i++) {

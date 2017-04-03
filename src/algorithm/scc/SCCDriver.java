@@ -1,8 +1,7 @@
 package algorithm.scc;
 
 import graph.DirectedGraph;
-import graph.partition.IntegerGraphPartition;
-import graph.partition.IntegerNodePartition;
+import graph.partition.IntegerPartition;
 import task.Task;
 import task.TaskBarrier;
 import thread.TaskWaitingRunnable;
@@ -11,14 +10,12 @@ import thread.ThreadUtil;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.function.DoubleBinaryOperator;
 import java.util.function.IntBinaryOperator;
 
 public class SCCDriver {
     int numThreads;
 
-    DirectedGraph<IntegerGraphPartition> graph;
-    IntegerGraphPartition graphPartition;
+    DirectedGraph<IntegerPartition> graph;
     IntBinaryOperator updateFunction;
     LinkedBlockingQueue<Task> taskQueue;
     TaskWaitingRunnable runnable;
@@ -32,21 +29,20 @@ public class SCCDriver {
 
     boolean[] isInActiveNode;
 
-    public SCCDriver(DirectedGraph<IntegerGraphPartition> graph, int numThreads) {
+    public SCCDriver(DirectedGraph<IntegerPartition> graph, int numThreads) {
         this.graph = graph;
         this.numThreads = numThreads;
-        graphPartition = graph.getPartitionInstance();
         isInActiveNode = new boolean[graph.getMaxNodeId() + 1];
 
         init();
     }
 
     public void init() {
-        int numPartitions = graphPartition.getNumPartitions();
+        int numPartitions = graph.getNumPartitions();
         graph.generateTransposeEdges(); // G^t = (V, E^T)
 
         updateFunction = getUpdateFunction();
-        IntegerNodePartition.setUpdateFunction(updateFunction);
+        IntegerPartition.setUpdateFunction(updateFunction);
 
         trimTasks = new Task[numPartitions];
         fwTraverseStartTasks = new Task[numPartitions];
@@ -88,7 +84,7 @@ public class SCCDriver {
         }
 
         System.out.println();
-        IntegerNodePartition partition = graphPartition.getPartition(0);
+        IntegerPartition partition = graph.getPartition(0);
         for (int i = 0; i < partition.getSize(); i++) {
             System.out.print(" " + partition.getVertexValue(i));
         }
@@ -123,42 +119,3 @@ public class SCCDriver {
     }
 }
 
-//
-//    public void doFwStart() {
-//        int maxNodeId = graphT.getMaxNodeId();
-//
-//        for (int i = 0; i <= maxNodeId; i++) {
-//            if (!isInActiveNode[i]) {
-//                Node node = graphT.getNode(i);
-//                if (node != null) {
-//                    node.setColorId(i);
-//                    sendOwnIdToOutNeighbor(node);
-//                }
-//            }
-//        }
-//    }
-//
-//    public void doFwRest() {
-//        int maxNodeId = graphT.getMaxNodeId();
-//
-//        for (int i = 0; i <= maxNodeId; i++) {
-//            if (!isInActiveNode[i]) {
-//                Node node = graphT.getNode(i);
-//                if (node != null) {
-//
-//                }
-//            }
-//        }
-//    }
-//
-//    public void sendOwnIdToOutNeighbor(Node node) {
-//        int colorId = node.getColorId();
-//        int neighborListSize = node.neighborListSize();
-//
-//        for (int i = 0; i < neighborListSize; i++) {
-//            int neighborId = node.getNeighbor(i);
-//            Node neighborNode = graph.getNode(neighborId);
-//            neighborNode.addColorId(colorId);
-//        }
-//    }
-//}
