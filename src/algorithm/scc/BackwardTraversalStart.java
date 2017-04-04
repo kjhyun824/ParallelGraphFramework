@@ -5,20 +5,22 @@ import graph.GraphAlgorithmInterface;
 
 public class BackwardTraversalStart implements GraphAlgorithmInterface{
     DirectedGraph graph;
+    final int partitionId;
     boolean[] isInActive;
 
-    public BackwardTraversalStart (DirectedGraph graph, boolean[] isInActive) {
+    public BackwardTraversalStart (int partitionId, DirectedGraph graph, boolean[] isInActive) {
+        this.partitionId = partitionId;
         this.graph = graph;
         this.isInActive = isInActive;
     }
 
     @Override
-    public void execute(int partitionId) {
+    public void execute() {
         
     }
 
     @Override
-    public void reset(int partitionId) {
+    public void reset() {
 
     }
 }

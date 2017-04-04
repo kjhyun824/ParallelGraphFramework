@@ -1,6 +1,7 @@
 package algorithm.pagerank;
 
 import graph.DirectedGraph;
+import graph.Graph;
 import graph.partition.DoublePartition;
 import task.*;
 import thread.TaskWaitingRunnable;
@@ -21,7 +22,7 @@ public class PageRankDriver {
     int iteration;
     double dampingFactor;
 
-    DirectedGraph<DoublePartition> graph;
+    Graph<DoublePartition> graph;
     DoubleBinaryOperator updateFunction;
     LinkedBlockingQueue<Task> taskQueue;
     TaskWaitingRunnable runnable;
@@ -31,7 +32,7 @@ public class PageRankDriver {
     Task[] workTasks;
     Task[] barrierTasks;
 
-    public PageRankDriver(DirectedGraph<DoublePartition> graph, double dampingFactor, int iteration, int numThreads) {
+    public PageRankDriver(Graph<DoublePartition> graph, double dampingFactor, int iteration, int numThreads) {
         this.graph = graph;
         this.dampingFactor = dampingFactor;
         this.iteration = iteration;
@@ -56,12 +57,12 @@ public class PageRankDriver {
         ThreadUtil.createAndStartThreads(numThreads, runnable);
 
         for (int i = 0; i < numPartitions; i++) {
-            initTasks[i] = new Task(i, new PageRankInit(graph, dampingFactor));
-            workTasks[i] = new Task(i, new PageRankExecutor(graph, dampingFactor));
+            initTasks[i] = new Task(new PageRankInit(i, graph, dampingFactor));
+            workTasks[i] = new Task(new PageRankExecutor(i, graph, dampingFactor));
         }
 
         for (int i = 0; i < numThreads; i++) {
-            barrierTasks[i] = new Task(i, new TaskBarrier(i, barriers));
+            barrierTasks[i] = new Task(new TaskBarrier(barriers));
         }
     }
 

@@ -1,54 +1,60 @@
 package algorithm.wcc;
 
-import graph.DirectedGraph;
+import graph.Graph;
 import graph.GraphAlgorithmInterface;
 import graph.Node;
 import graph.partition.IntegerPartition;
 
 public class WCCForwardTraversalRest implements GraphAlgorithmInterface {
     static final byte ACTIVE = 1;
+    static final byte IN_ACTIVE = 0;
 
-    DirectedGraph<IntegerPartition> graph;
+    Graph<IntegerPartition> graph;
     IntegerPartition partition;
+    final int partitionId;
+    int offset;
 
-    public WCCForwardTraversalRest(DirectedGraph<IntegerPartition> graph) {
+    public WCCForwardTraversalRest(int partitionId, Graph<IntegerPartition> graph) {
+        this.partitionId = partitionId;
         this.graph = graph;
+        partition = graph.getPartition(partitionId);
+        offset = partitionId << graph.getExpOfPartitionSize();
     }
 
     @Override
-    public void execute(int partitionId) {
-        partition = graph.getPartition(partitionId);
+    public void execute() {
         int partitionSize = partition.getSize();
-        int expOfPartitionSize = graph.getExpOfPartitionSize();
-        int offset = partitionId << expOfPartitionSize;
-
-        IntegerPartition partition = graph.getPartition(partitionId);
 
         for (int i = 0; i < partitionSize; i++) {
             int nodeId = offset + i;
-            int colorId = partition.getVertexValue(i);
+            int srcColor = partition.getVertexValue(i);
 
-            if (partition.checkNodeIsActive(nodeId, ACTIVE)) {
+            if (partition.checkNodeIsActive(i, ACTIVE)) {
+                partition.setNodeIsActive(i, IN_ACTIVE);
+
                 Node node = graph.getNode(nodeId);
+                int neighborListSize = node.neighborListSize();
 
-                if (node != null) {
-                    int neighborListSize = node.neighborListSize();
+                for (int j = 0; j < neighborListSize; j++) {
+                    int destId = node.getNeighbor(j);
+                    int destPartitionId = graph.getPartitionId(destId);
 
-                    for (int j = 0; j < neighborListSize; j++) {
-                        int neighborId = node.getNeighbor(j);
+                    IntegerPartition destPartition = graph.getPartition(destPartitionId);
+                    int destPosition = graph.getNodePositionInPart(destId);
+                    destPartition.update(destPosition, srcColor);
 
-                        if (partition.checkNodeIsActive(neighborId, ACTIVE)) {
-                            int nodeIdPositionInPart = graph.getNodePositionInPart(neighborId);
-                            partition.update(nodeIdPositionInPart, colorId);
-                        }
+                    if (destPartition.getVertexValue(destPosition) == srcColor) {
+                        destPartition.setNodeIsActive(destPosition, ACTIVE);
+                        destPartition.setPartitionActiveValue(ACTIVE);
                     }
+
                 }
             }
         }
     }
 
     @Override
-    public void reset(int partitionId) {
+    public void reset() {
 
     }
 }

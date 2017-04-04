@@ -1,21 +1,24 @@
 package algorithm.scc;
 
 import graph.DirectedGraph;
+import graph.Graph;
 import graph.GraphAlgorithmInterface;
 import graph.Node;
 import graph.partition.IntegerPartition;
 
 public class SCCForwardTraversalRest implements GraphAlgorithmInterface {
-    DirectedGraph<IntegerPartition> graph;
+    Graph<IntegerPartition> graph;
+    final int partitionId;
     boolean[] isInActive;
 
-    public SCCForwardTraversalRest(DirectedGraph<IntegerPartition> graph, boolean[] isInActive) {
+    public SCCForwardTraversalRest(int partitionId, Graph<IntegerPartition> graph, boolean[] isInActive) {
+        this.partitionId = partitionId;
         this.graph = graph;
         this.isInActive = isInActive;
     }
 
     @Override
-    public void execute(int partitionId) {
+    public void execute() {
         int partitionSize = graph.getPartition(partitionId).getSize();
         int offset = partitionId * partitionSize;
         IntegerPartition partition = graph.getPartition(partitionId);
@@ -44,7 +47,7 @@ public class SCCForwardTraversalRest implements GraphAlgorithmInterface {
     }
 
     @Override
-    public void reset(int partitionId) {
+    public void reset() {
 
     }
 }

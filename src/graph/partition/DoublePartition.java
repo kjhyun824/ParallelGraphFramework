@@ -29,15 +29,30 @@ public class DoublePartition extends Partition {
     }
 
     public final void setVertexValue(int entry, double value) {
-        tables[tablePos].asyncSet(entry, value);
+        if (entry < asyncRangeSize) {
+            tables[tablePos].asyncSet(entry, value);
+        }
+        else {
+            tables[tablePos].set(entry, value);
+        }
     }
 
     public final void setNextVertexValue(int entry, double value) {
-        tables[tablePos + 1].asyncSet(entry, value);
+        if (entry < asyncRangeSize) {
+            tables[tablePos + 1].asyncSet(entry, value);
+        }
+        else {
+            tables[tablePos + 1].set(entry, value);
+        }
     }
 
     public final double getVertexValue(int entry) {
-        return tables[tablePos].asyncGet(entry);
+        if (entry < asyncRangeSize) {
+            return tables[tablePos].asyncGet(entry);
+        }
+        else {
+            return tables[tablePos].get(entry);
+        }
     }
 
     public final void update(int entry, double value) {
@@ -47,7 +62,8 @@ public class DoublePartition extends Partition {
     public final void update(int pos, int entry, double value) {
         if (entry < asyncRangeSize) { // TODO : think about multiple ranges in a single partition
             tables[pos].asyncGetAndAccumulate(entry, value, updateFunction);
-        } else {
+        }
+        else {
             tables[pos].getAndAccumulate(entry, value, updateFunction);
         }
     }

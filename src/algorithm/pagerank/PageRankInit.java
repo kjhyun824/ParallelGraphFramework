@@ -1,21 +1,23 @@
 package algorithm.pagerank;
 
-import graph.DirectedGraph;
+import graph.Graph;
 import graph.GraphAlgorithmInterface;
 import graph.Node;
 import graph.partition.DoublePartition;
 
 public class PageRankInit implements GraphAlgorithmInterface{
-    DirectedGraph<DoublePartition> graph;
+    Graph<DoublePartition> graph;
     DoublePartition doublePartition;
     Node srcNode;
 
+    final int partitionId;
     double dampingFactor;
     double initialValue;
     double stopSurfValue;
     boolean isFirst;
 
-    PageRankInit(DirectedGraph<DoublePartition> graph, double dampingFactor) {
+    PageRankInit(int partitionId, Graph<DoublePartition> graph, double dampingFactor) {
+        this.partitionId = partitionId;
         this.graph = graph;
         this.dampingFactor = dampingFactor;
 
@@ -25,12 +27,12 @@ public class PageRankInit implements GraphAlgorithmInterface{
     }
 
     @Override
-    public void execute(int partitionId) {
+    public void execute() {
         if (!isFirst) {
             initialValue = stopSurfValue;
         }
         else {
-            initNextTable(partitionId);
+            initNextTable();
         }
 
         doublePartition = graph.getPartition(partitionId);
@@ -51,7 +53,7 @@ public class PageRankInit implements GraphAlgorithmInterface{
         isFirst = false;
     }
 
-    public void initNextTable(int partitionId) {
+    public void initNextTable() {
         DoublePartition doublePartition = graph.getPartition(partitionId);
         int partitionSize = doublePartition.getSize();
 
@@ -69,7 +71,7 @@ public class PageRankInit implements GraphAlgorithmInterface{
         return (1 - dampingFactor) / (double) graph.getNumNodes();
     }
 
-    public void reset(int taskId) {
+    public void reset() {
         isFirst = true;
         initialValue = getInitPageRankValue(0);
         if (doublePartition != null) {

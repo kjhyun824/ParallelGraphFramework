@@ -8,12 +8,12 @@ import java.util.concurrent.CyclicBarrier;
 public class TaskBarrier implements GraphAlgorithmInterface {
     CyclicBarrier barriers;
     
-    public TaskBarrier(int id, CyclicBarrier barrier) {
+    public TaskBarrier(CyclicBarrier barrier) {
         this.barriers = barrier;
     }
     
     @Override
-    public void execute(int id) {
+    public void execute() {
         try {
             barriers.await();
         } catch (InterruptedException e) {
@@ -24,7 +24,7 @@ public class TaskBarrier implements GraphAlgorithmInterface {
     }
     
     @Override
-    public void reset(int taskId) {
+    public void reset() {
         
     }
 }

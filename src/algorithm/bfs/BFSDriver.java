@@ -1,6 +1,6 @@
 package algorithm.bfs;
 
-import graph.DirectedGraph;
+import graph.Graph;
 import graph.Node;
 import graph.partition.IntegerPartition;
 import task.*;
@@ -16,7 +16,7 @@ public class BFSDriver {
     int numThreads;
     boolean isDone;
 
-    DirectedGraph<IntegerPartition> graph;
+    Graph<IntegerPartition> graph;
     IntBinaryOperator updateFunction;
     LinkedBlockingQueue<Task> taskQueue;
     TaskWaitingRunnable runnable;
@@ -27,7 +27,7 @@ public class BFSDriver {
 
     BFSExecutor[] bfsExecutors;
 
-    public BFSDriver(DirectedGraph<IntegerPartition> graph, int numThreads) {
+    public BFSDriver(Graph<IntegerPartition> graph, int numThreads) {
         this.graph = graph;
         this.numThreads = numThreads;
         this.isDone = false;
@@ -51,12 +51,12 @@ public class BFSDriver {
         ThreadUtil.createAndStartThreads(numThreads, runnable);
 
         for (int i = 0; i < numPartitions; i++) {
-            bfsExecutors[i] = new BFSExecutor(graph);
-            workTasks[i] = new Task(i, bfsExecutors[i]);
+            bfsExecutors[i] = new BFSExecutor(i, graph);
+            workTasks[i] = new Task(bfsExecutors[i]);
         }
 
         for (int i = 0; i < numThreads; i++) {
-            barrierTasks[i] = new Task(i, new TaskBarrier(i, barriers));
+            barrierTasks[i] = new Task(new TaskBarrier(barriers));
         }
     }
 

@@ -1,17 +1,21 @@
 package algorithm.bfs;
 
 import graph.DirectedGraph;
+import graph.Graph;
 import graph.GraphAlgorithmInterface;
 import graph.Node;
 import graph.partition.IntegerPartition;
 
 public class BFSExecutor implements GraphAlgorithmInterface {
 
-    DirectedGraph<IntegerPartition> graph;
+    Graph<IntegerPartition> graph;
     IntegerPartition partition;
+
+    final int partitionId;
     static int currentLevel;
 
-    BFSExecutor(DirectedGraph<IntegerPartition> graph) {
+    BFSExecutor(int partitionId, Graph<IntegerPartition> graph) {
+        this.partitionId = partitionId;
         this.graph = graph;
     }
 
@@ -28,7 +32,7 @@ public class BFSExecutor implements GraphAlgorithmInterface {
     }
 
     @Override
-    public void execute(int partitionId) {
+    public void execute() {
         partition = graph.getPartition(partitionId);
         int partitionSize = partition.getSize();
         int expOfPartitionSize = graph.getExpOfPartitionSize();
@@ -67,7 +71,7 @@ public class BFSExecutor implements GraphAlgorithmInterface {
     }
 
     @Override
-    public void reset(int taskId) {
+    public void reset() {
 
     }
 }

@@ -1,16 +1,16 @@
 package graph;
 
-public class DirectedGraph extends Graph {
-    static DirectedGraph instance = null;
+public class UnDirectedGraph extends Graph {
+    static UnDirectedGraph instance = null;
 
-    public static DirectedGraph getInstance(int expOfPartitionSize) {
+    public static UnDirectedGraph getInstance(int expOfPartitionSize) {
         if (instance == null) {
-            instance = new DirectedGraph(expOfPartitionSize);
+            instance = new UnDirectedGraph(expOfPartitionSize);
         }
         return instance;
     }
 
-    public DirectedGraph(int expOfPartitionSize) {
+    public UnDirectedGraph(int expOfPartitionSize) {
         super(expOfPartitionSize);
     }
 
@@ -23,8 +23,11 @@ public class DirectedGraph extends Graph {
         boolean isAdded = srcNode.addNeighborId(destNodeId); // Do not allow duplication
 
         if (isAdded) {
+            destNode.addNeighborId(srcNodeId);
+            srcNode.incrementInDegree();
             srcNode.incrementOutDegree();
             destNode.incrementInDegree();
+            destNode.incrementOutDegree();
             numEdges++;
         }
 

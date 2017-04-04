@@ -1,7 +1,8 @@
-import algorithm.bfs.BFSDriver;
 import algorithm.wcc.WCCDriver;
 import graph.DirectedGraph;
+import graph.Graph;
 import graph.GraphUtil;
+import graph.UnDirectedGraph;
 import graph.partition.IntegerPartition;
 
 public class WCCMain {
@@ -14,7 +15,7 @@ public class WCCMain {
         int asyncRangeSize = ((1 << 16) * 0);
 
         long start = System.currentTimeMillis();
-        DirectedGraph<IntegerPartition> graph = DirectedGraph.getInstance(expOfPartitionSize);
+        Graph<IntegerPartition> graph = UnDirectedGraph.getInstance(expOfPartitionSize);
         GraphUtil.load(graph, inputFile);
         graph.generatePartition(numValuesPerNode, asyncRangeSize, IntegerPartition.class);
         GraphUtil.finalizeLoading(graph);

@@ -1,5 +1,6 @@
 import algorithm.bfs.BFSDriver;
 import graph.DirectedGraph;
+import graph.Graph;
 import graph.GraphUtil;
 import graph.partition.IntegerPartition;
 
@@ -14,7 +15,7 @@ public class BFSMain {
 
         long start = System.currentTimeMillis();
 
-        DirectedGraph<IntegerPartition> graph = DirectedGraph.getInstance(expOfPartitionSize);
+        Graph<IntegerPartition> graph = DirectedGraph.getInstance(expOfPartitionSize);
         GraphUtil.load(graph, inputFile);
         graph.generatePartition(numValuesPerNode, asyncRangeSize, IntegerPartition.class);
         GraphUtil.finalizeLoading(graph);

@@ -10,7 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class GraphUtil {
-    public static DirectedGraph load(DirectedGraph graph, String inputFile) {
+    public static Graph load(Graph graph, String inputFile) {
         Path path = Paths.get(inputFile);
         try (BufferedReader reader = Files.newBufferedReader(path)) {
             readEdgeFromFile(graph, reader);
@@ -21,7 +21,7 @@ public class GraphUtil {
         return graph;
     }
 
-    static void readEdgeFromFile(DirectedGraph graph, BufferedReader reader)
+    static void readEdgeFromFile(Graph graph, BufferedReader reader)
             throws IOException {
         String line;
         while ((line = reader.readLine()) != null) {
@@ -50,12 +50,12 @@ public class GraphUtil {
         return graphT;
     }
 
-    public static void finalizeLoading(DirectedGraph graph) {
+    public static void finalizeLoading(Graph graph) {
         graph.finalizeLoading();
     }
 
 
-    public static void writeGraph(DirectedGraph graph, String fileName) {
+    public static void writeGraph(Graph graph, String fileName) {
         try (FileWriter fw = new FileWriter(fileName, true);
                 BufferedWriter bw = new BufferedWriter(fw); PrintWriter out = new PrintWriter(bw)) {
 

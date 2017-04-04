@@ -32,15 +32,30 @@ public class IntegerPartition extends Partition {
     }
 
     public final void setVertexValue(int entry, int value) {
-        tables[tablePos].set(entry, value);
+        if (entry < asyncRangeSize) {
+            tables[tablePos].asyncSet(entry, value);
+        }
+        else {
+            tables[tablePos].set(entry, value);
+        }
     }
 
     public final void setNextVertexValue(int entry, int value) {
-        tables[tablePos + 1].set(entry, value);
+        if (entry < asyncRangeSize) {
+            tables[tablePos + 1].asyncSet(entry, value);
+        }
+        else {
+            tables[tablePos + 1].set(entry, value);
+        }
     }
 
     public final int getVertexValue(int entry) {
-        return tables[tablePos].get(entry);
+        if (entry < asyncRangeSize) {
+            return tables[tablePos].asyncGet(entry);
+        }
+        else {
+            return tables[tablePos].get(entry);
+        }
     }
 
     public final void update(int entry, int value) {

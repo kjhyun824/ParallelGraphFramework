@@ -1,23 +1,26 @@
 package algorithm.pagerank;
 
-import graph.DirectedGraph;
+import graph.Graph;
 import graph.GraphAlgorithmInterface;
 import graph.Node;
 import graph.partition.DoublePartition;
 
 public class PageRankExecutor implements GraphAlgorithmInterface{
-    DirectedGraph<DoublePartition> graph;
+    Graph<DoublePartition> graph;
     DoublePartition doublePartition;
     Node srcNode;
+
+    final int partitionId;
     double dampingFactor;
 
-    PageRankExecutor(DirectedGraph<DoublePartition> graph, double dampingFactor) {
+    PageRankExecutor(int partitionId, Graph<DoublePartition> graph, double dampingFactor) {
+        this.partitionId = partitionId;
         this.graph = graph;
         this.dampingFactor = dampingFactor;
     }
 
     @Override
-    public void execute(int partitionId) {
+    public void execute() {
         doublePartition = graph.getPartition(partitionId);
         int partitionSize = doublePartition.getSize();
         int expOfPartitionSize = graph.getExpOfPartitionSize();
@@ -53,7 +56,7 @@ public class PageRankExecutor implements GraphAlgorithmInterface{
     }
 
     @Override
-    public void reset(int taskId) {
+    public void reset() {
 
     }
 }

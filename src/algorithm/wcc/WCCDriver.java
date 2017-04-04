@@ -1,6 +1,6 @@
 package algorithm.wcc;
 
-import graph.DirectedGraph;
+import graph.Graph;
 import graph.partition.IntegerPartition;
 import task.*;
 import thread.*;
@@ -15,17 +15,19 @@ public class WCCDriver {
     int numThreads;
     boolean isDone;
 
-    DirectedGraph<IntegerPartition> graph;
+    Graph<IntegerPartition> graph;
     IntBinaryOperator updateFunction;
     LinkedBlockingQueue<Task> taskQueue;
     TaskWaitingRunnable runnable;
     CyclicBarrier barriers;
 
     Task[] fwTraverseStartTasks;
-    Task[] fwTraverseStopTasks;
+    Task[] fwTraverseRestTasks;
     Task[] barrierTasks;
 
-    public WCCDriver(DirectedGraph<IntegerPartition> graph, int numThreads) {
+    byte[] isPartitionActives;
+
+    public WCCDriver(Graph<IntegerPartition> graph, int numThreads) {
         this.graph = graph;
         this.numThreads = numThreads;
         isDone = false;
@@ -39,8 +41,11 @@ public class WCCDriver {
         updateFunction = getUpdateFunction();
         IntegerPartition.setUpdateFunction(updateFunction);
 
+
         fwTraverseStartTasks = new Task[numPartitions];
-        fwTraverseStopTasks = new Task[numPartitions];
+        fwTraverseRestTasks = new Task[numPartitions];
+        isPartitionActives = new byte[numPartitions];
+        barrierTasks = new Task[numThreads];
 
         barriers = new CyclicBarrier(numThreads);
         taskQueue = new LinkedBlockingQueue<>();
@@ -49,32 +54,36 @@ public class WCCDriver {
         ThreadUtil.createAndStartThreads(numThreads, runnable);
 
         for (int i = 0; i < numPartitions; i++) {
-            fwTraverseStartTasks[i] = new Task(i, new WCCForwardTraversalStart(graph));
-            fwTraverseStopTasks[i] = new Task(i, new WCCForwardTraversalRest(graph));
+            fwTraverseStartTasks[i] = new Task(new WCCForwardTraversalStart(i, graph));
+            fwTraverseRestTasks[i] = new Task(new WCCForwardTraversalRest(i, graph));
         }
 
         for (int i = 0; i < numThreads; i++) {
-            barrierTasks[i] = new Task(i, new TaskBarrier(i, barriers));
+            barrierTasks[i] = new Task(new TaskBarrier(barriers));
         }
     }
 
     public void run() {
         runAllTasksOnce(fwTraverseStartTasks);
+        runAllTasksOnce(fwTraverseRestTasks);
 
         while (true) {
-            runSomeTasksOnce(fwTraverseStopTasks);
+            runAllTasksOnce(barrierTasks);
+            busyWaitForSyncStopMilli(10);
+
+            // get PartitionActiveValue;
+            for (int i = 0; i < isPartitionActives.length; i++) {
+                IntegerPartition partition =
+                isPartitionActives[i] = graph.getPartition(i).getActiveValue();
+
+            }
+
+            runSomeTasksOnce(fwTraverseRestTasks);
             if (isDone) {
                 break;
             }
-            runAllTasksOnce(barrierTasks);
-            busyWaitForSyncStopMilli(10);
         }
-
-        IntegerPartition partition = graph.getPartition(0);
-        for (int i = 0; i < partition.getSize(); i++) {
-            System.out.print(" " + partition.getVertexValue(i));
-        }
-    }
+   }
 
     public void busyWaitForSyncStopMilli(int millisecond) {
         while (taskQueue.size() != 0) {
@@ -88,11 +97,17 @@ public class WCCDriver {
     }
 
     public void runSomeTasksOnce(Task[] tasks) {
-        IntegerPartition[] partitions = graph.getPartitions();
+        int count = 0;
+
         for (int i = 0; i < tasks.length; i++) {
-            if (partitions[i].checkPartitionIsActive(ACTIVE)) {
+            if (isPartitionActives[i] == 1) {
                 taskQueue.offer(tasks[i]);
+                count++;
             }
+        }
+
+        if (count == 0) {
+            isDone = true;
         }
     }
 
@@ -114,6 +129,9 @@ public class WCCDriver {
     }
 
     public void reset() {
-
+        for (int i = 0; i < graph.getNumPartitions(); i++) {
+            graph.getPartition(i).reset();
+        }
+        isDone = false;
     }
 }

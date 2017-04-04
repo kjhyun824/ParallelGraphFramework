@@ -1,6 +1,6 @@
 package algorithm.wcc;
 
-import graph.DirectedGraph;
+import graph.Graph;
 import graph.GraphAlgorithmInterface;
 import graph.Node;
 import graph.partition.IntegerPartition;
@@ -8,19 +8,21 @@ import graph.partition.IntegerPartition;
 public class WCCForwardTraversalStart implements GraphAlgorithmInterface {
     static final byte ACTIVE = 1;
 
-    DirectedGraph<IntegerPartition> graph;
+    Graph<IntegerPartition> graph;
     IntegerPartition partition;
+    final int partitionId;
+    int offset;
 
-    public WCCForwardTraversalStart(DirectedGraph<IntegerPartition> graph) {
+    public WCCForwardTraversalStart(int partitionId, Graph<IntegerPartition> graph) {
+        this.partitionId = partitionId;
         this.graph = graph;
+        partition = graph.getPartition(partitionId);
+        offset = partitionId << graph.getExpOfPartitionSize();
     }
 
     @Override
-    public void execute(int partitionId) {
-        partition = graph.getPartition(partitionId);
+    public void execute() {
         int partitionSize = partition.getSize();
-        int expOfPartitionSize = graph.getExpOfPartitionSize();
-        int offset = partitionId << expOfPartitionSize;
 
         for (int i = 0; i < partitionSize; i++) {
             int nodeId = offset + i;
@@ -28,13 +30,13 @@ public class WCCForwardTraversalStart implements GraphAlgorithmInterface {
 
             if (node != null) {
                 partition.setVertexValue(i, nodeId);
-                partition.setIsActive(i, ACTIVE);
+                partition.setNodeIsActive(i, ACTIVE);
             }
         }
     }
 
     @Override
-    public void reset(int partitionId) {
+    public void reset( ) {
 
     }
 }

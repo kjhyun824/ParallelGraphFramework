@@ -1,6 +1,7 @@
 package algorithm.scc;
 
 import graph.DirectedGraph;
+import graph.Graph;
 import graph.partition.IntegerPartition;
 import task.Task;
 import task.TaskBarrier;
@@ -15,7 +16,7 @@ import java.util.function.IntBinaryOperator;
 public class SCCDriver {
     int numThreads;
 
-    DirectedGraph<IntegerPartition> graph;
+    Graph<IntegerPartition> graph;
     IntBinaryOperator updateFunction;
     LinkedBlockingQueue<Task> taskQueue;
     TaskWaitingRunnable runnable;
@@ -29,7 +30,7 @@ public class SCCDriver {
 
     boolean[] isInActiveNode;
 
-    public SCCDriver(DirectedGraph<IntegerPartition> graph, int numThreads) {
+    public SCCDriver(Graph<IntegerPartition> graph, int numThreads) {
         this.graph = graph;
         this.numThreads = numThreads;
         isInActiveNode = new boolean[graph.getMaxNodeId() + 1];
@@ -57,13 +58,13 @@ public class SCCDriver {
         ThreadUtil.createAndStartThreads(numThreads, runnable);
 
         for (int i = 0; i < numPartitions; i++) {
-            trimTasks[i] = new Task(i, new SCCTrim(graph, isInActiveNode));
-            fwTraverseStartTasks[i] = new Task(i, new SCCForwardTraversalStart(graph));
-            fwTraverseStopTasks[i] = new Task(i, new SCCForwardTraversalRest(graph, isInActiveNode));
+            trimTasks[i] = new Task( new SCCTrim(i, graph, isInActiveNode));
+            fwTraverseStartTasks[i] = new Task(new SCCForwardTraversalStart(i, graph));
+            fwTraverseStopTasks[i] = new Task(new SCCForwardTraversalRest(i, graph, isInActiveNode));
         }
 
         for (int i = 0; i < numThreads; i++) {
-            barrierTasks[i] = new Task(i, new TaskBarrier(i, barriers));
+            barrierTasks[i] = new Task(new TaskBarrier( barriers));
         }
     }
 

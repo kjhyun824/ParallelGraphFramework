@@ -39,12 +39,16 @@ public abstract class Partition {
         return partitionActiveValue == compareValue;
     }
 
+    public byte getActiveValue() {
+        return partitionActiveValue;
+    }
+
     public boolean checkNodeIsActive(int nodeId, byte compareValue) {
         return activeNodeCheckArray[nodeId] == compareValue;
     }
 
-    public void setIsActive(int nodeId, byte value) {
-        activeNodeCheckArray[nodeId] = value;
+    public void setNodeIsActive(int pos, byte value) {
+        activeNodeCheckArray[pos] = value;
     }
 
     public void reset() {
