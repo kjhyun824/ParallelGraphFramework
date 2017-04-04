@@ -73,9 +73,9 @@ public class WCCDriver {
 
             // get PartitionActiveValue;
             for (int i = 0; i < isPartitionActives.length; i++) {
-                IntegerPartition partition =
+                IntegerPartition partition = graph.getPartition(i);
                 isPartitionActives[i] = graph.getPartition(i).getActiveValue();
-
+                partition.setPartitionActiveValue((byte) 0);
             }
 
             runSomeTasksOnce(fwTraverseRestTasks);
