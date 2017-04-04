@@ -1,15 +1,24 @@
 package algorithm.pagerank;
 
 import graph.DirectedGraph;
+import graph.GraphAlgorithmInterface;
+import graph.Node;
 import graph.partition.DoublePartition;
 
-public class PageRankInit extends PageRank {
+public class PageRankInit implements GraphAlgorithmInterface{
+    DirectedGraph<DoublePartition> graph;
+    DoublePartition doublePartition;
+    Node srcNode;
+
+    double dampingFactor;
     double initialValue;
     double stopSurfValue;
     boolean isFirst;
 
     PageRankInit(DirectedGraph<DoublePartition> graph, double dampingFactor) {
-        super(graph, dampingFactor);
+        this.graph = graph;
+        this.dampingFactor = dampingFactor;
+
         initialValue = getInitPageRankValue(0); //initial PageRank Value
         stopSurfValue = getInitPageRankValue(dampingFactor);
         isFirst = true;

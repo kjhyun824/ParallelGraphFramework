@@ -40,9 +40,7 @@ public class PageRankDriver {
     }
 
     public void init() {
-        int numNodes = graph.getNumNodes();
         int numPartitions = graph.getNumPartitions();
-        double pageRankPartValue = getInitPageRankValue(dampingFactor, (double) numNodes);
 
         updateFunction = getUpdateFunction();
         DoublePartition.setUpdateFunction(updateFunction);
@@ -92,10 +90,6 @@ public class PageRankDriver {
         for (int i = 0; i < tasks.length; i++) {
             taskQueue.add(tasks[i]);
         }
-    }
-
-    public double getInitPageRankValue(double dampingFactor, double numNodes) {
-        return (1 - dampingFactor) / numNodes;
     }
 
     public DoubleBinaryOperator getUpdateFunction() {

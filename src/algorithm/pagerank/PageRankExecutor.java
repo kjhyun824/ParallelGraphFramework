@@ -1,28 +1,36 @@
 package algorithm.pagerank;
 
 import graph.DirectedGraph;
+import graph.GraphAlgorithmInterface;
+import graph.Node;
 import graph.partition.DoublePartition;
 
-public class PageRankExecutor
-        extends PageRank {
+public class PageRankExecutor implements GraphAlgorithmInterface{
+    DirectedGraph<DoublePartition> graph;
+    DoublePartition doublePartition;
+    Node srcNode;
+    double dampingFactor;
 
     PageRankExecutor(DirectedGraph<DoublePartition> graph, double dampingFactor) {
-        super(graph, dampingFactor);
+        this.graph = graph;
+        this.dampingFactor = dampingFactor;
     }
 
     @Override
     public void execute(int partitionId) {
         doublePartition = graph.getPartition(partitionId);
-        int partitionLength = doublePartition.getSize();
+        int partitionSize = doublePartition.getSize();
+        int expOfPartitionSize = graph.getExpOfPartitionSize();
+        int offset = partitionId << expOfPartitionSize;
 
-		for (int i = 0; i < partitionLength; i++) {
-			int nodeId = graph.getNodeNumberInPart(partitionId, i);
-			srcNode = graph.getNode(nodeId);
+        for (int i = 0; i < partitionSize; i++) {
+            int nodeId = offset + i;
+            srcNode = graph.getNode(nodeId);
 
-			if (srcNode != null) {
-				update(i);
-			}
-		}
+            if (srcNode != null) {
+                update(i);
+            }
+        }
     }
 
     public void update(int entry) {
@@ -31,10 +39,9 @@ public class PageRankExecutor
 
         for (int j = 0; j < neighborListSize; j++) {
             int dest = srcNode.getNeighbor(j);
-            int destPartitionNumber = graph.getPartitionId(dest);
+            int destPartitionId = graph.getPartitionId(dest);
 
-            DoublePartition destDoublePartition = graph.getPartition(destPartitionNumber);
-
+            DoublePartition destDoublePartition = graph.getPartition(destPartitionId);
             int destPosition = graph.getNodePositionInPart(dest);
 
             destDoublePartition.updateNextTable(destPosition, scatteredPageRank);
