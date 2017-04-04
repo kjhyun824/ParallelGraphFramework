@@ -83,6 +83,22 @@ public class WCCDriver {
                 break;
             }
         }
+
+        IntegerPartition[] partitions = graph.getPartitions();
+        int count = 0;
+
+        for (int i = 0; i < partitions.length; i++) {
+            for (int j = 0; j < partitions[i].getSize(); j++) {
+                int color = partitions[i].getVertexValue(j);
+                if (color == 4847570) {
+                    count++;
+                } else {
+                    System.out.println("NOT 4847570 SET : " + color);
+                }
+            }
+        }
+
+        System.out.println("4847570 SET COUNT : " + count);
    }
 
     public void busyWaitForSyncStopMilli(int millisecond) {

@@ -41,13 +41,13 @@ public class WCCForwardTraversalRest implements GraphAlgorithmInterface {
 
                     IntegerPartition destPartition = graph.getPartition(destPartitionId);
                     int destPosition = graph.getNodePositionInPart(destId);
-                    destPartition.update(destPosition, srcColor);
+                    int destColor = destPartition.getVertexValue(destPosition);
 
-                    if (destPartition.getVertexValue(destPosition) == srcColor) {
+                    if (destColor < srcColor) {
+                        destPartition.update(destPosition, srcColor);
                         destPartition.setNodeIsActive(destPosition, ACTIVE);
                         destPartition.setPartitionActiveValue(ACTIVE);
                     }
-
                 }
             }
         }
