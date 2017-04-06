@@ -30,7 +30,6 @@ public class WCCMain {
             driver.run();
             elapsedTime[i] = System.currentTimeMillis() - start;
             if (i >= 10) {
-                System.out.println("LWCC : " + driver.getLargestWCC());
                 System.out.println("[DEBUG] elapsed time for iteration" + (i-10) + " : " + (((double) elapsedTime[i]) / (1000.0)));
             }
         }

@@ -1,7 +1,5 @@
 package graph.partition;
 
-import atomic.AtomicIntegerArray;
-
 public abstract class Partition {
     final int numValuesPerNode;
     final int asyncRangeSize;
