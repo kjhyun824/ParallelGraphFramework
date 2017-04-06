@@ -7,46 +7,50 @@ import graph.partition.IntegerPartition;
 
 public class WCCForwardTraversalRest implements GraphAlgorithmInterface {
     static final byte ACTIVE = 1;
-    static final byte IN_ACTIVE = 0;
 
     Graph<IntegerPartition> graph;
     IntegerPartition partition;
     final int partitionId;
-    int offset;
+    final int offset;
+    final int partitionSize;
 
     public WCCForwardTraversalRest(int partitionId, Graph<IntegerPartition> graph) {
         this.partitionId = partitionId;
         this.graph = graph;
         partition = graph.getPartition(partitionId);
         offset = partitionId << graph.getExpOfPartitionSize();
+        partitionSize = partition.getSize();
     }
 
     @Override
     public void execute() {
-        int partitionSize = partition.getSize();
-
         for (int i = 0; i < partitionSize; i++) {
-            int nodeId = offset + i;
-            int srcColor = partition.getVertexValue(i);
+            int srcId = offset + i;
+            int srcColor = partition.getNodeActiveValue(i);
+            int nextSrcColor = partition.getVertexValue(i);
+            Node node = graph.getNode(srcId);
 
-            if (partition.checkNodeIsActive(i, ACTIVE)) {
-                partition.setNodeIsActive(i, IN_ACTIVE);
+            if (node != null) {
+                if (srcColor != nextSrcColor) {
+                    partition.setNodeIsActive(i, nextSrcColor);
 
-                Node node = graph.getNode(nodeId);
-                int neighborListSize = node.neighborListSize();
+                    srcColor = nextSrcColor;
+                    int neighborListSize = node.neighborListSize();
 
-                for (int j = 0; j < neighborListSize; j++) {
-                    int destId = node.getNeighbor(j);
-                    int destPartitionId = graph.getPartitionId(destId);
+                    for (int j = 0; j < neighborListSize; j++) {
+                        int destId = node.getNeighbor(j);
+                        int destPartitionId = graph.getPartitionId(destId);
 
-                    IntegerPartition destPartition = graph.getPartition(destPartitionId);
-                    int destPosition = graph.getNodePositionInPart(destId);
-                    int destColor = destPartition.getVertexValue(destPosition);
+                        IntegerPartition destPartition = graph.getPartition(destPartitionId);
+                        int destPosition = graph.getNodePositionInPart(destId);
+                        int destColor = destPartition.getNodeActiveValue( destPosition);
 
-                    if (destColor < srcColor) {
-                        destPartition.update(destPosition, srcColor);
-                        destPartition.setNodeIsActive(destPosition, ACTIVE);
-                        destPartition.setPartitionActiveValue(ACTIVE);
+                        if (destColor < srcColor) {
+                            destPartition.update(destPosition, srcColor);
+                            if (destPartition.getVertexValue(destPosition) == srcColor) {
+                                destPartition.setPartitionActiveValue(ACTIVE);
+                            }
+                        }
                     }
                 }
             }

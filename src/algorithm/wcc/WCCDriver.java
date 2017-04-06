@@ -11,7 +11,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.IntBinaryOperator;
 
 public class WCCDriver {
-    static final byte ACTIVE = 1;
+    static final int ACTIVE = 1;
+    static final int IN_ACTIVE = 0;
+
     int numThreads;
     boolean isDone;
 
@@ -25,7 +27,7 @@ public class WCCDriver {
     Task[] fwTraverseRestTasks;
     Task[] barrierTasks;
 
-    byte[] isPartitionActives;
+    int[] isPartitionActives;
 
     public WCCDriver(Graph<IntegerPartition> graph, int numThreads) {
         this.graph = graph;
@@ -41,10 +43,9 @@ public class WCCDriver {
         updateFunction = getUpdateFunction();
         IntegerPartition.setUpdateFunction(updateFunction);
 
-
         fwTraverseStartTasks = new Task[numPartitions];
         fwTraverseRestTasks = new Task[numPartitions];
-        isPartitionActives = new byte[numPartitions];
+        isPartitionActives = new int[numPartitions];
         barrierTasks = new Task[numThreads];
 
         barriers = new CyclicBarrier(numThreads);
@@ -67,39 +68,36 @@ public class WCCDriver {
         runAllTasksOnce(fwTraverseStartTasks);
         runAllTasksOnce(fwTraverseRestTasks);
 
-        while (true) {
+        while (!isDone) {
             runAllTasksOnce(barrierTasks);
             busyWaitForSyncStopMilli(10);
 
-            // get PartitionActiveValue;
             for (int i = 0; i < isPartitionActives.length; i++) {
                 IntegerPartition partition = graph.getPartition(i);
-                isPartitionActives[i] = graph.getPartition(i).getActiveValue();
-                partition.setPartitionActiveValue((byte) 0);
+                isPartitionActives[i] = partition.getPartitionActiveValue();
+                partition.setPartitionActiveValue(IN_ACTIVE);
             }
-
             runSomeTasksOnce(fwTraverseRestTasks);
-            if (isDone) {
-                break;
-            }
         }
 
         IntegerPartition[] partitions = graph.getPartitions();
-        int count = 0;
+
+        int[] colors = new int[graph.getMaxNodeId() + 1];
 
         for (int i = 0; i < partitions.length; i++) {
             for (int j = 0; j < partitions[i].getSize(); j++) {
                 int color = partitions[i].getVertexValue(j);
-                if (color == 4847570) {
-                    count++;
-                } else {
-                    System.out.println("NOT 4847570 SET : " + color);
-                }
+                colors[color]++;
             }
         }
 
-        System.out.println("4847570 SET COUNT : " + count);
-   }
+        int max = 0;
+        for (int i = 0; i < graph.getMaxNodeId() + 1; i++) {
+            max = Math.max(max, colors[i]);
+        }
+
+        System.out.println("LWCC : " + max);
+    }
 
     public void busyWaitForSyncStopMilli(int millisecond) {
         while (taskQueue.size() != 0) {
@@ -116,7 +114,7 @@ public class WCCDriver {
         int count = 0;
 
         for (int i = 0; i < tasks.length; i++) {
-            if (isPartitionActives[i] == 1) {
+            if (isPartitionActives[i] == ACTIVE) {
                 taskQueue.offer(tasks[i]);
                 count++;
             }
