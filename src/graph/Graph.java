@@ -5,11 +5,14 @@ import graph.partition.IntegerPartition;
 
 import java.lang.reflect.Array;
 
-public abstract class Graph<T> {
+public class Graph<T> {
     final static int defaultSize = 10;
-    static DirectedGraph instance = null;
+    static Graph instance = null;
 
-    Node[] tmpNodes;
+    boolean isDirected;
+    boolean isWeighted;
+
+    //    Node[] tmpNodes;
     Node[] nodes;
 
     int numNodes;
@@ -24,14 +27,73 @@ public abstract class Graph<T> {
 
     int numPartitions;
 
-    Graph(int expOfPartitionSize) {
+    Graph(int expOfPartitionSize, boolean isDirected, boolean isWeighted) {
         this.expOfPartitionSize = expOfPartitionSize;
+        this.isDirected = isDirected;
+        this.isWeighted = isWeighted;
         partitionCapacity = 1 << expOfPartitionSize;
         bitMaskForRemain = (1 << expOfPartitionSize) - 1;
+
         nodes = new Node[defaultSize];
     }
 
-    abstract boolean addEdge(int srcNodeId, int destNodeId);
+    public static Graph getInstance(int expOfPartitionSize, boolean isDirected, boolean isWeighted) {
+        if (instance == null) {
+            instance = new Graph(expOfPartitionSize, isDirected, isWeighted);
+        }
+        return instance;
+    }
+
+    public boolean addEdge(int srcNodeId, int destNodeId) {
+        checkAndCreateNodes(srcNodeId, destNodeId);
+
+        Node srcNode = nodes[srcNodeId];
+        Node destNode = nodes[destNodeId];
+
+        boolean isAdded = srcNode.addNeighborId(destNodeId); // Do not allow duplication
+
+        if (isAdded) {
+            if (isDirected) {
+                srcNode.incrementOutDegree();
+                destNode.incrementInDegree();
+                numEdges++;
+            } else {
+                destNode.addNeighborId(srcNodeId);
+                srcNode.incrementInDegree();
+                srcNode.incrementOutDegree();
+                destNode.incrementInDegree();
+                destNode.incrementOutDegree();
+                numEdges++;
+            }
+        }
+
+        return isAdded;
+    }
+
+    public boolean addEdge(int srcNodeId, int destNodeId, double weight) {
+        checkAndCreateNodes(srcNodeId, destNodeId);
+
+        Node srcNode = nodes[srcNodeId];
+        Node destNode = nodes[destNodeId];
+
+        boolean isAdded = srcNode.addNeighborId(destNodeId, weight);
+
+        if (isAdded) {
+            if (isDirected) {
+                srcNode.incrementOutDegree();
+                destNode.incrementInDegree();
+                numEdges++;
+            } else {
+                destNode.addNeighborId(srcNodeId,weight);
+                srcNode.incrementInDegree();
+                srcNode.incrementOutDegree();
+                destNode.incrementInDegree();
+                destNode.incrementOutDegree();
+                numEdges++;
+            }
+        }
+        return isAdded;
+    }
 
     void checkAndCreateNodes(int srcNodeId, int destNodeId) {
         int biggerNodeId = Math.max(srcNodeId, destNodeId);
@@ -61,19 +123,6 @@ public abstract class Graph<T> {
         }
     }
 
-    public void generateTransposeEdges() {
-        for (int i = 0; i <= maxNodeId; i++) {
-            if (nodes[i] != null) {
-                int neighborListSize = nodes[i].neighborListSize();
-
-                for (int j = 0; j < neighborListSize; j++) {
-                    int neighborNodeId = nodes[i].getNeighbor(j);
-                    nodes[neighborNodeId].addReverseEdge(i);
-                }
-            }
-        }
-    }
-
     public Node getNode(int nodeId) {
         return nodes[nodeId];
     }
@@ -90,13 +139,6 @@ public abstract class Graph<T> {
         return maxNodeId;
     }
 
-    public void finalizeLoading() {
-        tmpNodes = null;
-    }
-
-
-
-
     // The following part is related to Partiton
 
     public void generatePartition(int numValuesPerNode, int asyncRangeSize, Class<T> partitionClass) {
@@ -108,8 +150,7 @@ public abstract class Graph<T> {
             for (int i = 0; i < numPartitions; i++) {
                 partitions[i] = (T) new IntegerPartition(i, maxNodeId, partitionCapacity, numValuesPerNode, asyncRangeSize);
             }
-        }
-        else if (partitionClass == DoublePartition.class) {
+        } else if (partitionClass == DoublePartition.class) {
             for (int i = 0; i < numPartitions; i++) {
                 partitions[i] = (T) new DoublePartition(i, maxNodeId, partitionCapacity, numValuesPerNode, asyncRangeSize);
             }
@@ -145,5 +186,12 @@ public abstract class Graph<T> {
     public int getNodeNumberInPart(int partitionNumber, int position) {
         return (partitionNumber << expOfPartitionSize) + position;
     }
-}
 
+    public boolean isDirected() {
+        return isDirected;
+    }
+
+    public boolean isWeighted() {
+        return isWeighted;
+    }
+}

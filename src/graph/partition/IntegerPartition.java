@@ -2,6 +2,7 @@ package graph.partition;
 
 import atomic.AtomicIntegerArray;
 
+import java.util.Arrays;
 import java.util.function.IntBinaryOperator;
 
 public class IntegerPartition extends Partition {
@@ -12,7 +13,6 @@ public class IntegerPartition extends Partition {
     }
 
     AtomicIntegerArray[] tables;
-    byte[] activeCheckArray;
 
     public IntegerPartition(int partitionId, int maxNodeId, int partitionSize, int numValuesPerNode, int asyncRangeSize) {
         super(partitionId, maxNodeId, partitionSize, numValuesPerNode, asyncRangeSize);
@@ -20,11 +20,12 @@ public class IntegerPartition extends Partition {
 
     public final void initializeTable() {
         tables = new AtomicIntegerArray[numValuesPerNode];
-        activeCheckArray = new byte[partitionSize];
+        activeNodeCheckArray = new int[partitionSize];
 
         for (int i = 0; i < numValuesPerNode; i++) {
             tables[i] = new AtomicIntegerArray(partitionSize);
         }
+        Arrays.fill(activeNodeCheckArray, -1);
     }
 
     public final void initializedCallback() {

@@ -71,32 +71,8 @@ public class WCCDriver {
         while (!isDone) {
             runAllTasksOnce(barrierTasks);
             busyWaitForSyncStopMilli(10);
-
-            for (int i = 0; i < isPartitionActives.length; i++) {
-                IntegerPartition partition = graph.getPartition(i);
-                isPartitionActives[i] = partition.getPartitionActiveValue();
-                partition.setPartitionActiveValue(IN_ACTIVE);
-            }
             runSomeTasksOnce(fwTraverseRestTasks);
         }
-
-        IntegerPartition[] partitions = graph.getPartitions();
-
-        int[] colors = new int[graph.getMaxNodeId() + 1];
-
-        for (int i = 0; i < partitions.length; i++) {
-            for (int j = 0; j < partitions[i].getSize(); j++) {
-                int color = partitions[i].getVertexValue(j);
-                colors[color]++;
-            }
-        }
-
-        int max = 0;
-        for (int i = 0; i < graph.getMaxNodeId() + 1; i++) {
-            max = Math.max(max, colors[i]);
-        }
-
-        System.out.println("LWCC : " + max);
     }
 
     public void busyWaitForSyncStopMilli(int millisecond) {
@@ -114,7 +90,7 @@ public class WCCDriver {
         int count = 0;
 
         for (int i = 0; i < tasks.length; i++) {
-            if (isPartitionActives[i] == ACTIVE) {
+            if (graph.getPartition(i).checkPartitionIsActive(ACTIVE)) {
                 taskQueue.offer(tasks[i]);
                 count++;
             }
@@ -129,6 +105,22 @@ public class WCCDriver {
         for (int i = 0; i < tasks.length; i++) {
             taskQueue.offer(tasks[i]);
         }
+    }
+
+    public int getLargestWCC() {
+        IntegerPartition[] partitions = graph.getPartitions();
+        int[] colors = new int[graph.getMaxNodeId() + 1];
+        for (int i = 0; i < partitions.length; i++) {
+            for (int j = 0; j < partitions[i].getSize(); j++) {
+                int color = partitions[i].getVertexValue(j);
+                colors[color]++;
+            }
+        }
+        int max = 0;
+        for (int i = 0; i < graph.getMaxNodeId() + 1; i++) {
+            max = Math.max(max, colors[i]);
+        }
+        return max;
     }
 
     public IntBinaryOperator getUpdateFunction() {

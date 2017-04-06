@@ -1,6 +1,5 @@
 package algorithm.pagerank;
 
-import graph.DirectedGraph;
 import graph.Graph;
 import graph.partition.DoublePartition;
 import task.*;

@@ -1,6 +1,6 @@
 import algorithm.pagerank.PageRankDriver;
-import graph.DirectedGraph;
 import graph.Graph;
+import graph.Node;
 import graph.partition.DoublePartition;
 import graph.GraphUtil;
 
@@ -24,10 +24,10 @@ public class PageRankMain {
         int numValuesPerNode = 2;
         int asyncRangeSize = (int) ((1 << 16) * (percentage / 100));
 
-        Graph<DoublePartition> graph = DirectedGraph.getInstance(expOfPartitionSize);
+        Graph<DoublePartition> graph = Graph.getInstance(expOfPartitionSize,true,false);
         GraphUtil.load(graph, inputFile);
         graph.generatePartition(numValuesPerNode, asyncRangeSize, DoublePartition.class);
-        GraphUtil.finalizeLoading(graph);
+        //GraphUtil.finalizeLoading(graph);
 
         PageRankDriver driver = new PageRankDriver(graph, dampingFactor, iteration, numThreads);
 

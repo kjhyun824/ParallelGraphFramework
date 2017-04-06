@@ -28,31 +28,20 @@ public class GraphUtil {
             String[] nodeId = line.trim().split("\t");
             int srcNodeId = Integer.parseInt(nodeId[0]);
             int destNodeId = Integer.parseInt(nodeId[1]);
-            graph.addEdge(srcNodeId, destNodeId);
-        }
-    }
-
-    public static DirectedGraph transposeGraph(DirectedGraph graph) {
-        DirectedGraph graphT = new DirectedGraph(graph.getExpOfPartitionSize());
-        int maxNodeId = graph.getMaxNodeId();
-
-        for (int i = 0; i <= maxNodeId; i++) {
-            Node node = graph.getNode(i);
-            if (node != null) {
-                int neighborListSize = node.neighborListSize();
-
-                for (int j = 0; j < neighborListSize; j++) {
-                    int neighborId = node.getNeighbor(j);
-                    graphT.addEdge(neighborId, i);
-                }
+            if(graph.isWeighted()) {
+                graph.addEdge(srcNodeId, destNodeId, 1.0);
+            } else {
+                graph.addEdge(srcNodeId, destNodeId);
             }
         }
-        return graphT;
     }
 
+
+    /*
     public static void finalizeLoading(Graph graph) {
         graph.finalizeLoading();
     }
+    */
 
 
     public static void writeGraph(Graph graph, String fileName) {

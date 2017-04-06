@@ -1,5 +1,7 @@
 package graph.partition;
 
+import atomic.AtomicIntegerArray;
+
 public abstract class Partition {
     final int numValuesPerNode;
     final int asyncRangeSize;
@@ -7,8 +9,9 @@ public abstract class Partition {
     int partitionSize;
     int tablePos;
 
-    byte partitionActiveValue;
-    byte[] activeNodeCheckArray;
+    int partitionActiveValue;
+    int[] activeNodeCheckArray;
+
 
     Partition(int partitionId, int maxNodeId, int partitionSize, int numValuesPerNode, int asyncRangeSize) {
         this.partitionId = partitionId;
@@ -19,7 +22,7 @@ public abstract class Partition {
         }
         this.numValuesPerNode = numValuesPerNode;
         this.asyncRangeSize = asyncRangeSize;
-        activeNodeCheckArray = new byte[partitionSize];
+        activeNodeCheckArray = new int[partitionSize];
         initializeTable();
     }
 
@@ -29,26 +32,28 @@ public abstract class Partition {
         return partitionSize;
     }
 
-    public void setPartitionActiveValue(byte value) {
+    public void setPartitionActiveValue(int value) {
         if (partitionActiveValue != value) {
             partitionActiveValue = value;
         }
     }
 
-    public boolean checkPartitionIsActive(byte compareValue) {
+    public boolean checkPartitionIsActive(int compareValue) {
         return partitionActiveValue == compareValue;
     }
 
-    public byte getActiveValue() {
+    public int getPartitionActiveValue() {
         return partitionActiveValue;
     }
 
-    public boolean checkNodeIsActive(int nodeId, byte compareValue) {
-        return activeNodeCheckArray[nodeId] == compareValue;
+    public int getNodeActiveValue(int pos) {
+        return activeNodeCheckArray[pos];
     }
 
-    public void setNodeIsActive(int pos, byte value) {
-        activeNodeCheckArray[pos] = value;
+    public void setNodeIsActive(int pos, int value) {
+        if (activeNodeCheckArray[pos] != value) {
+            activeNodeCheckArray[pos] = value;
+        }
     }
 
     public void reset() {

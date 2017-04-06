@@ -1,7 +1,7 @@
 package algorithm.scc;
 
-import graph.DirectedGraph;
 import graph.Graph;
+import graph.Node;
 import graph.partition.IntegerPartition;
 import task.Task;
 import task.TaskBarrier;
@@ -40,7 +40,7 @@ public class SCCDriver {
 
     public void init() {
         int numPartitions = graph.getNumPartitions();
-        graph.generateTransposeEdges(); // G^t = (V, E^T)
+        //graph.generateTransposeEdges(); // G^t = (V, E^T) TODO: Make generateTransposeEdges again
 
         updateFunction = getUpdateFunction();
         IntegerPartition.setUpdateFunction(updateFunction);

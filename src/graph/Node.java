@@ -1,9 +1,12 @@
 package graph;
 
+import gnu.trove.list.array.TDoubleArrayList;
 import gnu.trove.list.array.TIntArrayList;
 
 public class Node extends TIntArrayList {
-    TIntArrayList transposeNeighbors = null;
+//    TIntArrayList transposeNeighbors = null;
+    TDoubleArrayList weights = null;
+
     int inDegree;
     int outDegree;
 
@@ -19,8 +22,26 @@ public class Node extends TIntArrayList {
         }
     }
 
-    public int getNeighbor(int neighborNodeId) {
-        return getQuick(neighborNodeId);
+    public boolean addNeighborId(int neighborNodeId, double weight) {
+        int pos = binarySearch(neighborNodeId);
+        if (pos >= 0) {
+            return false;
+        }
+        else {
+            pos = -(pos + 1);
+            insert(pos, neighborNodeId);
+            weights.insert(pos,weight);
+            return true;
+        }
+    }
+
+
+    public int getNeighbor(int neighborNodeIdx) {
+        return getQuick(neighborNodeIdx);
+    }
+
+    public double getWeight(int neighborNodeIdx) {
+        return weights.get(neighborNodeIdx);
     }
 
     public int neighborListSize() {
@@ -43,6 +64,7 @@ public class Node extends TIntArrayList {
         return outDegree;
     }
 
+    /*
     public void addReverseEdge(int neighborNodeId) {
         if (transposeNeighbors == null) {
             transposeNeighbors = new TIntArrayList();
@@ -54,5 +76,6 @@ public class Node extends TIntArrayList {
             transposeNeighbors.insert(pos, neighborNodeId);
         }
     }
+    */
 }
 

@@ -1,5 +1,4 @@
 import algorithm.scc.SCCDriver;
-import graph.DirectedGraph;
 import graph.Graph;
 import graph.GraphUtil;
 import graph.partition.IntegerPartition;
@@ -14,13 +13,13 @@ public class SCCMain {
         int asyncRangeSize = 0;//(int) ((1 << 16) * 0.3);
 
         long start = System.currentTimeMillis();
-        Graph<IntegerPartition> graph = DirectedGraph.getInstance(expOfPartitionSize);
+        Graph<IntegerPartition> graph = Graph.getInstance(expOfPartitionSize,true,false);
         GraphUtil.load(graph, inputFile);
         graph.generatePartition(numValuesPerNode, asyncRangeSize, IntegerPartition.class);
         long elapsedTime = System.currentTimeMillis() - start;
         System.out.println("Graph Load Time : " + elapsedTime / (double) 1000 + " \n");
 
-        GraphUtil.finalizeLoading(graph);
+        //GraphUtil.finalizeLoading(graph);
 
         SCCDriver driver = new SCCDriver(graph, numThreads);
         driver.run();

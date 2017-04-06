@@ -1,6 +1,5 @@
 package algorithm.scc;
 
-import graph.DirectedGraph;
 import graph.Graph;
 import graph.GraphAlgorithmInterface;
 import graph.Node;

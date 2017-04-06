@@ -1,14 +1,14 @@
 package algorithm.scc;
 
-import graph.DirectedGraph;
+import graph.Graph;
 import graph.GraphAlgorithmInterface;
 
 public class BackwardTraversalStart implements GraphAlgorithmInterface{
-    DirectedGraph graph;
+    Graph graph;
     final int partitionId;
     boolean[] isInActive;
 
-    public BackwardTraversalStart (int partitionId, DirectedGraph graph, boolean[] isInActive) {
+    public BackwardTraversalStart (int partitionId, Graph graph, boolean[] isInActive) {
         this.partitionId = partitionId;
         this.graph = graph;
         this.isInActive = isInActive;

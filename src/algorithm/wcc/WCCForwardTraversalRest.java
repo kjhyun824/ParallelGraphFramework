@@ -7,6 +7,7 @@ import graph.partition.IntegerPartition;
 
 public class WCCForwardTraversalRest implements GraphAlgorithmInterface {
     static final byte ACTIVE = 1;
+    static final byte IN_ACTIVE = 0;
 
     Graph<IntegerPartition> graph;
     IntegerPartition partition;
@@ -24,13 +25,15 @@ public class WCCForwardTraversalRest implements GraphAlgorithmInterface {
 
     @Override
     public void execute() {
+        partition.setPartitionActiveValue(IN_ACTIVE);
         for (int i = 0; i < partitionSize; i++) {
             int srcId = offset + i;
-            int srcColor = partition.getNodeActiveValue(i);
-            int nextSrcColor = partition.getVertexValue(i);
             Node node = graph.getNode(srcId);
 
             if (node != null) {
+                int srcColor = partition.getNodeActiveValue(i);
+                int nextSrcColor = partition.getVertexValue(i);
+
                 if (srcColor != nextSrcColor) {
                     partition.setNodeIsActive(i, nextSrcColor);
 
@@ -43,7 +46,7 @@ public class WCCForwardTraversalRest implements GraphAlgorithmInterface {
 
                         IntegerPartition destPartition = graph.getPartition(destPartitionId);
                         int destPosition = graph.getNodePositionInPart(destId);
-                        int destColor = destPartition.getNodeActiveValue( destPosition);
+                        int destColor = destPartition.getNodeActiveValue(destPosition);
 
                         if (destColor < srcColor) {
                             destPartition.update(destPosition, srcColor);

@@ -1,6 +1,5 @@
 package algorithm.bfs;
 
-import graph.DirectedGraph;
 import graph.Graph;
 import graph.GraphAlgorithmInterface;
 import graph.Node;

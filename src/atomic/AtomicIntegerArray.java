@@ -24,7 +24,6 @@ public class AtomicIntegerArray implements java.io.Serializable {
 
         return byteOffset(i);
     }
-
     private static long byteOffset(int i) {
         return ((long) i << shift) + base;
     }

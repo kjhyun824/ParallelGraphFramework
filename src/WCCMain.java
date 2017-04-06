@@ -1,8 +1,6 @@
 import algorithm.wcc.WCCDriver;
-import graph.DirectedGraph;
 import graph.Graph;
 import graph.GraphUtil;
-import graph.UnDirectedGraph;
 import graph.partition.IntegerPartition;
 
 public class WCCMain {
@@ -15,10 +13,9 @@ public class WCCMain {
         int asyncRangeSize = ((1 << 16) * 0);
 
         long start = System.currentTimeMillis();
-        Graph<IntegerPartition> graph = UnDirectedGraph.getInstance(expOfPartitionSize);
+        Graph<IntegerPartition> graph = Graph.getInstance(expOfPartitionSize,false,false);
         GraphUtil.load(graph, inputFile);
         graph.generatePartition(numValuesPerNode, asyncRangeSize, IntegerPartition.class);
-        GraphUtil.finalizeLoading(graph);
         long loadingTime = System.currentTimeMillis() - start;
 
         System.out.println("[DEBUG] Graph Loading : " + ((double) loadingTime / 1000.0));
@@ -33,10 +30,10 @@ public class WCCMain {
             driver.run();
             elapsedTime[i] = System.currentTimeMillis() - start;
             if (i >= 10) {
+                System.out.println("LWCC : " + driver.getLargestWCC());
                 System.out.println("[DEBUG] elapsed time for iteration" + (i-10) + " : " + (((double) elapsedTime[i]) / (1000.0)));
             }
         }
-
         System.exit(1);
     }
 }
