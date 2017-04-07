@@ -37,7 +37,6 @@ public class WCCForwardTraversalRest implements GraphAlgorithmInterface {
                 if (srcColor != nextSrcColor) {
                     partition.setNodeIsActive(i, nextSrcColor);
 
-                    srcColor = nextSrcColor;
                     int neighborListSize = node.neighborListSize();
 
                     for (int j = 0; j < neighborListSize; j++) {
@@ -48,11 +47,9 @@ public class WCCForwardTraversalRest implements GraphAlgorithmInterface {
                         int destPosition = graph.getNodePositionInPart(destId);
                         int destColor = destPartition.getNodeActiveValue(destPosition);
 
-                        if (destColor < srcColor) {
-                            destPartition.update(destPosition, srcColor);
-                            if (destPartition.getVertexValue(destPosition) == srcColor) {
-                                destPartition.setPartitionActiveValue(ACTIVE);
-                            }
+                        if (destColor < nextSrcColor) {
+                            destPartition.update(destPosition, nextSrcColor);
+                            destPartition.setPartitionActiveValue(ACTIVE);
                         }
                     }
                 }

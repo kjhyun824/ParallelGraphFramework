@@ -66,6 +66,7 @@ public class WCCDriver {
 
     public void run() {
         runAllTasksOnce(fwTraverseStartTasks);
+        runAllTasksOnce(barrierTasks);
         runAllTasksOnce(fwTraverseRestTasks);
 
         while (!isDone) {
