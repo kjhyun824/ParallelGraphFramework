@@ -1,86 +1,103 @@
 package graph.partition;
 
 import atomic.AtomicByteArray;
+import atomic.AtomicDoubleArray;
 import atomic.AtomicIntegerArray;
 
 import java.util.Arrays;
-import java.util.function.IntBinaryOperator;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.DoubleBinaryOperator;
 
 public class SSSPPartition extends Partition {
-    public static IntBinaryOperator updateFunction;
+    public static DoubleBinaryOperator updateFunction;
 
-    public static void setUpdateFunction(IntBinaryOperator function) {
+    public static void setUpdateFunction(DoubleBinaryOperator function) {
         updateFunction = function;
     }
 
-    AtomicIntegerArray[] tables;
-    AtomicByteArray bucketIds;
+    AtomicDoubleArray tables;
+    AtomicIntegerArray bucketIds;
+    AtomicInteger innerIter;
+    AtomicInteger currMaxBucket;
 
     public SSSPPartition(int partitionId, int maxNodeId, int partitionSize, int numValuesPerNode, int asyncRangeSize) {
         super(partitionId, maxNodeId, partitionSize, numValuesPerNode, asyncRangeSize);
     }
 
     public final void initializeTable() {
-        tables = new AtomicIntegerArray[numValuesPerNode];
+        tables = new AtomicDoubleArray(partitionSize);
         activeNodeCheckArray = new int[partitionSize];
+        bucketIds = new AtomicIntegerArray(partitionSize);
+        innerIter = new AtomicInteger();
+        currMaxBucket = new AtomicInteger();
 
-        for (int i = 0; i < numValuesPerNode; i++) {
-            tables[i] = new AtomicIntegerArray(partitionSize);
-        }
         Arrays.fill(activeNodeCheckArray, -1);
+
+        for (int i = 0; i < partitionSize; i++) {
+            tables.set(i,0);
+            bucketIds.set(i, -1);
+        }
+        innerIter.set(-1);
+        currMaxBucket.set(-1);
     }
 
-    public final void initializedCallback() {
-        swapConsecutiveTwoTables();
+    public void setBucketIds(int entry, int value) {
+        int temp;
+        do {
+            temp = bucketIds.get(entry);
+            if (temp != -1 && temp <= value) break;
+        } while (!bucketIds.compareAndSet(entry, temp, value));
     }
 
-    public final void setVertexValue(int entry, int value) {
+    public int getBucketIds(int entry) {
+        return bucketIds.get(entry);
+    }
+
+    public void setInnerIter(int value) {
+        if (innerIter.get() != value)
+            innerIter.set(value);
+    }
+
+    public int getInnerIter() {
+        return innerIter.get();
+    }
+
+    public void setCurrMaxBucket(int value) {
+        int temp;
+        do {
+            temp = currMaxBucket.get();
+            if (temp >= value) break;
+        } while (!currMaxBucket.compareAndSet(temp, value));
+    }
+
+    public int getCurrMaxBucket() {
+        return currMaxBucket.get();
+    }
+
+    public final double getVertexValue(int entry) {
         if (entry < asyncRangeSize) {
-            tables[tablePos].asyncSet(entry, value);
-        }
-        else {
-            tables[tablePos].set(entry, value);
-        }
-    }
-
-    public final void setNextVertexValue(int entry, int value) {
-        if (entry < asyncRangeSize) {
-            tables[tablePos + 1].asyncSet(entry, value);
-        }
-        else {
-            tables[tablePos + 1].set(entry, value);
+            return tables.asyncGet(entry);
+        } else {
+            return tables.get(entry);
         }
     }
 
-    public final int getVertexValue(int entry) {
-        if (entry < asyncRangeSize) {
-            return tables[tablePos].asyncGet(entry);
-        }
-        else {
-            return tables[tablePos].get(entry);
-        }
-    }
-
-    public final void update(int entry, int value) {
-        update(tablePos, entry, value);
-    }
-
-    public final void update(int pos, int entry, int value) {
+    public final void update(int entry, double value) {
         if (entry < asyncRangeSize) { // TODO : think about multiple ranges in a single partition
-            tables[pos].asyncGetAndAccumulate(entry, value, updateFunction);
-        }
-        else {
-            tables[pos].getAndAccumulate(entry, value, updateFunction);
+            if (tables.asyncGet(entry) > value) {
+                tables.asyncGetAndAccumulate(entry, value, updateFunction);
+            }
+        } else {
+            double tempDist;
+            do {
+                tempDist = tables.get(entry);
+                if (tempDist != 0 && tempDist <= value) break;
+            } while (!tables.compareAndSet(entry, tempDist, value));
         }
     }
 
-    public final void updateNextTable(int entry, int value) {
-        update(tablePos + 1, entry, value);
-    }
-
-    public final void swapConsecutiveTwoTables() {
-        AtomicIntegerArray tmp = tables[tablePos];
-        tables[tablePos] = tables[tablePos + 1];
-        tables[tablePos + 1] = tmp;
+    public void reset() {
+        initializeTable();
+        partitionActiveValue = 1;
     }
 }

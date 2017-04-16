@@ -96,6 +96,7 @@ public class SSSPDriver {
     }
 
     public void run() {
+        SSSPExecutor.setCurBucketId(bucketIdx);
         graph.getPartition(0).setBucketIds(0, bucketIdx);
         graph.getPartition(0).setCurrMaxBucket(bucketIdx);
         graph.getPartition(0).setInnerIter(innerIdx-1);

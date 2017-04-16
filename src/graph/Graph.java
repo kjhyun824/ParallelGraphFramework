@@ -2,6 +2,7 @@ package graph;
 
 import graph.partition.DoublePartition;
 import graph.partition.IntegerPartition;
+import graph.partition.SSSPPartition;
 
 import java.lang.reflect.Array;
 
@@ -84,7 +85,7 @@ public class Graph<T> {
                 destNode.incrementInDegree();
                 numEdges++;
             } else {
-                destNode.addNeighborId(srcNodeId,weight);
+                destNode.addNeighborId(srcNodeId, weight);
                 srcNode.incrementInDegree();
                 srcNode.incrementOutDegree();
                 destNode.incrementInDegree();
@@ -153,6 +154,10 @@ public class Graph<T> {
         } else if (partitionClass == DoublePartition.class) {
             for (int i = 0; i < numPartitions; i++) {
                 partitions[i] = (T) new DoublePartition(i, maxNodeId, partitionCapacity, numValuesPerNode, asyncRangeSize);
+            }
+        } else if (partitionClass == SSSPPartition.class) {
+            for (int i = 0; i < numPartitions; i++) {
+                partitions[i] = (T) new SSSPPartition(i, maxNodeId, partitionCapacity, numValuesPerNode, asyncRangeSize);
             }
         }
     }

@@ -61,7 +61,7 @@ public class SSSPExecutor implements GraphAlgorithmInterface
     }
 
     public void update(int srcNodeIdInPart) {
-        TIntArrayList srcEdges = edges[srcNodeIdInPart];
+        TIntArrayList srcEdges = edges[offset + srcNodeIdInPart];
 
         int neighborListSize = srcEdges.size();
 
@@ -80,6 +80,7 @@ public class SSSPExecutor implements GraphAlgorithmInterface
             }
 
             // xxx : graph.getPartition(partitionId) == partition
+
             double newDist = partition.getVertexValue(srcNodeIdInPart) + srcNode.getNeighborWeight(destId);
             double distTent = destPartition.getVertexValue(destPosition);
 
@@ -91,7 +92,7 @@ public class SSSPExecutor implements GraphAlgorithmInterface
 
             destPartition.update(destPosition, newDist);
             // xxx :
-            // destPositionId -> destPartition
+            // destPartitionId -> destPosition
             destPartition.setBucketIds(destPosition, newBucketId);
 
             if (newBucketId == bucketId) {

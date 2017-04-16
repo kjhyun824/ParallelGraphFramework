@@ -4,18 +4,20 @@ import gnu.trove.list.array.TDoubleArrayList;
 import gnu.trove.list.array.TIntArrayList;
 
 public class Node extends TIntArrayList {
-//    TIntArrayList transposeNeighbors = null;
     TDoubleArrayList weights = null;
 
     int inDegree;
     int outDegree;
 
+    Node() {
+        weights = new TDoubleArrayList(10);
+    }
+
     public boolean addNeighborId(int neighborNodeId) {
         int pos = binarySearch(neighborNodeId);
         if (pos >= 0) {
             return false;
-        }
-        else {
+        } else {
             pos = -(pos + 1);
             insert(pos, neighborNodeId);
             return true;
@@ -26,11 +28,10 @@ public class Node extends TIntArrayList {
         int pos = binarySearch(neighborNodeId);
         if (pos >= 0) {
             return false;
-        }
-        else {
+        } else {
             pos = -(pos + 1);
             insert(pos, neighborNodeId);
-            weights.insert(pos,weight);
+            weights.insert(pos, weight);
             return true;
         }
     }
@@ -40,8 +41,9 @@ public class Node extends TIntArrayList {
         return getQuick(neighborNodeIdx);
     }
 
-    public double getWeight(int neighborNodeIdx) {
-        return weights.get(neighborNodeIdx);
+    public double getNeighborWeight(int neighborNodeId) {
+        int pos = binarySearch(neighborNodeId);
+        return weights.get(pos);
     }
 
     public int neighborListSize() {
@@ -78,4 +80,3 @@ public class Node extends TIntArrayList {
     }
     */
 }
-

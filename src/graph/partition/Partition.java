@@ -30,7 +30,7 @@ public abstract class Partition {
         return partitionSize;
     }
 
-    public void setPartitionActiveValue(int value) {
+    public final void setPartitionActiveValue(int value) {
         if (partitionActiveValue != value) {
             partitionActiveValue = value;
         }
