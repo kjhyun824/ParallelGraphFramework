@@ -3,16 +3,16 @@ package algorithm.wcc;
 import graph.Graph;
 import graph.GraphAlgorithmInterface;
 import graph.Node;
-import graph.partition.IntegerPartition;
+import graph.partition.WCCPartition;
 
 public class WCCForwardTraversalStart implements GraphAlgorithmInterface {
-    Graph<IntegerPartition> graph;
-    IntegerPartition partition;
+    Graph<WCCPartition> graph;
+    WCCPartition partition;
     final int partitionId;
     int offset;
     int partitionSize;
 
-    public WCCForwardTraversalStart(int partitionId, Graph<IntegerPartition> graph) {
+    public WCCForwardTraversalStart(int partitionId, Graph<WCCPartition> graph) {
         this.partitionId = partitionId;
         this.graph = graph;
         partition = graph.getPartition(partitionId);

@@ -3,10 +3,12 @@ package graph;
 import graph.partition.DoublePartition;
 import graph.partition.IntegerPartition;
 import graph.partition.SSSPPartition;
+import graph.partition.WCCPartition;
 
 import java.lang.reflect.Array;
 
-public class Graph<T> {
+public class Graph<T>
+{
     final static int defaultSize = 10;
     static Graph instance = null;
 
@@ -58,7 +60,8 @@ public class Graph<T> {
                 srcNode.incrementOutDegree();
                 destNode.incrementInDegree();
                 numEdges++;
-            } else {
+            }
+            else {
                 destNode.addNeighborId(srcNodeId);
                 srcNode.incrementInDegree();
                 srcNode.incrementOutDegree();
@@ -84,7 +87,8 @@ public class Graph<T> {
                 srcNode.incrementOutDegree();
                 destNode.incrementInDegree();
                 numEdges++;
-            } else {
+            }
+            else {
                 destNode.addNeighborId(srcNodeId, weight);
                 srcNode.incrementInDegree();
                 srcNode.incrementOutDegree();
@@ -151,13 +155,20 @@ public class Graph<T> {
             for (int i = 0; i < numPartitions; i++) {
                 partitions[i] = (T) new IntegerPartition(i, maxNodeId, partitionCapacity, numValuesPerNode, asyncRangeSize);
             }
-        } else if (partitionClass == DoublePartition.class) {
+        }
+        else if (partitionClass == DoublePartition.class) {
             for (int i = 0; i < numPartitions; i++) {
                 partitions[i] = (T) new DoublePartition(i, maxNodeId, partitionCapacity, numValuesPerNode, asyncRangeSize);
             }
-        } else if (partitionClass == SSSPPartition.class) {
+        }
+        else if (partitionClass == SSSPPartition.class) {
             for (int i = 0; i < numPartitions; i++) {
                 partitions[i] = (T) new SSSPPartition(i, maxNodeId, partitionCapacity, numValuesPerNode, asyncRangeSize);
+            }
+        }
+        else if (partitionClass == WCCPartition.class) {
+            for (int i = 0; i < numPartitions; i++) {
+                partitions[i] = (T) new WCCPartition(i, maxNodeId, partitionCapacity, asyncRangeSize);
             }
         }
     }

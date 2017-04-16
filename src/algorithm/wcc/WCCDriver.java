@@ -1,7 +1,7 @@
 package algorithm.wcc;
 
 import graph.Graph;
-import graph.partition.IntegerPartition;
+import graph.partition.WCCPartition;
 import task.*;
 import thread.*;
 
@@ -17,7 +17,7 @@ public class WCCDriver {
     int numThreads;
     boolean isDone;
 
-    Graph<IntegerPartition> graph;
+    Graph<WCCPartition> graph;
     IntBinaryOperator updateFunction;
     LinkedBlockingQueue<Task> taskQueue;
     TaskWaitingRunnable runnable;
@@ -29,7 +29,7 @@ public class WCCDriver {
 
     int[] isPartitionActives;
 
-    public WCCDriver(Graph<IntegerPartition> graph, int numThreads) {
+    public WCCDriver(Graph<WCCPartition> graph, int numThreads) {
         this.graph = graph;
         this.numThreads = numThreads;
         isDone = false;
@@ -41,7 +41,7 @@ public class WCCDriver {
         int numPartitions = graph.getNumPartitions();
 
         updateFunction = getUpdateFunction();
-        IntegerPartition.setUpdateFunction(updateFunction);
+        WCCPartition.setUpdateFunction(updateFunction);
 
         fwTraverseStartTasks = new Task[numPartitions];
         fwTraverseRestTasks = new Task[numPartitions];
@@ -109,7 +109,7 @@ public class WCCDriver {
     }
 
     public int getLargestWCC() {
-        IntegerPartition[] partitions = graph.getPartitions();
+        WCCPartition[] partitions = graph.getPartitions();
         int[] colors = new int[graph.getMaxNodeId() + 1];
         for (int i = 0; i < partitions.length; i++) {
             for (int j = 0; j < partitions[i].getSize(); j++) {

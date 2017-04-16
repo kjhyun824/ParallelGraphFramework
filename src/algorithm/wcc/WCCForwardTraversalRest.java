@@ -3,19 +3,19 @@ package algorithm.wcc;
 import graph.Graph;
 import graph.GraphAlgorithmInterface;
 import graph.Node;
-import graph.partition.IntegerPartition;
+import graph.partition.WCCPartition;
 
 public class WCCForwardTraversalRest implements GraphAlgorithmInterface {
     static final byte ACTIVE = 1;
     static final byte IN_ACTIVE = 0;
 
-    Graph<IntegerPartition> graph;
-    IntegerPartition partition;
+    Graph<WCCPartition> graph;
+    WCCPartition partition;
     final int partitionId;
     final int offset;
     final int partitionSize;
 
-    public WCCForwardTraversalRest(int partitionId, Graph<IntegerPartition> graph) {
+    public WCCForwardTraversalRest(int partitionId, Graph<WCCPartition> graph) {
         this.partitionId = partitionId;
         this.graph = graph;
         partition = graph.getPartition(partitionId);
@@ -28,22 +28,22 @@ public class WCCForwardTraversalRest implements GraphAlgorithmInterface {
         partition.setPartitionActiveValue(IN_ACTIVE);
         for (int i = 0; i < partitionSize; i++) {
             int srcId = offset + i;
-            Node node = graph.getNode(srcId);
+            Node srcNode = graph.getNode(srcId);
 
-            if (node != null) {
-                int srcColor = partition.getNodeActiveValue(i);
+            if (srcNode != null) {
+                int srcCurColor = partition.getNodeActiveValue(i);
                 int nextSrcColor = partition.getVertexValue(i);
 
-                if (srcColor != nextSrcColor) {
+                if (srcCurColor != nextSrcColor) {
                     partition.setNodeIsActive(i, nextSrcColor);
 
-                    int neighborListSize = node.neighborListSize();
+                    int neighborListSize = srcNode.neighborListSize();
 
                     for (int j = 0; j < neighborListSize; j++) {
-                        int destId = node.getNeighbor(j);
+                        int destId = srcNode.getNeighbor(j);
                         int destPartitionId = graph.getPartitionId(destId);
 
-                        IntegerPartition destPartition = graph.getPartition(destPartitionId);
+                        WCCPartition destPartition = graph.getPartition(destPartitionId);
                         int destPosition = graph.getNodePositionInPart(destId);
                         int destColor = destPartition.getNodeActiveValue(destPosition);
 
