@@ -1,5 +1,6 @@
 package algorithm.sssp;
 
+import gnu.trove.list.array.TDoubleArrayList;
 import gnu.trove.list.array.TIntArrayList;
 import graph.Graph;
 import graph.GraphAlgorithmInterface;
@@ -8,24 +9,21 @@ import graph.partition.SSSPPartition;
 
 public class SSSPExecutor implements GraphAlgorithmInterface
 {
+
     Graph<SSSPPartition> graph;
     SSSPPartition partition;
-    TIntArrayList[] lightEdges;
-    TIntArrayList[] heavyEdges;
-    TIntArrayList[] edges = null;
-    Node srcNode;
-
-    static boolean isHeavy;
-    static int bucketId;
-
     int offset;
-    int partitionSize;
-    int partitionId;
     double delta;
+    static volatile boolean isHeavy;
 
-    public static void setCurBucketId(int id) {
-        bucketId = id;
-    }
+    TIntArrayList[] lightEdges;
+    TDoubleArrayList[] lightWeights;
+    TIntArrayList[] heavyEdges;
+    TDoubleArrayList[] heavyWeights;
+    TIntArrayList edges = null;
+    TDoubleArrayList weights = null;
+
+    final int partitionId;
 
     SSSPExecutor(int partitionId, Graph<SSSPPartition> graph, double delta) {
         this.partitionId = partitionId;
@@ -33,75 +31,57 @@ public class SSSPExecutor implements GraphAlgorithmInterface
         this.delta = delta;
         this.lightEdges = SSSPDriver.getLightEdges();
         this.heavyEdges = SSSPDriver.getHeavyEdges();
+        this.lightWeights = SSSPDriver.getLightWeights();
+        this.heavyWeights = SSSPDriver.getHeavyWeights();
         this.offset = this.partitionId << graph.getExpOfPartitionSize();
-        this.partition = graph.getPartition(partitionId);
-        this.partitionSize = partition.getSize();
     }
 
     @Override
     public void execute() {
-        if (!isHeavy) {
-            edges = lightEdges;
-        }
-        else {
-            edges = heavyEdges;
-        }
+        partition = graph.getPartition(partitionId);
+        int partitionSize = partition.getSize();
+        int bucketIdx = SSSPDriver.getBucketIdx();
 
         for (int i = 0; i < partitionSize; i++) {
-            int srcId = offset + i;
-            int currBucket = partition.getBucketIds(i);
+            int nodeId = offset + i;
+            int currBucket = partition.getBucketId(i);
 
-            if (currBucket == bucketId) {
-                srcNode = graph.getNode(srcId);
-                if (srcNode != null) {
-                    update(i);
-                }
+            if (currBucket == bucketIdx) {
+                Node srcNode = graph.getNode(nodeId);
+                update(srcNode, i, bucketIdx);
             }
         }
     }
 
-    public void update(int srcNodeIdInPart) {
-        TIntArrayList srcEdges = edges[offset + srcNodeIdInPart];
+    public void update(Node srcNode, int srcNodeIdInPart, int bucketIdx) {
+        if (!isHeavy) {
+            edges = lightEdges[offset + srcNodeIdInPart];
+            weights = lightWeights[offset + srcNodeIdInPart];
+        }
+        else {
+            edges = heavyEdges[offset + srcNodeIdInPart];
+            weights = heavyWeights[offset + srcNodeIdInPart];
+        }
 
-        int neighborListSize = srcEdges.size();
+        int neighborListSize = edges.size();
+        int InnerIdx = SSSPDriver.getInnerIdx();
 
         for (int j = 0; j < neighborListSize; j++) {
-            int destId = srcEdges.get(j);
+            int destId = edges.get(j);
             int destPartitionId = graph.getPartitionId(destId);
             SSSPPartition destPartition = graph.getPartition(destPartitionId);
             int destPosition = graph.getNodePositionInPart(destId);
 
-            // xxx :
-            // (graph.getNode(destOffset + j) == srcNode) -> (graph.getNode(destId) == srcNode)
-            // reason : destOffset + j != destId
-
-            if (graph.getNode(destId) == srcNode) { // Consider Self Edge
-                continue;
-            }
-
-            // xxx : graph.getPartition(partitionId) == partition
-
-            double newDist = partition.getVertexValue(srcNodeIdInPart) + srcNode.getNeighborWeight(destId);
-            double distTent = destPartition.getVertexValue(destPosition);
-
-            if (newDist == distTent) {
-                break;
-            }
-
-            int newBucketId = ((int) Math.floor(newDist / delta));
+            double currDist = destPartition.getVertexValue(destPosition);
+            double newDist = graph.getPartition(partitionId).getVertexValue(srcNodeIdInPart) + weights.get(j);
+            int newBucketId = (int) (newDist / delta);
 
             destPartition.update(destPosition, newDist);
-            // xxx :
-            // destPartitionId -> destPosition
-            destPartition.setBucketIds(destPosition, newBucketId);
+            destPartition.setBucketId(destPosition, newBucketId);
+            destPartition.setCurrMaxBucket(newBucketId);
 
-            if (newBucketId == bucketId) {
-                System.out.println("[DEBUG] SRCPart->DESTPart : " + partitionId + "->" + destPartitionId + " / srcId->DestId" + (offset + srcNodeIdInPart) + "->" + (destId) + " currDist : " + newDist + " newBucketId : " + newBucketId + " Curr Bucket Id : " + SSSPDriver.getBucketIdx() + " Inner Idx " + SSSPDriver.getInnerIdx());
-                destPartition.setInnerIter(SSSPDriver.getInnerIdx());
-            }
-
-            if (newBucketId > destPartition.getCurrMaxBucket()) {
-                destPartition.setCurrMaxBucket(newBucketId);
+            if (newDist < currDist && newBucketId == bucketIdx) {
+                destPartition.setInnerIdx(InnerIdx);
             }
         }
     }

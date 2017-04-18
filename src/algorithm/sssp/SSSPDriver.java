@@ -1,20 +1,24 @@
 package algorithm.sssp;
 
+import gnu.trove.list.array.TDoubleArrayList;
 import gnu.trove.list.array.TIntArrayList;
 import graph.Graph;
 import graph.Node;
 import graph.partition.SSSPPartition;
 import task.Task;
 import task.TaskBarrier;
+import thread.SSSPTaskWaitingRunnable;
 import thread.TaskWaitingRunnable;
 import thread.ThreadUtil;
 
+import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
-import java.util.function.DoubleBinaryOperator;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
-public class SSSPDriver {
+public class SSSPDriver
+{
     int numThreads;
     double delta;
     boolean lightIsDone;
@@ -23,12 +27,13 @@ public class SSSPDriver {
     static int bucketIdx;
 
     static TIntArrayList[] lightEdges;
+    static TDoubleArrayList[] lightWeights;
     static TIntArrayList[] heavyEdges;
+    static TDoubleArrayList[] heavyWeights;
 
     Graph<SSSPPartition> graph;
-    DoubleBinaryOperator updateFunction;
     LinkedBlockingQueue<Task> taskQueue;
-    TaskWaitingRunnable runnable;
+    SSSPTaskWaitingRunnable runnable;
     CyclicBarrier barriers;
 
     Task[] workTasks;
@@ -36,7 +41,10 @@ public class SSSPDriver {
 
     SSSPExecutor[] ssspExecutors;
 
-    public SSSPDriver(Graph<SSSPPartition> graph, int numThreads, double delta) {
+    ReentrantLock lock = new ReentrantLock();
+    Condition condition = lock.newCondition();
+
+    public SSSPDriver(Graph<SSSPPartition> graph, int numThreads, double delta, int source) {
         this.graph = graph;
         this.numThreads = numThreads;
         this.delta = delta;
@@ -50,33 +58,39 @@ public class SSSPDriver {
     public void init() {
         int numPartitions = graph.getNumPartitions();
 
-        updateFunction = getUpdateFunction();
-        SSSPPartition.setUpdateFunction(updateFunction);
-
         workTasks = new Task[numPartitions];
         ssspExecutors = new SSSPExecutor[numPartitions];
         barrierTasks = new Task[numThreads];
-        barriers = new CyclicBarrier(numThreads);
+
+        barriers = new CyclicBarrier(numThreads + 1);
 
         taskQueue = new LinkedBlockingQueue<>();
-        runnable = new TaskWaitingRunnable(taskQueue);
+        runnable = new SSSPTaskWaitingRunnable(taskQueue, lock, condition);
 
         int numNodes = graph.getNumNodes();
         lightEdges = new TIntArrayList[numNodes];
+        lightWeights = new TDoubleArrayList[numNodes];
         heavyEdges = new TIntArrayList[numNodes];
-
+        heavyWeights = new TDoubleArrayList[numNodes];
 
         for (int i = 0; i < numNodes; i++) {
             lightEdges[i] = new TIntArrayList();
+            lightWeights[i] = new TDoubleArrayList();
             heavyEdges[i] = new TIntArrayList();
+            heavyWeights[i] = new TDoubleArrayList();
+
             Node srcNode = graph.getNode(i);
 
             for (int j = 0; j < srcNode.getOutDegree(); j++) {
                 int destId = srcNode.getNeighbor(j);
-                if (srcNode.getNeighborWeight(destId) > delta) {
+                double weight = srcNode.getWeight(destId);
+                if (weight > delta) {
                     heavyEdges[i].add(destId);
-                } else {
+                    heavyWeights[i].add(weight);
+                }
+                else {
                     lightEdges[i].add(destId);
+                    lightWeights[i].add(weight);
                 }
             }
         }
@@ -95,45 +109,68 @@ public class SSSPDriver {
         System.out.println("[DEBUG] SSSP Driver Init Done");
     }
 
-    public void run() {
-        SSSPExecutor.setCurBucketId(bucketIdx);
-        graph.getPartition(0).setBucketIds(0, bucketIdx);
+    public void run()
+            throws BrokenBarrierException, InterruptedException {
+        // TODO:
+        graph.getPartition(0).update(0, 0.0);
+        graph.getPartition(0).setBucketId(0, bucketIdx);
         graph.getPartition(0).setCurrMaxBucket(bucketIdx);
-        graph.getPartition(0).setInnerIter(innerIdx-1);
+        graph.getPartition(0).setInnerIdx(innerIdx - 1);
 
         while (true) {
-            System.out.println("[DEBUG] Here");
             if (totalDone()) {
                 break;
+            }
+            for (int i = 0; i < graph.getNumPartitions(); i++) {
+                graph.getPartition(i).setInnerIdx(0);
             }
 
             SSSPExecutor.setIsHeavy(false);
             while (true) {
-                System.out.println("[DEBUG] There");
                 runLightEdges(workTasks);
                 if (lightIsDone) {
                     break;
                 }
-                runBarrierOnce(barrierTasks);
-                busyWaitForSyncStopMilli(10);
+                lock.lock();
+                try {
+                    condition.signalAll();
+                } finally {
+                    lock.unlock();
+                }
+                pushBarriers(barrierTasks);
+                barriers.await();
+                barriers.reset();
                 innerIdx++;
             }
 
             SSSPExecutor.setIsHeavy(true);
             runHeavyEdges(workTasks);
-            runBarrierOnce(barrierTasks);
-            busyWaitForSyncStopMilli(10);
+            pushBarriers(barrierTasks);
+            barriers.await();
+            barriers.reset();
+
             bucketIdx++;
-            SSSPExecutor.setCurBucketId(bucketIdx);
             innerIdx = 1;
             lightIsDone = false;
+        }
+    }
+
+    public void print() {
+        for (int i = 0; i < graph.getNumPartitions(); i++) {
+            SSSPPartition partition = graph.getPartition(i);
+            int offset = i << graph.getExpOfPartitionSize();
+            for (int j = 0; j < partition.getSize(); j++) {
+                int nodeId = offset + j;
+                String distance = String.format("%.3f", partition.getVertexValue(j));
+                System.out.println(nodeId + "   " + distance);
+            }
         }
     }
 
     public void runLightEdges(Task[] tasks) {
         int count = 0;
         for (int i = 0; i < tasks.length; i++) {
-            if (!checkDone(i, false)) {
+            if (!isLightEdgesDone(i)) {
                 taskQueue.offer(tasks[i]);
                 count++;
             }
@@ -146,38 +183,18 @@ public class SSSPDriver {
 
     public void runHeavyEdges(Task[] tasks) {
         for (int i = 0; i < tasks.length; i++) {
-            if (!checkDone(i, true)) {
-                taskQueue.offer(tasks[i]);
-            }
+            taskQueue.offer(tasks[i]);
         }
     }
 
-    public void runBarrierOnce(Task[] tasks) {
+    public void pushBarriers(Task[] tasks) {
         for (int i = 0; i < tasks.length; i++) {
             taskQueue.offer(tasks[i]);
         }
     }
 
-    public void busyWaitForSyncStopMilli(int millisecond) {
-        while (taskQueue.size() != 0) {
-            try {
-                TimeUnit.MILLISECONDS.sleep(millisecond);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public DoubleBinaryOperator getUpdateFunction() {
-        DoubleBinaryOperator updateFunction = (prev, value) -> value;
-        return updateFunction;
-    }
-
     public void reset() {
         for (int i = 0; i < graph.getNumPartitions(); i++) {
-            if (graph.getPartition(i) == null) {
-                System.out.println("NULL");
-            }
             graph.getPartition(i).reset();
         }
         lightIsDone = false;
@@ -195,22 +212,13 @@ public class SSSPDriver {
         return true;
     }
 
-    public boolean checkDone(int partitionId, boolean isHeavy) {
+    public boolean isLightEdgesDone(int partitionId) {
         SSSPPartition partition = graph.getPartition(partitionId);
-        if (!isHeavy) {
-            if (partition.getInnerIter() == (innerIdx-1)) {
-                return false;
-            } else {
-                return true;
-            }
-        } else {
-            int offset = partitionId << graph.getExpOfPartitionSize();
-            for (int i = 0; i < partition.getSize(); i++) {
-                int nodeId = offset + i;
-                if (partition.getBucketIds(i) == bucketIdx && !heavyEdges[nodeId].isEmpty()) {
-                    return false;
-                }
-            }
+
+        if (partition.getInnerIdx() == (innerIdx - 1)) {
+            return false;
+        }
+        else {
             return true;
         }
     }
@@ -221,6 +229,14 @@ public class SSSPDriver {
 
     public static TIntArrayList[] getHeavyEdges() {
         return heavyEdges;
+    }
+
+    public static TDoubleArrayList[] getLightWeights() {
+        return lightWeights;
+    }
+
+    public static TDoubleArrayList[] getHeavyWeights() {
+        return heavyWeights;
     }
 
     public static int getInnerIdx() {

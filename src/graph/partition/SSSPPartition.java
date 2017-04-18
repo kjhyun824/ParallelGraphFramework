@@ -8,66 +8,74 @@ import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.DoubleBinaryOperator;
 
-public class SSSPPartition extends Partition {
+public class SSSPPartition extends Partition
+{
     public static DoubleBinaryOperator updateFunction;
-
-    public static void setUpdateFunction(DoubleBinaryOperator function) {
-        updateFunction = function;
-    }
 
     AtomicDoubleArray tables;
     AtomicIntegerArray bucketIds;
-    AtomicInteger innerIter;
     AtomicInteger currMaxBucket;
+    int innerIdx;
 
-    public SSSPPartition(int partitionId, int maxNodeId, int partitionSize, int numValuesPerNode, int asyncRangeSize) {
-        super(partitionId, maxNodeId, partitionSize, numValuesPerNode, asyncRangeSize);
+    public SSSPPartition(int partitionId, int maxNodeId, int partitionSize, int asyncRangeSize) {
+        super(partitionId, maxNodeId, partitionSize, asyncRangeSize);
     }
 
     public final void initializeTable() {
         tables = new AtomicDoubleArray(partitionSize);
-        activeNodeCheckArray = new int[partitionSize];
         bucketIds = new AtomicIntegerArray(partitionSize);
-        innerIter = new AtomicInteger();
         currMaxBucket = new AtomicInteger();
 
-        Arrays.fill(activeNodeCheckArray, -1);
-
         for (int i = 0; i < partitionSize; i++) {
-            tables.set(i,0);
-            bucketIds.set(i, -1);
+            tables.set(i, Double.POSITIVE_INFINITY);
+            bucketIds.set(i, Integer.MAX_VALUE);
         }
-        innerIter.set(-1);
+        innerIdx = -1;
         currMaxBucket.set(-1);
     }
 
-    public void setBucketIds(int entry, int value) {
-        int temp;
-        do {
-            temp = bucketIds.get(entry);
-            if (temp != -1 && temp <= value) break;
-        } while (!bucketIds.compareAndSet(entry, temp, value));
+    public void setBucketId(int entry, int newId) {
+        int prevId;
+        if (entry < asyncRangeSize) {
+            prevId = bucketIds.get(entry);
+            if (prevId > newId) {
+                bucketIds.asyncSet(entry, newId);
+            }
+        }
+        else {
+            do {
+                prevId = bucketIds.get(entry);
+                if (prevId <= newId) {
+                    break;
+                }
+            }
+            while (!bucketIds.compareAndSet(entry, prevId, newId));
+        }
     }
 
-    public int getBucketIds(int entry) {
+    public int getBucketId(int entry) {
         return bucketIds.get(entry);
     }
 
-    public void setInnerIter(int value) {
-        if (innerIter.get() != value)
-            innerIter.set(value);
+    public void setInnerIdx(int value) {
+        if (innerIdx != value) {
+            innerIdx = value;
+        }
     }
 
-    public int getInnerIter() {
-        return innerIter.get();
+    public int getInnerIdx() {
+        return innerIdx;
     }
 
     public void setCurrMaxBucket(int value) {
-        int temp;
+        int currMax;
         do {
-            temp = currMaxBucket.get();
-            if (temp >= value) break;
-        } while (!currMaxBucket.compareAndSet(temp, value));
+            currMax = currMaxBucket.get();
+            if (currMax >= value) {
+                break;
+            }
+        }
+        while (!currMaxBucket.compareAndSet(currMax, value));
     }
 
     public int getCurrMaxBucket() {
@@ -77,22 +85,28 @@ public class SSSPPartition extends Partition {
     public final double getVertexValue(int entry) {
         if (entry < asyncRangeSize) {
             return tables.asyncGet(entry);
-        } else {
+        }
+        else {
             return tables.get(entry);
         }
     }
 
-    public final void update(int entry, double value) {
+    public final void update(int entry, double newDist) {
+        double currDist;
         if (entry < asyncRangeSize) { // TODO : think about multiple ranges in a single partition
-            if (tables.asyncGet(entry) > value) {
-                tables.asyncGetAndAccumulate(entry, value, updateFunction);
+            currDist = tables.asyncGet(entry);
+            if (currDist == 0 || currDist > newDist) {
+                tables.asyncGetAndAccumulate(entry, newDist, updateFunction);
             }
-        } else {
-            double tempDist;
+        }
+        else {
             do {
-                tempDist = tables.get(entry);
-                if (tempDist != 0 && tempDist <= value) break;
-            } while (!tables.compareAndSet(entry, tempDist, value));
+                currDist = tables.get(entry);
+                if (currDist <= newDist) {
+                    break;
+                }
+            }
+            while (!tables.compareAndSet(entry, currDist, newDist));
         }
     }
 
