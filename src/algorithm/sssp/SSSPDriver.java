@@ -156,7 +156,7 @@ public class SSSPDriver
     }
 
     public void print() {
-        try (FileWriter fw = new FileWriter("sssp.txt", true); BufferedWriter bw = new BufferedWriter(fw); PrintWriter out = new PrintWriter(bw)) {
+        try (FileWriter fw = new FileWriter("Distance.txt", true); BufferedWriter bw = new BufferedWriter(fw); PrintWriter out = new PrintWriter(bw)) {
             for (int i = 0; i < graph.getNumPartitions(); i++) {
                 SSSPPartition partition = graph.getPartition(i);
                 int offset = i << graph.getExpOfPartitionSize();
@@ -169,7 +169,7 @@ public class SSSPDriver
                 for (int j = 0; j < partition.getSize(); j++) {
                     int nodeId = offset + j;
                     String distance = String.format("%.3f", partition.getVertexValue(j));
-                    out.println(nodeId + " " + distance);
+                    out.println(nodeId + "  " + distance);
                 }
             }
         }
@@ -189,14 +189,6 @@ public class SSSPDriver
 
         if (count == 0) {
             lightIsDone = true;
-        }
-
-        lock.lock();
-        try {
-            condition.signalAll();
-        }
-        finally {
-            lock.unlock();
         }
     }
 
@@ -234,7 +226,7 @@ public class SSSPDriver
     public boolean isLightEdgesDone(int partitionId) {
         SSSPPartition partition = graph.getPartition(partitionId);
 
-        if (partition.getInnerIdx() == (innerIdx - 1)) {
+        if (partition.getInnerIdx() >= (innerIdx - 1)) {
             return false;
         }
         else {

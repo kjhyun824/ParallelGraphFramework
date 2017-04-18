@@ -25,35 +25,14 @@ public class SSSPTaskWaitingRunnable implements Runnable
     @Override
     public void run() {
         while (true) {
-            if(!isHeavy) {
-                lock.lock();
-                try {
-                    condition.await();
-                    if (taskQueue.size() == 0)
-                        isHeavy = true;
-                }
-                catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                finally {
-                    lock.unlock();
-                }
+            Task task = null;
+            try {
+                task = taskQueue.take();
             }
-            while (true) {
-                Task task = null;
-                try {
-                    task = taskQueue.take();
-                }
-                catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                task.run();
-
-                if(taskQueue.size() == 0) {
-                    if(isHeavy) isHeavy = false;
-                    break;
-                }
+            catch (InterruptedException e) {
+                e.printStackTrace();
             }
+            task.run();
         }
     }
 }

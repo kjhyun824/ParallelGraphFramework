@@ -35,8 +35,12 @@ public class SSSPMain {
             driver.run();
             elapsedTime[i] = System.currentTimeMillis() - start;
             System.out.println("[DEBUG] elapsed time for iteration" + i + " : " + (elapsedTime[i] / (double) 1000));
+            if (i == 0) {
+                break;
+            }
         }
         System.out.println("[DEBUG] SSSP END");
+        System.out.print("[DEBUG] FileWrite ...");
         driver.print();
         System.exit(1);
     }
