@@ -4,7 +4,7 @@ import atomic.AtomicDoubleArray;
 
 import java.util.function.DoubleBinaryOperator;
 
-public class DoublePartition extends Partition {
+public class PageRankPartition extends Partition {
     public static DoubleBinaryOperator updateFunction;
 
     public static void setUpdateFunction(DoubleBinaryOperator function) {
@@ -13,13 +13,13 @@ public class DoublePartition extends Partition {
 
     AtomicDoubleArray[] tables;
 
-    public DoublePartition(int partitionId, int maxNodeId, int partitionSize, int numValuesPerNode, int asyncRangeSize) {
-        super(partitionId, maxNodeId, partitionSize, numValuesPerNode, asyncRangeSize);
+    public PageRankPartition(int partitionId, int maxNodeId, int partitionSize, int asyncRangeSize) {
+        super(partitionId, maxNodeId, partitionSize, asyncRangeSize);
     }
 
     public final void initializeTable() {
-        tables = new AtomicDoubleArray[numValuesPerNode];
-        for (int i = 0; i < numValuesPerNode; i++) {
+        tables = new AtomicDoubleArray[2];
+        for (int i = 0; i < tables.length; i++) {
             tables[i] = new AtomicDoubleArray(partitionSize);
         }
     }

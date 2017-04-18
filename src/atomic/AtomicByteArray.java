@@ -1,7 +1,4 @@
 package atomic;
-
-import java.util.concurrent.atomic.AtomicIntegerArray;
-
 /**
  *
  *
@@ -164,6 +161,10 @@ public class AtomicByteArray {
      */
     public byte get(final int i) {
         return (byte) (this.array.get(i >>> 2) >> ((i & 3) << 3));
+    }
+
+    public byte asyncGet(final int i) {
+        return (byte) (this.array.asyncGet(i >>> 2) >> ((i & 3) << 3));
     }
 
     /**

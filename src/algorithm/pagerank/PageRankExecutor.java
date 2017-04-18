@@ -3,17 +3,17 @@ package algorithm.pagerank;
 import graph.Graph;
 import graph.GraphAlgorithmInterface;
 import graph.Node;
-import graph.partition.DoublePartition;
+import graph.partition.PageRankPartition;
 
 public class PageRankExecutor implements GraphAlgorithmInterface{
-    Graph<DoublePartition> graph;
-    DoublePartition doublePartition;
+    Graph<PageRankPartition> graph;
+    PageRankPartition doublePartition;
     Node srcNode;
 
     final int partitionId;
     double dampingFactor;
 
-    PageRankExecutor(int partitionId, Graph<DoublePartition> graph, double dampingFactor) {
+    PageRankExecutor(int partitionId, Graph<PageRankPartition> graph, double dampingFactor) {
         this.partitionId = partitionId;
         this.graph = graph;
         this.dampingFactor = dampingFactor;
@@ -44,14 +44,14 @@ public class PageRankExecutor implements GraphAlgorithmInterface{
             int dest = srcNode.getNeighbor(j);
             int destPartitionId = graph.getPartitionId(dest);
 
-            DoublePartition destDoublePartition = graph.getPartition(destPartitionId);
+            PageRankPartition destDoublePartition = graph.getPartition(destPartitionId);
             int destPosition = graph.getNodePositionInPart(dest);
 
             destDoublePartition.updateNextTable(destPosition, scatteredPageRank);
         }
     }
 
-    public double getScatteredPageRank(DoublePartition doublePartition, int index, int neighborListSize) {
+    public double getScatteredPageRank(PageRankPartition doublePartition, int index, int neighborListSize) {
         return dampingFactor * doublePartition.getVertexValue(index) / (double) neighborListSize;
     }
 

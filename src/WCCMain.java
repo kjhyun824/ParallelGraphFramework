@@ -11,6 +11,7 @@ import java.io.PrintWriter;
 public class WCCMain
 {
     public static void main(String[] args) {
+
         final boolean isDirected = false;
         final boolean isWeighted = false;
         String inputFile = args[0];
@@ -23,7 +24,7 @@ public class WCCMain
         long start = System.currentTimeMillis();
         Graph<WCCPartition> graph = Graph.getInstance(expOfPartitionSize, isDirected, isWeighted);
         GraphUtil.load(graph, inputFile);
-        graph.generatePartition(0, asyncRangeSize, WCCPartition.class);
+        graph.generatePartition(asyncRangeSize, WCCPartition.class);
         long loadingTime = System.currentTimeMillis() - start;
 
         System.out.println("[DEBUG] Graph Loading : " + ((double) loadingTime / 1000.0));

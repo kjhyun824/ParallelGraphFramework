@@ -16,7 +16,7 @@ public class WCCPartition extends Partition
     AtomicIntegerArray tables;
 
     public WCCPartition(int partitionId, int maxNodeId, int partitionSize, int asyncRangeSize) {
-        super(partitionId, maxNodeId, partitionSize, 0, asyncRangeSize);
+        super(partitionId, maxNodeId, partitionSize, asyncRangeSize);
     }
 
     public void initializeTable() {

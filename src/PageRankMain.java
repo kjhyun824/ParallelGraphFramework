@@ -1,19 +1,18 @@
 import algorithm.pagerank.PageRankDriver;
 import graph.Graph;
-import graph.Node;
-import graph.partition.DoublePartition;
+import graph.partition.PageRankPartition;
 import graph.GraphUtil;
+import java.util.concurrent.TimeUnit;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-
-public class PageRankMain {
+public class PageRankMain
+{
     /**
      * USER : Set the PageRank Configuration
      **/
-    public static void main(String[] args) {
+    public static void main(String[] args)
+            throws InterruptedException {
+        final boolean isDirected = true;
+        final boolean isWeighted = false;
         String inputFile = args[0];
         int numThreads = Integer.parseInt(args[1]);
         double percentage = Double.parseDouble(args[2]);
@@ -21,45 +20,45 @@ public class PageRankMain {
         double dampingFactor = 0.85;
         int iteration = 10;
         int expOfPartitionSize = 16;//1 << 12;      // 2 ^ n     For PartitionSize
-        int numValuesPerNode = 2;
-        int asyncRangeSize = (int) ((1 << 16) * (percentage / 100));
+        int asyncRangeSize = (int) ((1 << expOfPartitionSize) * percentage);
 
-        Graph<DoublePartition> graph = Graph.getInstance(expOfPartitionSize,true,false);
+        Graph<PageRankPartition> graph = Graph.getInstance(expOfPartitionSize, isDirected, isWeighted);
+
+        long start = System.currentTimeMillis();
+        System.out.println("[DEBUG] Graph Loading... ");
         GraphUtil.load(graph, inputFile);
-        graph.generatePartition(numValuesPerNode, asyncRangeSize, DoublePartition.class);
-        //GraphUtil.finalizeLoading(graph);
+        System.out.println("[DEBUG] Loading Time : " + (System.currentTimeMillis() - start));
+        graph.generatePartition(asyncRangeSize, PageRankPartition.class);
 
         PageRankDriver driver = new PageRankDriver(graph, dampingFactor, iteration, numThreads);
 
         /**     PageRank Start      **/
         long[] elapsedTime = new long[20];
 
+        System.out.println("[DEBUG] PageRank running .... ");
+        GraphUtil.load(graph, inputFile);
         for (int i = 0; i < 20; i++) {
             driver.reset();
-            long start = System.currentTimeMillis();
+
+            if (i == 10) {
+                System.out.println("START");
+                TimeUnit.SECONDS.sleep(5);
+            }
+
+            start = System.currentTimeMillis();
             driver.run();
-            driver._printPageRankSum();
             elapsedTime[i] = System.currentTimeMillis() - start;
+
+            if (i >= 10) {
+                System.out.println("[DEBUG] elapsed time for iteration" + (i-10) + " : " + ((elapsedTime[i]) / (1000.0)));
+            }
+
+            // For Testing.. (perf)
+            if (i == 10) {
+                break;
+            }
         }
 
-        System.out.println("Async  " + percentage + "%" + "  Atomic " + (100 - percentage) + "%\n");
-        double timeSum = 0;
-        for (int i = 0; i < 10; i++) {
-            System.out.print(elapsedTime[i + 10] / (double) 1000 + " ");
-            timeSum += elapsedTime[i + 10] / (double) 1000;
-        }
-
-//        driver._printPageRankSum();
-        System.out.print("AVG : " + timeSum / 10);
-
-
-        try (FileWriter fw = new FileWriter(String.valueOf(percentage) + "out.txt", true); BufferedWriter bw = new BufferedWriter(fw); PrintWriter out = new PrintWriter(bw)) {
-            out.print((timeSum / 10) + "/");
-        }
-        catch (IOException e) {
-
-        }
         System.exit(1);
     }
-
 }

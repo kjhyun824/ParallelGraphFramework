@@ -14,8 +14,7 @@ public class GraphUtil {
         Path path = Paths.get(inputFile);
         try (BufferedReader reader = Files.newBufferedReader(path)) {
             readEdgeFromFile(graph, reader);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return graph;
@@ -28,8 +27,9 @@ public class GraphUtil {
             String[] nodeId = line.trim().split("\t");
             int srcNodeId = Integer.parseInt(nodeId[0]);
             int destNodeId = Integer.parseInt(nodeId[1]);
-            if(graph.isWeighted()) {
-                graph.addEdge(srcNodeId, destNodeId, 1.0);
+            if (graph.isWeighted()) {
+                double weight = Double.parseDouble(nodeId[2]);
+                graph.addEdge(srcNodeId, destNodeId, weight);
             } else {
                 graph.addEdge(srcNodeId, destNodeId);
             }
@@ -57,10 +57,8 @@ public class GraphUtil {
                     out.println(i + "\t" + neighborId);
                 }
             }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
 
         }
     }
 }
-

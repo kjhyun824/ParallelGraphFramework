@@ -3,6 +3,9 @@ import graph.Graph;
 import graph.GraphUtil;
 import graph.partition.IntegerPartition;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 public class SCCMain {
     public static void main(String[] args) {
         String inputFile = args[0];
@@ -15,7 +18,7 @@ public class SCCMain {
         long start = System.currentTimeMillis();
         Graph<IntegerPartition> graph = Graph.getInstance(expOfPartitionSize,true,false);
         GraphUtil.load(graph, inputFile);
-        graph.generatePartition(numValuesPerNode, asyncRangeSize, IntegerPartition.class);
+        graph.generatePartition(asyncRangeSize, IntegerPartition.class);
         long elapsedTime = System.currentTimeMillis() - start;
         System.out.println("Graph Load Time : " + elapsedTime / (double) 1000 + " \n");
 
@@ -23,6 +26,5 @@ public class SCCMain {
 
         SCCDriver driver = new SCCDriver(graph, numThreads);
         driver.run();
-
     }
 }

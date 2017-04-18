@@ -3,11 +3,11 @@ package algorithm.pagerank;
 import graph.Graph;
 import graph.GraphAlgorithmInterface;
 import graph.Node;
-import graph.partition.DoublePartition;
+import graph.partition.PageRankPartition;
 
 public class PageRankInit implements GraphAlgorithmInterface{
-    Graph<DoublePartition> graph;
-    DoublePartition doublePartition;
+    Graph<PageRankPartition> graph;
+    PageRankPartition doublePartition;
     Node srcNode;
 
     final int partitionId;
@@ -16,7 +16,7 @@ public class PageRankInit implements GraphAlgorithmInterface{
     double stopSurfValue;
     boolean isFirst;
 
-    PageRankInit(int partitionId, Graph<DoublePartition> graph, double dampingFactor) {
+    PageRankInit(int partitionId, Graph<PageRankPartition> graph, double dampingFactor) {
         this.partitionId = partitionId;
         this.graph = graph;
         this.dampingFactor = dampingFactor;
@@ -54,7 +54,7 @@ public class PageRankInit implements GraphAlgorithmInterface{
     }
 
     public void initNextTable() {
-        DoublePartition doublePartition = graph.getPartition(partitionId);
+        PageRankPartition doublePartition = graph.getPartition(partitionId);
         int partitionSize = doublePartition.getSize();
 
         for (int i = 0; i < partitionSize; i++) {

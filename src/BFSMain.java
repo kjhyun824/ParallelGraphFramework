@@ -9,14 +9,13 @@ public class BFSMain {
         int numThreads = Integer.parseInt(args[1]);
 
         int expOfPartitionSize = 16; // 1 << 16;
-        int numValuesPerNode = 1;
         int asyncRangeSize = ((1 << 16) * 0);
 
         long start = System.currentTimeMillis();
 
         Graph<IntegerPartition> graph = Graph.getInstance(expOfPartitionSize,true,false);
         GraphUtil.load(graph, inputFile);
-        graph.generatePartition(numValuesPerNode, asyncRangeSize, IntegerPartition.class);
+        graph.generatePartition(asyncRangeSize, IntegerPartition.class);
         //GraphUtil.finalizeLoading(graph);
 
         long loadingTime = System.currentTimeMillis() - start;

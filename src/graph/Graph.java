@@ -1,6 +1,6 @@
 package graph;
 
-import graph.partition.DoublePartition;
+import graph.partition.PageRankPartition;
 import graph.partition.IntegerPartition;
 import graph.partition.SSSPPartition;
 import graph.partition.WCCPartition;
@@ -146,24 +146,24 @@ public class Graph<T>
 
     // The following part is related to Partiton
 
-    public void generatePartition(int numValuesPerNode, int asyncRangeSize, Class<T> partitionClass) {
+    public void generatePartition(int asyncRangeSize, Class<T> partitionClass) {
         int nodeCapacity = maxNodeId + 1; // TODO : Change Capacity to the number of node
         numPartitions = (nodeCapacity + (partitionCapacity - 1)) / partitionCapacity;
         partitions = (T[]) Array.newInstance(partitionClass, numPartitions);
 
         if (partitionClass == IntegerPartition.class) {
             for (int i = 0; i < numPartitions; i++) {
-                partitions[i] = (T) new IntegerPartition(i, maxNodeId, partitionCapacity, numValuesPerNode, asyncRangeSize);
+                partitions[i] = (T) new IntegerPartition(i, maxNodeId, partitionCapacity, asyncRangeSize);
             }
         }
-        else if (partitionClass == DoublePartition.class) {
+        else if (partitionClass == PageRankPartition.class) {
             for (int i = 0; i < numPartitions; i++) {
-                partitions[i] = (T) new DoublePartition(i, maxNodeId, partitionCapacity, numValuesPerNode, asyncRangeSize);
+                partitions[i] = (T) new PageRankPartition(i, maxNodeId, partitionCapacity, asyncRangeSize);
             }
         }
         else if (partitionClass == SSSPPartition.class) {
             for (int i = 0; i < numPartitions; i++) {
-                partitions[i] = (T) new SSSPPartition(i, maxNodeId, partitionCapacity, numValuesPerNode, asyncRangeSize);
+                partitions[i] = (T) new SSSPPartition(i, maxNodeId, partitionCapacity, asyncRangeSize);
             }
         }
         else if (partitionClass == WCCPartition.class) {

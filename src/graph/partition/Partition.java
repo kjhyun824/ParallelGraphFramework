@@ -1,7 +1,7 @@
 package graph.partition;
 
-public abstract class Partition {
-    final int numValuesPerNode;
+public abstract class Partition
+{
     final int asyncRangeSize;
     int partitionId;
     int partitionSize;
@@ -10,15 +10,13 @@ public abstract class Partition {
     int partitionActiveValue;
     int[] activeNodeCheckArray;
 
-
-    Partition(int partitionId, int maxNodeId, int partitionSize, int numValuesPerNode, int asyncRangeSize) {
+    Partition(int partitionId, int maxNodeId, int partitionSize, int asyncRangeSize) {
         this.partitionId = partitionId;
         this.partitionSize = partitionSize;
         this.partitionActiveValue = 1;
         if ((partitionId + 1) * this.partitionSize > maxNodeId) {
             this.partitionSize = (maxNodeId % partitionSize) + 1;
         }
-        this.numValuesPerNode = numValuesPerNode;
         this.asyncRangeSize = asyncRangeSize;
         activeNodeCheckArray = new int[partitionSize];
         initializeTable();
@@ -49,9 +47,7 @@ public abstract class Partition {
     }
 
     public void setNodeIsActive(int pos, int value) {
-        if (activeNodeCheckArray[pos] != value) {
-            activeNodeCheckArray[pos] = value;
-        }
+        activeNodeCheckArray[pos] = value;
     }
 
     public void reset() {

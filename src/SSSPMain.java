@@ -3,30 +3,32 @@ import graph.Graph;
 import graph.GraphUtil;
 import graph.partition.SSSPPartition;
 
+import java.util.concurrent.BrokenBarrierException;
+
 public class SSSPMain {
-    public static void main(String[] args) {
+    public static void main(String[] args)
+            throws BrokenBarrierException, InterruptedException {
         String inputFile = args[0];
         int numThreads = Integer.parseInt(args[1]);
         double delta = Double.parseDouble(args[2]);
 
         int expOfPartitionSize = 16; // 1 << 16;
-        int numValuesPerNode = 1;
         int asyncRangeSize = ((1 << 16) * 0); // 1 for async, 0 for sync
 
         long start = System.currentTimeMillis();
 
         Graph<SSSPPartition> graph = Graph.getInstance(expOfPartitionSize,true,true);
+        System.out.println("[DEBUG] Graph Loading ... ");
         GraphUtil.load(graph, inputFile);
-        graph.generatePartition(numValuesPerNode, asyncRangeSize, SSSPPartition.class);
-        //GraphUtil.finalizeLoading(graph);
+        graph.generatePartition(asyncRangeSize, SSSPPartition.class);
 
-        long loadingTime = System.currentTimeMillis() - start;
-        System.out.println("[DEBUG] Graph Loading : " + ((double) loadingTime / 1000.0));
+        System.out.println("[DEBUG] Loading Time : " + (System.currentTimeMillis() - start) / 1000.0);
 
-        SSSPDriver driver = new SSSPDriver(graph, numThreads, delta);
+        SSSPDriver driver = new SSSPDriver(graph, numThreads, delta, 0);
 
         long[] elapsedTime = new long[20];
 
+        System.out.println("[DEBUG] SSSP Start");
         for (int i = 0; i < 20; i++) {
             driver.reset();
             start = System.currentTimeMillis();
@@ -34,7 +36,8 @@ public class SSSPMain {
             elapsedTime[i] = System.currentTimeMillis() - start;
             System.out.println("[DEBUG] elapsed time for iteration" + i + " : " + (elapsedTime[i] / (double) 1000));
         }
-
+        System.out.println("[DEBUG] SSSP END");
+        driver.print();
         System.exit(1);
     }
 }

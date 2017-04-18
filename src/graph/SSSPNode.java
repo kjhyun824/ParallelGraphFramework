@@ -3,37 +3,34 @@ package graph;
 import gnu.trove.list.array.TDoubleArrayList;
 import gnu.trove.list.array.TIntArrayList;
 
-public class Node extends TIntArrayList {
-    TDoubleArrayList weights = null;
+public class SSSPNode extends TIntArrayList {
+    //    TIntArrayList transposeNeighbors = null;
+    TDoubleArrayList heavyEdges = new TDoubleArrayList();
+    TDoubleArrayList lightEdges = new TDoubleArrayList();
+    TDoubleArrayList weights = new TDoubleArrayList();
 
     int inDegree;
     int outDegree;
+    static double delta;
 
-    Node() {
-        weights = new TDoubleArrayList(10);
-    }
-
-    public boolean addNeighborId(int neighborNodeId) {
-        int pos = binarySearch(neighborNodeId);
-        if (pos >= 0) {
-            return false;
-        } else {
-            pos = -(pos + 1);
-            insert(pos, neighborNodeId);
-            return true;
-        }
+    public static void setDelta(double d) {
+        delta = d;
     }
 
     public boolean addNeighborId(int neighborNodeId, double weight) {
-        int pos = binarySearch(neighborNodeId);
-        if (pos >= 0) {
-            return false;
-        } else {
-            pos = -(pos + 1);
-            insert(pos, neighborNodeId);
-            weights.insert(pos, weight);
-            return true;
+        if (weight < delta) {
+            int pos = lightEdges.binarySearch(neighborNodeId);
+            if (pos >= 0) {
+                return false;
+            }
+            else {
+                pos = -(pos + 1);
+                lightEdges.insert(pos, neighborNodeId);
+                weights.insert(pos, weight);
+                return true;
+            }
         }
+        return false;
     }
 
 
@@ -41,9 +38,8 @@ public class Node extends TIntArrayList {
         return getQuick(neighborNodeIdx);
     }
 
-    public double getWeight(int neighborNodeId) {
-        int pos = binarySearch(neighborNodeId);
-        return weights.get(pos);
+    public double getWeight(int neighborNodeIdx) {
+        return weights.get(neighborNodeIdx);
     }
 
     public int neighborListSize() {
@@ -80,3 +76,4 @@ public class Node extends TIntArrayList {
     }
     */
 }
+

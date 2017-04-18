@@ -1,7 +1,7 @@
 package algorithm.pagerank;
 
 import graph.Graph;
-import graph.partition.DoublePartition;
+import graph.partition.PageRankPartition;
 import task.*;
 import thread.TaskWaitingRunnable;
 import thread.ThreadUtil;
@@ -21,7 +21,7 @@ public class PageRankDriver {
     int iteration;
     double dampingFactor;
 
-    Graph<DoublePartition> graph;
+    Graph<PageRankPartition> graph;
     DoubleBinaryOperator updateFunction;
     LinkedBlockingQueue<Task> taskQueue;
     TaskWaitingRunnable runnable;
@@ -31,7 +31,7 @@ public class PageRankDriver {
     Task[] workTasks;
     Task[] barrierTasks;
 
-    public PageRankDriver(Graph<DoublePartition> graph, double dampingFactor, int iteration, int numThreads) {
+    public PageRankDriver(Graph<PageRankPartition> graph, double dampingFactor, int iteration, int numThreads) {
         this.graph = graph;
         this.dampingFactor = dampingFactor;
         this.iteration = iteration;
@@ -43,7 +43,7 @@ public class PageRankDriver {
         int numPartitions = graph.getNumPartitions();
 
         updateFunction = getUpdateFunction();
-        DoublePartition.setUpdateFunction(updateFunction);
+        PageRankPartition.setUpdateFunction(updateFunction);
 
         initTasks = new Task[numPartitions];
         workTasks = new Task[numPartitions];
@@ -105,7 +105,7 @@ public class PageRankDriver {
     }
 
     public void _printPageRankSum() {
-        DoublePartition[] partitions = graph.getPartitions();
+        PageRankPartition[] partitions = graph.getPartitions();
         ArrayList<Double> pagerank = new ArrayList<>();
         double sum = 0.0d;
 
@@ -135,7 +135,7 @@ public class PageRankDriver {
             int partitionNumber = graph.getPartitionId(node);
             int nodePosition = graph.getNodePositionInPart(node);
 
-            DoublePartition doublePartition = graph.getPartition(partitionNumber);
+            PageRankPartition doublePartition = graph.getPartition(partitionNumber);
             pageRank[i] = doublePartition.getVertexValue(nodePosition);
 
 //            System.out.println(sampleData[i] + " : " + graph.getNode(node).getInDegree() + " : " + graph.getNode(node).getOutDegree());
