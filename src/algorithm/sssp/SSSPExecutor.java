@@ -94,4 +94,8 @@ public class SSSPExecutor implements GraphAlgorithmInterface
     public static void setIsHeavy(boolean value) {
         isHeavy = value;
     }
+
+    public static boolean getIsHeavy() {
+        return isHeavy;
+    }
 }

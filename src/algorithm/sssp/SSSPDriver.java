@@ -11,6 +11,10 @@ import thread.SSSPTaskWaitingRunnable;
 import thread.TaskWaitingRunnable;
 import thread.ThreadUtil;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -131,17 +135,13 @@ public class SSSPDriver
                 if (lightIsDone) {
                     break;
                 }
-                lock.lock();
-                try {
-                    condition.signalAll();
-                } finally {
-                    lock.unlock();
-                }
                 pushBarriers(barrierTasks);
+
                 barriers.await();
                 barriers.reset();
                 innerIdx++;
             }
+            System.out.println("[DEBUG] inner : " + innerIdx);
 
             SSSPExecutor.setIsHeavy(true);
             runHeavyEdges(workTasks);
@@ -156,14 +156,25 @@ public class SSSPDriver
     }
 
     public void print() {
-        for (int i = 0; i < graph.getNumPartitions(); i++) {
-            SSSPPartition partition = graph.getPartition(i);
-            int offset = i << graph.getExpOfPartitionSize();
-            for (int j = 0; j < partition.getSize(); j++) {
-                int nodeId = offset + j;
-                String distance = String.format("%.3f", partition.getVertexValue(j));
-                System.out.println(nodeId + "   " + distance);
+        try (FileWriter fw = new FileWriter("sssp.txt", true); BufferedWriter bw = new BufferedWriter(fw); PrintWriter out = new PrintWriter(bw)) {
+            for (int i = 0; i < graph.getNumPartitions(); i++) {
+                SSSPPartition partition = graph.getPartition(i);
+                int offset = i << graph.getExpOfPartitionSize();
+//            for (int j = 0; j < partition.getSize(); j++) {
+//                int nodeId = offset + j;
+//                String distance = String.format("%.3f", partition.getVertexValue(j));
+//                System.out.println(nodeId + "   " + distance);
+//            }
+
+                for (int j = 0; j < partition.getSize(); j++) {
+                    int nodeId = offset + j;
+                    String distance = String.format("%.3f", partition.getVertexValue(j));
+                    out.println(nodeId + " " + distance);
+                }
             }
+        }
+        catch (IOException e) {
+
         }
     }
 
@@ -178,6 +189,14 @@ public class SSSPDriver
 
         if (count == 0) {
             lightIsDone = true;
+        }
+
+        lock.lock();
+        try {
+            condition.signalAll();
+        }
+        finally {
+            lock.unlock();
         }
     }
 
