@@ -36,14 +36,6 @@ public class GraphUtil {
         }
     }
 
-
-    /*
-    public static void finalizeLoading(Graph graph) {
-        graph.finalizeLoading();
-    }
-    */
-
-
     public static void writeGraph(Graph graph, String fileName) {
         try (FileWriter fw = new FileWriter(fileName, true);
                 BufferedWriter bw = new BufferedWriter(fw); PrintWriter out = new PrintWriter(bw)) {

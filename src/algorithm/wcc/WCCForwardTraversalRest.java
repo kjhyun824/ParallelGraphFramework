@@ -5,7 +5,8 @@ import graph.GraphAlgorithmInterface;
 import graph.Node;
 import graph.partition.WCCPartition;
 
-public class WCCForwardTraversalRest implements GraphAlgorithmInterface {
+public class WCCForwardTraversalRest implements GraphAlgorithmInterface
+{
     static final byte ACTIVE = 1;
     static final byte IN_ACTIVE = 0;
 
@@ -30,27 +31,25 @@ public class WCCForwardTraversalRest implements GraphAlgorithmInterface {
             int srcId = offset + i;
             Node srcNode = graph.getNode(srcId);
 
-            if (srcNode != null) {
-                int srcCurColor = partition.getNodeActiveValue(i);
-                int nextSrcColor = partition.getVertexValue(i);
+            int srcCurColor = partition.getNodeActiveValue(i);
+            int srcNextColor = partition.getVertexValue(i);
 
-                if (srcCurColor != nextSrcColor) {
-                    partition.setNodeIsActive(i, nextSrcColor);
+            if (srcCurColor != srcNextColor) {
+                partition.setNodeIsActive(i, srcNextColor);
 
-                    int neighborListSize = srcNode.neighborListSize();
+                int neighborListSize = srcNode.neighborListSize();
 
-                    for (int j = 0; j < neighborListSize; j++) {
-                        int destId = srcNode.getNeighbor(j);
-                        int destPartitionId = graph.getPartitionId(destId);
+                for (int j = 0; j < neighborListSize; j++) {
+                    int destId = srcNode.getNeighbor(j);
+                    int destPartitionId = graph.getPartitionId(destId);
 
-                        WCCPartition destPartition = graph.getPartition(destPartitionId);
-                        int destPosition = graph.getNodePositionInPart(destId);
-                        int destColor = destPartition.getNodeActiveValue(destPosition);
+                    WCCPartition destPartition = graph.getPartition(destPartitionId);
+                    int destPosition = graph.getNodePositionInPart(destId);
+                    int destColor = destPartition.getNodeActiveValue(destPosition);
 
-                        if (destColor < nextSrcColor) {
-                            destPartition.update(destPosition, nextSrcColor);
-                            destPartition.setPartitionActiveValue(ACTIVE);
-                        }
+                    if (destColor < srcNextColor) {
+                        destPartition.update(destPosition, srcNextColor);
+                        destPartition.setPartitionActiveValue(ACTIVE);
                     }
                 }
             }

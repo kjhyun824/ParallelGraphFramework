@@ -1,4 +1,4 @@
-import algorithm.sssp.DijkstraDriver;
+import algorithm.ssspSequential.DijkstraDriver;
 import graph.Graph;
 import graph.GraphUtil;
 import graph.partition.SSSPPartition;

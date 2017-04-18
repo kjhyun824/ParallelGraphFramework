@@ -5,27 +5,26 @@ import graph.partition.WCCPartition;
 import task.*;
 import thread.*;
 
+import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
-import java.util.function.IntBinaryOperator;
 
 public class WCCDriver {
     static final int ACTIVE = 1;
-    static final int IN_ACTIVE = 0;
 
     int numThreads;
     boolean isDone;
 
     Graph<WCCPartition> graph;
-    IntBinaryOperator updateFunction;
     LinkedBlockingQueue<Task> taskQueue;
     TaskWaitingRunnable runnable;
     CyclicBarrier barriers;
+    CyclicBarrier barriers2;
 
     Task[] fwTraverseStartTasks;
     Task[] fwTraverseRestTasks;
     Task[] barrierTasks;
+    Task[] barrierTasks2;
 
     int[] isPartitionActives;
 
@@ -40,15 +39,14 @@ public class WCCDriver {
     public void init() {
         int numPartitions = graph.getNumPartitions();
 
-        updateFunction = getUpdateFunction();
-        WCCPartition.setUpdateFunction(updateFunction);
-
         fwTraverseStartTasks = new Task[numPartitions];
         fwTraverseRestTasks = new Task[numPartitions];
         isPartitionActives = new int[numPartitions];
         barrierTasks = new Task[numThreads];
+        barrierTasks2 = new Task[numThreads];
 
         barriers = new CyclicBarrier(numThreads);
+        barriers2 = new CyclicBarrier(numThreads + 1);
         taskQueue = new LinkedBlockingQueue<>();
         runnable = new TaskWaitingRunnable(taskQueue);
 
@@ -61,29 +59,23 @@ public class WCCDriver {
 
         for (int i = 0; i < numThreads; i++) {
             barrierTasks[i] = new Task(new TaskBarrier(barriers));
+            barrierTasks2[i] = new Task(new TaskBarrier(barriers2));
         }
     }
 
-    public void run() {
+    public void run()
+            throws BrokenBarrierException, InterruptedException {
         runAllTasksOnce(fwTraverseStartTasks);
         runAllTasksOnce(barrierTasks);
         runAllTasksOnce(fwTraverseRestTasks);
 
         while (!isDone) {
-            runAllTasksOnce(barrierTasks);
-            busyWaitForSyncStopMilli(10);
-            runSomeTasksOnce(fwTraverseRestTasks);
-        }
-    }
+            runAllTasksOnce(barrierTasks2);
 
-    public void busyWaitForSyncStopMilli(int millisecond) {
-        while (taskQueue.size() != 0) {
-            try {
-                TimeUnit.MILLISECONDS.sleep(millisecond);
-            }
-            catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            barriers2.await();
+            barriers.reset();
+            barriers2.reset();
+            runSomeTasksOnce(fwTraverseRestTasks);
         }
     }
 
@@ -122,17 +114,6 @@ public class WCCDriver {
             max = Math.max(max, colors[i]);
         }
         return max;
-    }
-
-    public IntBinaryOperator getUpdateFunction() {
-        IntBinaryOperator updateFunction = (prev, value) -> {
-            int updateValue = prev;
-            if (prev < value) {
-                updateValue = value;
-            }
-            return updateValue;
-        };
-        return updateFunction;
     }
 
     public void reset() {

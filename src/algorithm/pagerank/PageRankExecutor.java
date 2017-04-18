@@ -5,54 +5,54 @@ import graph.GraphAlgorithmInterface;
 import graph.Node;
 import graph.partition.PageRankPartition;
 
-public class PageRankExecutor implements GraphAlgorithmInterface{
+public class PageRankExecutor implements GraphAlgorithmInterface
+{
     Graph<PageRankPartition> graph;
-    PageRankPartition doublePartition;
+    PageRankPartition partition;
     Node srcNode;
 
-    final int partitionId;
+    int partitionId;
+    int partitionSize;
+    int offset;
+
     double dampingFactor;
 
     PageRankExecutor(int partitionId, Graph<PageRankPartition> graph, double dampingFactor) {
         this.partitionId = partitionId;
         this.graph = graph;
         this.dampingFactor = dampingFactor;
+        partition = graph.getPartition(partitionId);
+        partitionSize = partition.getSize();
+        offset = partitionId << graph.getExpOfPartitionSize();
     }
 
     @Override
     public void execute() {
-        doublePartition = graph.getPartition(partitionId);
-        int partitionSize = doublePartition.getSize();
-        int expOfPartitionSize = graph.getExpOfPartitionSize();
-        int offset = partitionId << expOfPartitionSize;
-
         for (int i = 0; i < partitionSize; i++) {
             int nodeId = offset + i;
             srcNode = graph.getNode(nodeId);
 
-            if (srcNode != null) {
-                update(i);
-            }
+            update(i);
         }
     }
 
     public void update(int entry) {
         int neighborListSize = srcNode.neighborListSize();
-        double scatteredPageRank = getScatteredPageRank(doublePartition, entry, neighborListSize);
+        double scatteredPageRank = getScatteredPageRank(partition, entry, neighborListSize);
 
         for (int j = 0; j < neighborListSize; j++) {
             int dest = srcNode.getNeighbor(j);
             int destPartitionId = graph.getPartitionId(dest);
 
-            PageRankPartition destDoublePartition = graph.getPartition(destPartitionId);
+            PageRankPartition destPartition = graph.getPartition(destPartitionId);
             int destPosition = graph.getNodePositionInPart(dest);
 
-            destDoublePartition.updateNextTable(destPosition, scatteredPageRank);
+            destPartition.updateNextTable(destPosition, scatteredPageRank);
         }
     }
 
-    public double getScatteredPageRank(PageRankPartition doublePartition, int index, int neighborListSize) {
-        return dampingFactor * doublePartition.getVertexValue(index) / (double) neighborListSize;
+    public double getScatteredPageRank(PageRankPartition partition, int index, int neighborListSize) {
+        return dampingFactor * partition.getVertexValue(index) / (double) neighborListSize;
     }
 
     @Override

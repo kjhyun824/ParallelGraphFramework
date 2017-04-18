@@ -5,7 +5,8 @@ import graph.GraphAlgorithmInterface;
 import graph.Node;
 import graph.partition.WCCPartition;
 
-public class WCCForwardTraversalStart implements GraphAlgorithmInterface {
+public class WCCForwardTraversalStart implements GraphAlgorithmInterface
+{
     Graph<WCCPartition> graph;
     WCCPartition partition;
     final int partitionId;
@@ -24,16 +25,12 @@ public class WCCForwardTraversalStart implements GraphAlgorithmInterface {
     public void execute() {
         for (int i = 0; i < partitionSize; i++) {
             int nodeId = offset + i;
-            Node node = graph.getNode(nodeId);
-
-            if (node != null) {
-                partition.setVertexValue(i, nodeId);
-            }
+            partition.setVertexValue(i, nodeId);
         }
     }
 
     @Override
-    public void reset( ) {
+    public void reset() {
 
     }
 }

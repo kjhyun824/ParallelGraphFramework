@@ -3,16 +3,9 @@ package graph.partition;
 import atomic.AtomicIntegerArray;
 
 import java.util.Arrays;
-import java.util.function.IntBinaryOperator;
 
 public class WCCPartition extends Partition
 {
-    public static IntBinaryOperator updateFunction;
-
-    public static void setUpdateFunction(IntBinaryOperator function) {
-        updateFunction = function;
-    }
-
     AtomicIntegerArray tables;
 
     public WCCPartition(int partitionId, int maxNodeId, int partitionSize, int asyncRangeSize) {

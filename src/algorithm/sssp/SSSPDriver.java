@@ -7,19 +7,12 @@ import graph.Node;
 import graph.partition.SSSPPartition;
 import task.Task;
 import task.TaskBarrier;
-import thread.SSSPTaskWaitingRunnable;
 import thread.TaskWaitingRunnable;
 import thread.ThreadUtil;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class SSSPDriver
 {
@@ -37,16 +30,13 @@ public class SSSPDriver
 
     Graph<SSSPPartition> graph;
     LinkedBlockingQueue<Task> taskQueue;
-    SSSPTaskWaitingRunnable runnable;
+    TaskWaitingRunnable runnable;
     CyclicBarrier barriers;
 
     Task[] workTasks;
     Task[] barrierTasks;
 
     SSSPExecutor[] ssspExecutors;
-
-    ReentrantLock lock = new ReentrantLock();
-    Condition condition = lock.newCondition();
 
     public SSSPDriver(Graph<SSSPPartition> graph, int numThreads, double delta, int source) {
         this.graph = graph;
@@ -69,7 +59,7 @@ public class SSSPDriver
         barriers = new CyclicBarrier(numThreads + 1);
 
         taskQueue = new LinkedBlockingQueue<>();
-        runnable = new SSSPTaskWaitingRunnable(taskQueue, lock, condition);
+        runnable = new TaskWaitingRunnable(taskQueue);
 
         int numNodes = graph.getNumNodes();
         lightEdges = new TIntArrayList[numNodes];
@@ -156,25 +146,14 @@ public class SSSPDriver
     }
 
     public void print() {
-        try (FileWriter fw = new FileWriter("Distance.txt", true); BufferedWriter bw = new BufferedWriter(fw); PrintWriter out = new PrintWriter(bw)) {
-            for (int i = 0; i < graph.getNumPartitions(); i++) {
-                SSSPPartition partition = graph.getPartition(i);
-                int offset = i << graph.getExpOfPartitionSize();
-//            for (int j = 0; j < partition.getSize(); j++) {
-//                int nodeId = offset + j;
-//                String distance = String.format("%.3f", partition.getVertexValue(j));
-//                System.out.println(nodeId + "   " + distance);
-//            }
-
-                for (int j = 0; j < partition.getSize(); j++) {
-                    int nodeId = offset + j;
-                    String distance = String.format("%.3f", partition.getVertexValue(j));
-                    out.println(nodeId + "  " + distance);
-                }
+        for (int i = 0; i < graph.getNumPartitions(); i++) {
+            SSSPPartition partition = graph.getPartition(i);
+            int offset = i << graph.getExpOfPartitionSize();
+            for (int j = 0; j < partition.getSize(); j++) {
+                int nodeId = offset + j;
+                String distance = String.format("%.3f", partition.getVertexValue(j));
+                System.out.println(nodeId + "   " + distance);
             }
-        }
-        catch (IOException e) {
-
         }
     }
 

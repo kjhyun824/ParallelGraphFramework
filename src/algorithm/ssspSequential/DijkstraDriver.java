@@ -1,4 +1,4 @@
-package algorithm.sssp;
+package algorithm.ssspSequential;
 
 import graph.Graph;
 import graph.Node;
@@ -8,17 +8,27 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Comparator;
+import java.util.PriorityQueue;
 
-public class BellmanFordDriver
+public class DijkstraDriver
 {
     Graph<SSSPPartition> graph;
+    PriorityQueue<Integer> activeQueue;
     double[] dist;
 
     final int source;
     final int maxNodeId;
 
-    public BellmanFordDriver(Graph<SSSPPartition> graph, int source) {
+    public DijkstraDriver(Graph<SSSPPartition> graph, int source) {
         this.graph = graph;
+        activeQueue = new PriorityQueue<>(new Comparator<Integer>()
+        {
+            @Override
+            public int compare(Integer o1, Integer o2) {
+                return (int) (dist[o1] - dist[o2]);
+            }
+        });
 
         this.source = source;
         this.maxNodeId = graph.getMaxNodeId();
@@ -30,16 +40,19 @@ public class BellmanFordDriver
             dist[i] = Double.POSITIVE_INFINITY;
         }
         dist[source] = 0;
+        activeQueue.add(source);
 
-        for (int i = 0; i <= maxNodeId - 1; i++) {
-            for (int z = 0; z <= maxNodeId; z++) {
-                Node node = graph.getNode(z);
-                if (node != null) {
-                    int neighborListSize = node.size();
-                    for (int j = 0; j < neighborListSize; j++) {
-                        int neighborId = node.getNeighbor(j);
-                        relax(z, neighborId, node.getWeight(j));
-                    }
+        while (activeQueue.size() != 0) {
+            int v = activeQueue.poll();
+
+            Node node = graph.getNode(v);
+
+            if (node != null) {
+                int neighborListSize = node.neighborListSize();
+
+                for (int i = 0; i < neighborListSize; i++) {
+                    int u = node.getNeighbor(i);
+                    relax(v, u, node.getWeight(i));
                 }
             }
         }
@@ -48,13 +61,14 @@ public class BellmanFordDriver
     public void relax(int src, int dest, double weight) {
         if (dist[dest] > dist[src] + weight) {
             dist[dest] = dist[src] + weight;
+            activeQueue.add(dest);
         }
     }
 
     public void printDist() {
         try (FileWriter fw = new FileWriter("sssp.txt", true); BufferedWriter bw = new BufferedWriter(fw); PrintWriter out = new PrintWriter(bw)) {
             for (int i = 0; i < dist.length; i++) {
-                String distance = String.format("%.2f", dist[i]);
+                String distance = String.format("%.3f", dist[i]);
                 out.println(i + " " + distance);
             }
         }

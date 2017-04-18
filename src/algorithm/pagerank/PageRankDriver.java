@@ -8,9 +8,9 @@ import thread.ThreadUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 import java.util.function.DoubleBinaryOperator;
 
 /**
@@ -25,11 +25,14 @@ public class PageRankDriver {
     DoubleBinaryOperator updateFunction;
     LinkedBlockingQueue<Task> taskQueue;
     TaskWaitingRunnable runnable;
-    CyclicBarrier barriers;
+    CyclicBarrier initBarrier;
+    CyclicBarrier iterBarrier;
+
 
     Task[] initTasks;
     Task[] workTasks;
-    Task[] barrierTasks;
+    Task[] initBarrierTasks;
+    Task[] iterBarrierTasks;
 
     public PageRankDriver(Graph<PageRankPartition> graph, double dampingFactor, int iteration, int numThreads) {
         this.graph = graph;
@@ -47,8 +50,11 @@ public class PageRankDriver {
 
         initTasks = new Task[numPartitions];
         workTasks = new Task[numPartitions];
-        barrierTasks = new Task[numThreads];
-        barriers = new CyclicBarrier(numThreads);
+        initBarrierTasks = new Task[numThreads];
+        iterBarrierTasks = new Task[numThreads];
+
+        initBarrier = new CyclicBarrier(numThreads);
+        iterBarrier = new CyclicBarrier(numThreads + 1);
 
         taskQueue = new LinkedBlockingQueue<>();
         runnable = new TaskWaitingRunnable(taskQueue);
@@ -61,32 +67,26 @@ public class PageRankDriver {
         }
 
         for (int i = 0; i < numThreads; i++) {
-            barrierTasks[i] = new Task(new TaskBarrier(barriers));
+            initBarrierTasks[i] = new Task(new TaskBarrier(initBarrier));
+            iterBarrierTasks[i] = new Task(new TaskBarrier(iterBarrier));
         }
     }
 
-    public void run() {
+    public void run()
+            throws BrokenBarrierException, InterruptedException {
         for (int i = 0; i < iteration; i++) {
-            runOnce(initTasks);
-            runOnce(barrierTasks);
-            runOnce(workTasks);
-            runOnce(barrierTasks);
-        }
-        busyWaitForSyncStopMilli(10);
-    }
+            pushTasks(initTasks);
+            pushTasks(initBarrierTasks);
+            pushTasks(workTasks);
+            pushTasks(iterBarrierTasks);
 
-    public void busyWaitForSyncStopMilli(int millisecond) {
-        while (taskQueue.size() != 0) {
-            try {
-                TimeUnit.MILLISECONDS.sleep(millisecond);
-            }
-            catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            iterBarrier.await();
+            initBarrier.reset();
+            iterBarrier.reset();
         }
     }
 
-    public void runOnce(Task[] tasks) {
+    public void pushTasks(Task[] tasks) {
         for (int i = 0; i < tasks.length; i++) {
             taskQueue.add(tasks[i]);
         }
@@ -106,24 +106,24 @@ public class PageRankDriver {
 
     public void _printPageRankSum() {
         PageRankPartition[] partitions = graph.getPartitions();
-        ArrayList<Double> pagerank = new ArrayList<>();
+        ArrayList<Double> pageRankValues = new ArrayList<>();
         double sum = 0.0d;
 
         for (int i = 0; i < partitions.length; i++) {
             partitions[i].initializedCallback();
-            int numNodeInPart = partitions[i].getSize();
-            for (int j = 0; j < numNodeInPart; j++) {
-                pagerank.add(partitions[i].getVertexValue(j));
+            int partitionSize = partitions[i].getSize();
+            for (int j = 0; j < partitionSize; j++) {
+                pageRankValues.add(partitions[i].getVertexValue(j));
                 sum += partitions[i].getVertexValue(j);
             }
         }
 
-        Collections.sort(pagerank, Collections.reverseOrder());
+        Collections.sort(pageRankValues, Collections.reverseOrder());
 
         for (int i = 0; i < 10; i++) {
-            System.out.println("pageRank : " + i + " : " + pagerank.get(i));
+            System.out.println("[DEBUG] pageRank " + i + " : " + pageRankValues.get(i));
         }
-        System.out.println("PageRank : " + sum);
+        System.out.println("[DEBUG] PageRank Sum : " + sum);
     }
 
 
