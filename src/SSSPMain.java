@@ -40,8 +40,6 @@ public class SSSPMain {
             }
         }
         System.out.println("[DEBUG] SSSP END");
-        System.out.print("[DEBUG] FileWrite ...");
-        driver.print();
         System.exit(1);
     }
 }

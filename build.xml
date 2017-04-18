@@ -1,0 +1,44 @@
+<project name="SSSP" basedir="." default="main">
+    <property name="src.dir"        value="src"/>
+    <property name="build.dir"      value="build"/>
+    <property name="classes.dir"    value="${build.dir}/classes"/>
+    <property name="jar.dir"        value="${build.dir}/jar"/>
+    <property name="lib.dir"        value="lib"/>
+    <property name="graph.data.dir" value="/home/woori4829/Data"/>
+
+    <property name="arg0"           value="${graph.data.dir}/LiveJournal_weighted.txt"/>  
+    <property name="arg1"           value="1"/>
+    <property name="arg2"           value="0.1"/>
+
+<!--    <property name="arg0"           value="${graph.data.dir}/soc-LiveJournal1.txt"/> -->
+
+    <property name="main-class"     value="SSSPMain"/>
+    
+    <path id="classpath">
+        <fileset dir="${lib.dir}" includes="*.jar"/>
+    </path>
+
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+    </target>
+
+    <target name="compile">
+        <mkdir dir="${classes.dir}"/>
+        <javac srcdir="${src.dir}" destdir="${classes.dir}" classpathref="classpath" includeantruntime="false">
+        <compilerarg value="-XDignore.symbol.file"/>
+        </javac>
+    </target>
+
+    <target name="jar" depends="compile">
+        <mkdir dir="${jar.dir}"/>
+        <jar destfile="${jar.dir}/${ant.project.name}.jar" basedir="${classes.dir}">
+            <manifest>
+                <attribute name="Main-Class" value="${main-class}"/>
+            </manifest>
+						<zipgroupfileset dir="${lib.dir}" includes="**/*.jar"/>
+        </jar>
+     </target>
+     <target name="clean-build" depends="clean,jar"/>
+
+     <target name="main" depends="clean,jar"/>
+</project>
