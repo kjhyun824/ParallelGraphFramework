@@ -9,7 +9,8 @@ import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class WCCDriver {
+public class WCCDriver
+{
     static final int ACTIVE = 1;
 
     int numThreads;
@@ -24,7 +25,7 @@ public class WCCDriver {
     Task[] fwTraverseStartTasks;
     Task[] fwTraverseRestTasks;
     Task[] barrierTasks;
-    Task[] barrierTasks2;
+    Task[] barrier2Tasks;
 
     int[] isPartitionActives;
 
@@ -43,13 +44,12 @@ public class WCCDriver {
         fwTraverseRestTasks = new Task[numPartitions];
         isPartitionActives = new int[numPartitions];
         barrierTasks = new Task[numThreads];
-        barrierTasks2 = new Task[numThreads];
+        barrier2Tasks = new Task[numThreads];
 
         barriers = new CyclicBarrier(numThreads);
         barriers2 = new CyclicBarrier(numThreads + 1);
         taskQueue = new LinkedBlockingQueue<>();
         runnable = new TaskWaitingRunnable(taskQueue);
-
         ThreadUtil.createAndStartThreads(numThreads, runnable);
 
         for (int i = 0; i < numPartitions; i++) {
@@ -58,28 +58,29 @@ public class WCCDriver {
         }
 
         for (int i = 0; i < numThreads; i++) {
-            barrierTasks[i] = new Task(new TaskBarrier(barriers));
-            barrierTasks2[i] = new Task(new TaskBarrier(barriers2));
+            barrierTasks[i] = new Task(new BarrierTask(barriers));
+            barrier2Tasks[i] = new Task(new BarrierTask(barriers2));
         }
     }
 
     public void run()
             throws BrokenBarrierException, InterruptedException {
-        runAllTasksOnce(fwTraverseStartTasks);
-        runAllTasksOnce(barrierTasks);
-        runAllTasksOnce(fwTraverseRestTasks);
+        pushAllTasks(fwTraverseStartTasks);
+        pushAllTasks(barrierTasks);
+        pushAllTasks(fwTraverseRestTasks);
 
-        while (!isDone) {
-            runAllTasksOnce(barrierTasks2);
-
+        while (true) {
+            pushAllTasks(barrier2Tasks);
+            pushSomeTasks(fwTraverseRestTasks);
+            if (isDone) {
+                break;
+            }
             barriers2.await();
-            barriers.reset();
             barriers2.reset();
-            runSomeTasksOnce(fwTraverseRestTasks);
         }
     }
 
-    public void runSomeTasksOnce(Task[] tasks) {
+    public void pushSomeTasks(Task[] tasks) {
         int count = 0;
 
         for (int i = 0; i < tasks.length; i++) {
@@ -94,7 +95,7 @@ public class WCCDriver {
         }
     }
 
-    public void runAllTasksOnce(Task[] tasks) {
+    public void pushAllTasks(Task[] tasks) {
         for (int i = 0; i < tasks.length; i++) {
             taskQueue.offer(tasks[i]);
         }
@@ -117,6 +118,7 @@ public class WCCDriver {
     }
 
     public void reset() {
+        barriers.reset();
         for (int i = 0; i < graph.getNumPartitions(); i++) {
             graph.getPartition(i).reset();
         }

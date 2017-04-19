@@ -25,19 +25,19 @@ public class WCCMain
 
         long start = System.currentTimeMillis();
         Graph<WCCPartition> graph = Graph.getInstance(expOfPartitionSize, isDirected, isWeighted);
-        System.out.println("[DEBUG] Graph Loading ... ");
+        System.err.println("Graph Loading ... ");
         GraphUtil.load(graph, inputFile);
         graph.generatePartition(asyncRangeSize, WCCPartition.class);
         long loadingTime = System.currentTimeMillis() - start;
 
-        System.out.println("[DEBUG] Loading Time : " + ((double) loadingTime / 1000.0));
+        System.err.println("Loading Time : " + ((double) loadingTime / 1000.0));
 
         WCCDriver driver = new WCCDriver(graph, numThreads);
 
         long[] elapsedTime = new long[20];
         double timeSum = 0;
 
-        System.out.println("[DEBUG] WCC Running ... ");
+        System.err.println("WCC Running ... ");
         for (int i = 0; i < 20; i++) {
             driver.reset();
 
@@ -46,21 +46,18 @@ public class WCCMain
             elapsedTime[i] = System.currentTimeMillis() - start;
 
 //            System.out.println(driver.getLargestWCC());
+
             if (i >= 10) {
                 timeSum += (elapsedTime[i] / 1000.0);
 //                System.out.println("[DEBUG] Average : " + (elapsedTime[i] / 1000.0) + "/");
 //                System.out.println("[DEBUG] elapsed time for iteration" + (i-10) + " : " + ((elapsedTime[i]) / (1000.0)));
             }
-        }
-        System.out.println("[DEBUG] WCC Complete : " + driver.getLargestWCC());
-
-        try (FileWriter fw = new FileWriter("WCC.txt", true); BufferedWriter bw = new BufferedWriter(fw); PrintWriter out = new PrintWriter(bw)) {
-            String averageTime = String.format("%.3f", (timeSum / 10));
-            out.println(driver.getLargestWCC() + "/" + averageTime);
-        }
-        catch (IOException e) {
 
         }
+        System.err.println("[DEBUG] WCC Complete : " + driver.getLargestWCC());
+
+        String averageTime = String.format("%.3f", (timeSum / 10));
+        System.out.println(driver.getLargestWCC() + "/" + averageTime);
 
         System.exit(1);
     }
