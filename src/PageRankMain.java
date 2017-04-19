@@ -31,9 +31,9 @@ public class PageRankMain
         Graph<PageRankPartition> graph = Graph.getInstance(expOfPartitionSize, isDirected, isWeighted);
 
         long start = System.currentTimeMillis();
-        System.out.println("[DEBUG] Graph Loading... ");
+        System.err.println("Graph Loading... ");
         GraphUtil.load(graph, inputFile);
-        System.out.println("[DEBUG] Loading Time : " + (System.currentTimeMillis() - start) / 1000.0);
+        System.err.println("Loading Time : " + (System.currentTimeMillis() - start) / 1000.0);
         graph.generatePartition(asyncRangeSize, PageRankPartition.class);
 
         PageRankDriver driver = new PageRankDriver(graph, dampingFactor, iteration, numThreads);
@@ -42,29 +42,21 @@ public class PageRankMain
         long[] elapsedTime = new long[20];
         double timeSum = 0;
 
-        System.out.println("[DEBUG] PageRank Running ... ");
+        System.err.println("PageRank Running ... ");
         for (int i = 0; i < 20; i++) {
             driver.reset();
             start = System.currentTimeMillis();
             driver.run();
             elapsedTime[i] = System.currentTimeMillis() - start;
 
-            if (i >= 10) {
-                timeSum += (elapsedTime[i] / 1000.0);
-//                System.out.println("[DEBUG] Average : " + (elapsedTime[i] / 1000.0) + "/");
-//                System.out.println("[DEBUG] elapsed time for iteration" + (i-10) + " : " + ((elapsedTime[i]) / (1000.0)));
-            }
+            break;
+//            if (i >= 10) {
+//                timeSum += (elapsedTime[i] / 1000.0);
+//            }
         }
-        System.out.println("[DEBUG] PageRank Complete : ");
-        System.out.println("[DEBUG] File Write ...");
-
-        try (FileWriter fw = new FileWriter("PageRank.txt", true); BufferedWriter bw = new BufferedWriter(fw); PrintWriter out = new PrintWriter(bw)) {
-            String averageTime = String.format("%.3f", (timeSum / 10));
-            out.println(averageTime);
-        }
-        catch (IOException e) {
-
-        }
+        System.err.println("PageRank Complete : ");
+        String averageTime = String.format("%.3f", (timeSum / 10));
+        System.out.println(driver._printPageRankSum() + "/" + averageTime);
 
         System.exit(1);
     }

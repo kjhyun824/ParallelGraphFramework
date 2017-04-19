@@ -5,7 +5,6 @@ public abstract class Partition
     final int asyncRangeSize;
     int partitionId;
     int partitionSize;
-    int tablePos;
 
     int partitionActiveValue;
     int[] activeNodeCheckArray;

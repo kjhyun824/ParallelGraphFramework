@@ -29,29 +29,23 @@ public class PageRankExecutor implements GraphAlgorithmInterface
     @Override
     public void execute() {
         for (int i = 0; i < partitionSize; i++) {
-            int nodeId = offset + i;
-            srcNode = graph.getNode(nodeId);
+            srcNode = graph.getNode(i);
+            int neighborListSize = srcNode.neighborListSize();
+            double scatterPageRank = getScatterPageRank(partition, i, neighborListSize);
 
-            update(i);
+            for (int j = 0; j < neighborListSize; j++) {
+                int dest = srcNode.getNeighbor(j);
+                int destPartitionId = graph.getPartitionId(dest);
+
+                PageRankPartition destPartition = graph.getPartition(destPartitionId);
+                int destPosition = graph.getNodePositionInPart(dest);
+
+                destPartition.updateNextTable(destPosition, scatterPageRank);
+            }
         }
     }
 
-    public void update(int entry) {
-        int neighborListSize = srcNode.neighborListSize();
-        double scatteredPageRank = getScatteredPageRank(partition, entry, neighborListSize);
-
-        for (int j = 0; j < neighborListSize; j++) {
-            int dest = srcNode.getNeighbor(j);
-            int destPartitionId = graph.getPartitionId(dest);
-
-            PageRankPartition destPartition = graph.getPartition(destPartitionId);
-            int destPosition = graph.getNodePositionInPart(dest);
-
-            destPartition.updateNextTable(destPosition, scatteredPageRank);
-        }
-    }
-
-    public double getScatteredPageRank(PageRankPartition partition, int index, int neighborListSize) {
+    public double getScatterPageRank(PageRankPartition partition, int index, int neighborListSize) {
         return dampingFactor * partition.getVertexValue(index) / (double) neighborListSize;
     }
 

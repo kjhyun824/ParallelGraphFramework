@@ -25,14 +25,14 @@ public class PageRankDriver {
     DoubleBinaryOperator updateFunction;
     LinkedBlockingQueue<Task> taskQueue;
     TaskWaitingRunnable runnable;
-    CyclicBarrier initBarrier;
-    CyclicBarrier iterBarrier;
-
+    CyclicBarrier barriers;
+    CyclicBarrier exitBarriers;
 
     Task[] initTasks;
     Task[] workTasks;
-    Task[] initBarrierTasks;
-    Task[] iterBarrierTasks;
+    Task[] barrierTasks;
+    Task[] exitBarrierTasks;
+    Task[] barrierResetTasks;
 
     public PageRankDriver(Graph<PageRankPartition> graph, double dampingFactor, int iteration, int numThreads) {
         this.graph = graph;
@@ -50,11 +50,12 @@ public class PageRankDriver {
 
         initTasks = new Task[numPartitions];
         workTasks = new Task[numPartitions];
-        initBarrierTasks = new Task[numThreads];
-        iterBarrierTasks = new Task[numThreads];
+        barrierTasks = new Task[numThreads];
+        exitBarrierTasks = new Task[numThreads];
+        barrierResetTasks = new Task[1];
 
-        initBarrier = new CyclicBarrier(numThreads);
-        iterBarrier = new CyclicBarrier(numThreads + 1);
+        barriers = new CyclicBarrier(numThreads);
+        exitBarriers = new CyclicBarrier(numThreads + 1);
 
         taskQueue = new LinkedBlockingQueue<>();
         runnable = new TaskWaitingRunnable(taskQueue);
@@ -67,23 +68,24 @@ public class PageRankDriver {
         }
 
         for (int i = 0; i < numThreads; i++) {
-            initBarrierTasks[i] = new Task(new TaskBarrier(initBarrier));
-            iterBarrierTasks[i] = new Task(new TaskBarrier(iterBarrier));
+            barrierTasks[i] = new Task(new BarrierTask(barriers));
+            exitBarrierTasks[i] = new Task(new BarrierTask(exitBarriers));
         }
+        barrierResetTasks[0] = new Task(new BarrierResetTask(barriers));
     }
 
     public void run()
             throws BrokenBarrierException, InterruptedException {
         for (int i = 0; i < iteration; i++) {
             pushTasks(initTasks);
-            pushTasks(initBarrierTasks);
+            pushTasks(barrierTasks);
+            pushTasks(barrierResetTasks);
             pushTasks(workTasks);
-            pushTasks(iterBarrierTasks);
-
-            iterBarrier.await();
-            initBarrier.reset();
-            iterBarrier.reset();
+            pushTasks(barrierTasks);
+            pushTasks(barrierResetTasks);
         }
+        pushTasks(exitBarrierTasks);
+        exitBarriers.await();
     }
 
     public void pushTasks(Task[] tasks) {
@@ -99,12 +101,13 @@ public class PageRankDriver {
 
     //For JIT Test
     public void reset() {
+        exitBarriers.reset();
         for (int i = 0; i < initTasks.length; i++) {
             initTasks[i].reset();
         }
     }
 
-    public void _printPageRankSum() {
+    public String _printPageRankSum() {
         PageRankPartition[] partitions = graph.getPartitions();
         ArrayList<Double> pageRankValues = new ArrayList<>();
         double sum = 0.0d;
@@ -120,10 +123,12 @@ public class PageRankDriver {
 
         Collections.sort(pageRankValues, Collections.reverseOrder());
 
-        for (int i = 0; i < 10; i++) {
-            System.out.println("[DEBUG] pageRank " + i + " : " + pageRankValues.get(i));
-        }
-        System.out.println("[DEBUG] PageRank Sum : " + sum);
+//        for (int i = 0; i < 10; i++) {
+//            System.out.println("[DEBUG] pageRank " + i + " : " + pageRankValues.get(i));
+//        }
+        String pageRanksum = String.format("%.3f", sum);
+
+        return pageRanksum;
     }
 
 
