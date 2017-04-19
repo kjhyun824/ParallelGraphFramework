@@ -3,10 +3,6 @@ import graph.Graph;
 import graph.GraphUtil;
 import graph.partition.WCCPartition;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.concurrent.BrokenBarrierException;
 
 public class WCCMain
@@ -20,11 +16,12 @@ public class WCCMain
         int numThreads = Integer.parseInt(args[1]);
         double asyncPercent = Double.parseDouble(args[2]);
 
-        int expOfPartitionSize = 16; // 1 << 16;
+        int expOfPartitionSize = 16;
         int asyncRangeSize = (int) ((1 << 16) * asyncPercent);
 
-        long start = System.currentTimeMillis();
         Graph<WCCPartition> graph = Graph.getInstance(expOfPartitionSize, isDirected, isWeighted);
+
+        long start = System.currentTimeMillis();
         System.err.println("Graph Loading ... ");
         GraphUtil.load(graph, inputFile);
         graph.generatePartition(asyncRangeSize, WCCPartition.class);
@@ -34,27 +31,25 @@ public class WCCMain
 
         WCCDriver driver = new WCCDriver(graph, numThreads);
 
-        long[] elapsedTime = new long[20];
+        long[] elapsedTime = new long[15];
         double timeSum = 0;
 
         System.err.println("WCC Running ... ");
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < elapsedTime.length; i++) {
             driver.reset();
 
             start = System.currentTimeMillis();
             driver.run();
             elapsedTime[i] = System.currentTimeMillis() - start;
 
-//            System.out.println(driver.getLargestWCC());
+            System.err.println("elapsed time for iteration" + i + " : " + ((elapsedTime[i]) / (1000.0)));
+            System.err.println("Nodes in Largest WCC : " + driver.getLargestWCC());
 
             if (i >= 10) {
                 timeSum += (elapsedTime[i] / 1000.0);
-//                System.out.println("[DEBUG] Average : " + (elapsedTime[i] / 1000.0) + "/");
-//                System.out.println("[DEBUG] elapsed time for iteration" + (i-10) + " : " + ((elapsedTime[i]) / (1000.0)));
             }
-
         }
-        System.err.println("[DEBUG] WCC Complete : " + driver.getLargestWCC());
+        System.err.println("WCC Complete : " + driver.getLargestWCC());
 
         String averageTime = String.format("%.3f", (timeSum / 10));
         System.out.println(driver.getLargestWCC() + "/" + averageTime);

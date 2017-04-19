@@ -6,52 +6,64 @@ import java.util.Arrays;
 
 public class WCCPartition extends Partition
 {
-    AtomicIntegerArray tables;
+    AtomicIntegerArray nextCompIds;
+    int[] curCompIds;
 
     public WCCPartition(int partitionId, int maxNodeId, int partitionSize, int asyncRangeSize) {
         super(partitionId, maxNodeId, partitionSize, asyncRangeSize);
     }
 
     public void initializeTable() {
-        tables = new AtomicIntegerArray(partitionSize);
-        activeNodeCheckArray = new int[partitionSize];
-        Arrays.fill(activeNodeCheckArray, -1);
+        nextCompIds = new AtomicIntegerArray(partitionSize);
+        curCompIds = new int[partitionSize];
+        Arrays.fill(curCompIds, -1);
     }
 
-    public void setVertexValue(int entry, int value) {
+    public void setNextCompId(int entry, int value) {
         if (entry < asyncRangeSize) {
-            tables.asyncSet(entry, value);
+            nextCompIds.asyncSet(entry, value);
         }
         else {
-            tables.set(entry, value);
+            nextCompIds.set(entry, value);
         }
     }
 
-    public int getVertexValue(int entry) {
+    public int getNextCompId(int entry) {
         if (entry < asyncRangeSize) {
-            return tables.asyncGet(entry);
+            return nextCompIds.asyncGet(entry);
         }
         else {
-            return tables.get(entry);
+            return nextCompIds.get(entry);
         }
     }
 
-    public void update(int entry, int value) {
+    public final boolean update(int entry, int value) {
         int prev;
         if (entry < asyncRangeSize) { // TODO : think about multiple ranges in a single partition
-            prev = tables.asyncGet(entry);
-            if (value > prev) {
-                tables.asyncSet(entry, value);
+            prev = nextCompIds.asyncGet(entry);
+            if (prev < value) {
+                nextCompIds.asyncSet(entry, value);
+                return true;
             }
+            return false;
         }
         else {
             do {
-                prev = tables.get(entry);
-                if (value <= prev) {
-                    break;
+                prev = nextCompIds.get(entry);
+                if (prev >= value) {
+                    return false;
                 }
             }
-            while (!tables.compareAndSet(entry, prev, value));
+            while (!nextCompIds.compareAndSet(entry, prev, value));
+            return true;
         }
+    }
+
+    public void setCurComponentId(int pos, int value) {
+        curCompIds[pos] = value;
+    }
+
+    public int getCurCompId(int pos) {
+        return curCompIds[pos];
     }
 }

@@ -12,8 +12,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class WCCDriver
 {
     static final int ACTIVE = 1;
+    final int numThreads;
 
-    int numThreads;
     boolean isDone;
 
     Graph<WCCPartition> graph;
@@ -26,8 +26,6 @@ public class WCCDriver
     Task[] fwTraverseRestTasks;
     Task[] barrierTasks;
     Task[] barrier2Tasks;
-
-    int[] isPartitionActives;
 
     public WCCDriver(Graph<WCCPartition> graph, int numThreads) {
         this.graph = graph;
@@ -42,7 +40,6 @@ public class WCCDriver
 
         fwTraverseStartTasks = new Task[numPartitions];
         fwTraverseRestTasks = new Task[numPartitions];
-        isPartitionActives = new int[numPartitions];
         barrierTasks = new Task[numThreads];
         barrier2Tasks = new Task[numThreads];
 
@@ -50,6 +47,7 @@ public class WCCDriver
         barriers2 = new CyclicBarrier(numThreads + 1);
         taskQueue = new LinkedBlockingQueue<>();
         runnable = new TaskWaitingRunnable(taskQueue);
+
         ThreadUtil.createAndStartThreads(numThreads, runnable);
 
         for (int i = 0; i < numPartitions; i++) {
@@ -71,12 +69,11 @@ public class WCCDriver
 
         while (true) {
             pushAllTasks(barrier2Tasks);
+            barriers2.await();
             pushSomeTasks(fwTraverseRestTasks);
             if (isDone) {
                 break;
             }
-            barriers2.await();
-            barriers2.reset();
         }
     }
 
@@ -103,22 +100,22 @@ public class WCCDriver
 
     public int getLargestWCC() {
         WCCPartition[] partitions = graph.getPartitions();
-        int[] colors = new int[graph.getMaxNodeId() + 1];
+        int[] compIds = new int[graph.getMaxNodeId() + 1];
         for (int i = 0; i < partitions.length; i++) {
             for (int j = 0; j < partitions[i].getSize(); j++) {
-                int color = partitions[i].getVertexValue(j);
-                colors[color]++;
+                int compId = partitions[i].getNextCompId(j);
+                compIds[compId]++;
             }
         }
+
         int max = 0;
         for (int i = 0; i < graph.getMaxNodeId() + 1; i++) {
-            max = Math.max(max, colors[i]);
+            max = Math.max(max, compIds[i]);
         }
         return max;
     }
 
     public void reset() {
-        barriers.reset();
         for (int i = 0; i < graph.getNumPartitions(); i++) {
             graph.getPartition(i).reset();
         }
