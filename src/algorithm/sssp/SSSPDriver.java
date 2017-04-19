@@ -6,7 +6,7 @@ import graph.Graph;
 import graph.Node;
 import graph.partition.SSSPPartition;
 import task.Task;
-import task.TaskBarrier;
+import task.BarrierTask;
 import thread.TaskWaitingRunnable;
 import thread.ThreadUtil;
 
@@ -56,7 +56,8 @@ public class SSSPDriver
         ssspExecutors = new SSSPExecutor[numPartitions];
         barrierTasks = new Task[numThreads];
 
-        barriers = new CyclicBarrier(numThreads + 1);
+        barriers = new CyclicBarrier(numThreads);
+
 
         taskQueue = new LinkedBlockingQueue<>();
         runnable = new TaskWaitingRunnable(taskQueue);
@@ -97,10 +98,10 @@ public class SSSPDriver
         }
 
         for (int i = 0; i < numThreads; i++) {
-            barrierTasks[i] = new Task(new TaskBarrier(barriers));
+            barrierTasks[i] = new Task(new BarrierTask(barriers));
         }
 
-        System.out.println("[DEBUG] SSSP Driver Init Done");
+        System.err.println("[DEBUG] SSSP Driver Init Done");
     }
 
     public void run()
@@ -128,16 +129,14 @@ public class SSSPDriver
                 pushBarriers(barrierTasks);
 
                 barriers.await();
-                barriers.reset();
                 innerIdx++;
             }
-            System.out.println("[DEBUG] inner : " + innerIdx);
+            System.err.println("[DEBUG] inner : " + innerIdx);
 
             SSSPExecutor.setIsHeavy(true);
             runHeavyEdges(workTasks);
             pushBarriers(barrierTasks);
             barriers.await();
-            barriers.reset();
 
             bucketIdx++;
             innerIdx = 1;

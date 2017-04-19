@@ -56,7 +56,7 @@ public class BFSDriver {
         }
 
         for (int i = 0; i < numThreads; i++) {
-            barrierTasks[i] = new Task(new TaskBarrier(barriers));
+            barrierTasks[i] = new Task(new BarrierTask(barriers));
         }
     }
 
