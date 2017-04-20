@@ -1,6 +1,5 @@
 package algorithm.sssp;
 
-import gnu.trove.list.array.TDoubleArrayList;
 import gnu.trove.list.array.TIntArrayList;
 import graph.Graph;
 import graph.Node;
@@ -17,16 +16,16 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class SSSPDriver
 {
     int numThreads;
-    double delta;
+    int delta;
     boolean lightIsDone;
 
     static int innerIdx;
     static int bucketIdx;
 
     static TIntArrayList[] lightEdges;
-    static TDoubleArrayList[] lightWeights;
+    static TIntArrayList[] lightWeights;
     static TIntArrayList[] heavyEdges;
-    static TDoubleArrayList[] heavyWeights;
+    static TIntArrayList[] heavyWeights;
 
     Graph<SSSPPartition> graph;
     LinkedBlockingQueue<Task> taskQueue;
@@ -38,7 +37,7 @@ public class SSSPDriver
 
     SSSPExecutor[] ssspExecutors;
 
-    public SSSPDriver(Graph<SSSPPartition> graph, int numThreads, double delta, int source) {
+    public SSSPDriver(Graph<SSSPPartition> graph, int numThreads, int delta, int source) {
         this.graph = graph;
         this.numThreads = numThreads;
         this.delta = delta;
@@ -64,21 +63,25 @@ public class SSSPDriver
 
         int numNodes = graph.getNumNodes();
         lightEdges = new TIntArrayList[numNodes];
-        lightWeights = new TDoubleArrayList[numNodes];
+        lightWeights = new TIntArrayList[numNodes];
         heavyEdges = new TIntArrayList[numNodes];
-        heavyWeights = new TDoubleArrayList[numNodes];
+        heavyWeights = new TIntArrayList[numNodes];
 
         for (int i = 0; i < numNodes; i++) {
             lightEdges[i] = new TIntArrayList();
-            lightWeights[i] = new TDoubleArrayList();
+            lightWeights[i] = new TIntArrayList();
             heavyEdges[i] = new TIntArrayList();
-            heavyWeights[i] = new TDoubleArrayList();
+            heavyWeights[i] = new TIntArrayList();
 
             Node srcNode = graph.getNode(i);
 
+            if (srcNode == null) {
+                continue;
+            }
+
             for (int j = 0; j < srcNode.getOutDegree(); j++) {
                 int destId = srcNode.getNeighbor(j);
-                double weight = srcNode.getWeight(destId);
+                int weight = srcNode.getWeight(destId);
                 if (weight > delta) {
                     heavyEdges[i].add(destId);
                     heavyWeights[i].add(weight);
@@ -107,7 +110,7 @@ public class SSSPDriver
     public void run()
             throws BrokenBarrierException, InterruptedException {
         // TODO:
-        graph.getPartition(0).update(0, 0.0);
+        graph.getPartition(0).update(0, 0);
         graph.getPartition(0).setBucketId(0, bucketIdx);
         graph.getPartition(0).setCurrMaxBucket(bucketIdx);
         graph.getPartition(0).setInnerIdx(innerIdx - 1);
@@ -197,6 +200,13 @@ public class SSSPDriver
             if (partitions[i].getCurrMaxBucket() >= bucketIdx) {
                 return false;
             }
+
+            int partitionSize = partitions[i].getSize();
+            for (int j = 0; j < partitionSize; j++) {
+                if (partitions[i].getBucketId(j) >= bucketIdx) {
+                    return false;
+                }
+            }
         }
         return true;
     }
@@ -220,11 +230,11 @@ public class SSSPDriver
         return heavyEdges;
     }
 
-    public static TDoubleArrayList[] getLightWeights() {
+    public static TIntArrayList[] getLightWeights() {
         return lightWeights;
     }
 
-    public static TDoubleArrayList[] getHeavyWeights() {
+    public static TIntArrayList[] getHeavyWeights() {
         return heavyWeights;
     }
 

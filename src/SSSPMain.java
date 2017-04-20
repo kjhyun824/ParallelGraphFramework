@@ -3,10 +3,6 @@ import graph.Graph;
 import graph.GraphUtil;
 import graph.partition.SSSPPartition;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.concurrent.BrokenBarrierException;
 
 public class SSSPMain
@@ -17,48 +13,45 @@ public class SSSPMain
         final boolean isWeighted = true;
         String inputFile = args[0];
         int numThreads = Integer.parseInt(args[1]);
-        double delta = Double.parseDouble(args[2]);
+        int delta = Integer.parseInt(args[2]);
+        int sync = Integer.parseInt(args[3]);
 
         int expOfPartitionSize = 16; // 1 << 16;
-        int asyncRangeSize = ((1 << 16) * 0); // 1 for async, 0 for sync
+        int asyncRangeSize = ((1 << 16) * sync); // 1 for async, 0 for sync
 
         long start = System.currentTimeMillis();
 
         Graph<SSSPPartition> graph = Graph.getInstance(expOfPartitionSize, isDirected, isWeighted);
-        System.out.println("[DEBUG] Graph Loading ... ");
+        System.err.println("Graph Loading ... ");
         GraphUtil.load(graph, inputFile);
         graph.generatePartition(asyncRangeSize, SSSPPartition.class);
 
-        System.out.println("[DEBUG] Loading Time : " + (System.currentTimeMillis() - start) / 1000.0);
+        System.err.println("Loading Time : " + (System.currentTimeMillis() - start) / 1000.0);
 
         SSSPDriver driver = new SSSPDriver(graph, numThreads, delta, 0);
 
-        long[] elapsedTime = new long[20];
+        final int numRun = 20;
+        long[] elapsedTime = new long[numRun];
         double timeSum = 0;
 
-        System.out.println("[DEBUG] SSSP Running ... ");
-        for (int i = 0; i < 20; i++) {
+        System.err.println("SSSP Running ... ");
+
+        for (int i = 0; i < numRun; i++) {
             driver.reset();
             start = System.currentTimeMillis();
             driver.run();
             elapsedTime[i] = System.currentTimeMillis() - start;
+            System.err.println("elapsed time for iteration" + i + " : " + ((elapsedTime[i]) / (1000.0)));
 
             if (i >= 10) {
                 timeSum += (elapsedTime[i] / 1000.0);
-//                System.out.println("[DEBUG] Average : " + (elapsedTime[i] / 1000.0) + "/");
-//                System.out.println("[DEBUG] elapsed time for iteration" + (i-10) + " : " + ((elapsedTime[i]) / (1000.0)));
             }
         }
-        System.out.println("[DEBUG] SSSP Complete : ");
-        System.out.println("[DEBUG] File Write ...");
+        System.err.println("SSSP Complete : ");
+        System.err.println("File Write ...");
 
-        try (FileWriter fw = new FileWriter("SSSP.txt", true); BufferedWriter bw = new BufferedWriter(fw); PrintWriter out = new PrintWriter(bw)) {
-            String averageTime = String.format("%.3f", (timeSum / 10));
-            out.println(averageTime);
-        }
-        catch (IOException e) {
-
-        }
+        String averageTime = String.format("%.3f", (timeSum / 10));
+        System.out.println(averageTime);
 
         System.exit(1);
     }
