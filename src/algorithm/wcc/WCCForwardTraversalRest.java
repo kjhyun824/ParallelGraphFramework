@@ -5,7 +5,8 @@ import graph.GraphAlgorithmInterface;
 import graph.Node;
 import graph.partition.WCCPartition;
 
-public class WCCForwardTraversalRest implements GraphAlgorithmInterface {
+public class WCCForwardTraversalRest implements GraphAlgorithmInterface
+{
     static final byte ACTIVE = 1;
     static final byte IN_ACTIVE = 0;
 
@@ -30,28 +31,30 @@ public class WCCForwardTraversalRest implements GraphAlgorithmInterface {
             int srcId = offset + i;
             Node srcNode = graph.getNode(srcId);
 
-            if (srcNode != null) {
-                int srcCurColor = partition.getNodeActiveValue(i);
-                int nextSrcColor = partition.getVertexValue(i);
+            if (srcNode == null) {
+                continue;
+            }
 
-                if (srcCurColor != nextSrcColor) {
-                    partition.setNodeIsActive(i, nextSrcColor);
+            int curCompId = partition.getCurCompId(i);
+            int nextCompId = partition.getNextCompId(i);
 
-                    int neighborListSize = srcNode.neighborListSize();
+            if (curCompId == nextCompId) {
+                continue;
+            }
 
-                    for (int j = 0; j < neighborListSize; j++) {
-                        int destId = srcNode.getNeighbor(j);
-                        int destPartitionId = graph.getPartitionId(destId);
+            partition.setCurComponentId(i, nextCompId);
 
-                        WCCPartition destPartition = graph.getPartition(destPartitionId);
-                        int destPosition = graph.getNodePositionInPart(destId);
-                        int destColor = destPartition.getNodeActiveValue(destPosition);
+            int neighborListSize = srcNode.neighborListSize();
 
-                        if (destColor < nextSrcColor) {
-                            destPartition.update(destPosition, nextSrcColor);
-                            destPartition.setPartitionActiveValue(ACTIVE);
-                        }
-                    }
+            for (int j = 0; j < neighborListSize; j++) {
+                int destId = srcNode.getNeighbor(j);
+                int destPartitionId = graph.getPartitionId(destId);
+
+                WCCPartition destPartition = graph.getPartition(destPartitionId);
+                int destPosition = graph.getNodePositionInPart(destId);
+
+                if (destPartition.update(destPosition, nextCompId)) {
+                    destPartition.setPartitionActiveValue(ACTIVE);
                 }
             }
         }

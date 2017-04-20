@@ -74,7 +74,7 @@ public class Graph<T>
         return isAdded;
     }
 
-    public boolean addEdge(int srcNodeId, int destNodeId, double weight) {
+    public boolean addEdge(int srcNodeId, int destNodeId, int weight) {
         checkAndCreateNodes(srcNodeId, destNodeId);
 
         Node srcNode = nodes[srcNodeId];

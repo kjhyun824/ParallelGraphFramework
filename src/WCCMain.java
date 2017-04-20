@@ -3,14 +3,12 @@ import graph.Graph;
 import graph.GraphUtil;
 import graph.partition.WCCPartition;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.util.concurrent.BrokenBarrierException;
 
 public class WCCMain
 {
-    public static void main(String[] args) {
+    public static void main(String[] args)
+            throws BrokenBarrierException, InterruptedException {
 
         final boolean isDirected = false;
         final boolean isWeighted = false;
@@ -18,55 +16,43 @@ public class WCCMain
         int numThreads = Integer.parseInt(args[1]);
         double asyncPercent = Double.parseDouble(args[2]);
 
-        int expOfPartitionSize = 16; // 1 << 16;
+        int expOfPartitionSize = 16;
         int asyncRangeSize = (int) ((1 << 16) * asyncPercent);
 
-        long start = System.currentTimeMillis();
         Graph<WCCPartition> graph = Graph.getInstance(expOfPartitionSize, isDirected, isWeighted);
+
+        long start = System.currentTimeMillis();
+        System.err.println("Graph Loading ... ");
         GraphUtil.load(graph, inputFile);
         graph.generatePartition(asyncRangeSize, WCCPartition.class);
         long loadingTime = System.currentTimeMillis() - start;
 
-        System.out.println("[DEBUG] Graph Loading : " + ((double) loadingTime / 1000.0));
+        System.err.println("Loading Time : " + ((double) loadingTime / 1000.0));
 
         WCCDriver driver = new WCCDriver(graph, numThreads);
 
-        long[] elapsedTime = new long[20];
+        long[] elapsedTime = new long[15];
+        double timeSum = 0;
 
-        for (int i = 0; i < 20; i++) {
+        System.err.println("WCC Running ... ");
+        for (int i = 0; i < elapsedTime.length; i++) {
             driver.reset();
+
             start = System.currentTimeMillis();
             driver.run();
             elapsedTime[i] = System.currentTimeMillis() - start;
-//            wccValue[i] = driver.getLargestWCC();
+
+            System.err.println("elapsed time for iteration" + i + " : " + ((elapsedTime[i]) / (1000.0)));
+            System.err.println("Nodes in Largest WCC : " + driver.getLargestWCC());
+
             if (i >= 10) {
-                System.out.println("[DEBUG] elapsed time for iteration" + (i - 10) + " : " + (((double) elapsedTime[i]) / (1000.0)));
+                timeSum += (elapsedTime[i] / 1000.0);
             }
         }
+        System.err.println("WCC Complete : " + driver.getLargestWCC());
 
-        long timeSum = 0;
-        long max = -1;
-        long min = 1000000;
-
-        for (int i = 0; i < elapsedTime.length - 10; i++) {
-            max = Math.max(max, elapsedTime[i + 10]);
-            min = Math.min(max, elapsedTime[i + 10]);
-            System.out.print(elapsedTime[i + 10] / (double) 1000 + " ");
-            timeSum += elapsedTime[i + 10];
-        }
-        timeSum -= max;
-        timeSum -= min;
-
-        double avg = timeSum / (double) 8;
-        System.out.print("AVG : " + avg);
-
-
-        try (FileWriter fw = new FileWriter(String.valueOf(asyncPercent) + "out.txt", true); BufferedWriter bw = new BufferedWriter(fw); PrintWriter out = new PrintWriter(bw)) {
-            out.print((avg / 1000) + "/");
-        }
-        catch (IOException e) {
-
-        }
+        String averageTime = String.format("%.3f", (timeSum / 10));
+        System.out.println(driver.getLargestWCC() + "/" + averageTime);
 
         System.exit(1);
     }

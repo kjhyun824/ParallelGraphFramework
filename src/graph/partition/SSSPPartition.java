@@ -1,51 +1,42 @@
 package graph.partition;
 
-import atomic.AtomicByteArray;
-import atomic.AtomicDoubleArray;
 import atomic.AtomicIntegerArray;
-
-import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.DoubleBinaryOperator;
 
 public class SSSPPartition extends Partition
 {
-    public static DoubleBinaryOperator updateFunction;
-
-    AtomicDoubleArray tables;
+    AtomicIntegerArray tables;
     AtomicIntegerArray bucketIds;
-    AtomicInteger currMaxBucket;
-    int innerIdx;
+    int currMaxBucket;
+    volatile int innerIdx;
 
     public SSSPPartition(int partitionId, int maxNodeId, int partitionSize, int asyncRangeSize) {
         super(partitionId, maxNodeId, partitionSize, asyncRangeSize);
     }
 
     public final void initializeTable() {
-        tables = new AtomicDoubleArray(partitionSize);
+        tables = new AtomicIntegerArray(partitionSize);
         bucketIds = new AtomicIntegerArray(partitionSize);
-        currMaxBucket = new AtomicInteger();
 
         for (int i = 0; i < partitionSize; i++) {
-            tables.set(i, Double.POSITIVE_INFINITY);
-            bucketIds.set(i, Integer.MAX_VALUE);
+            tables.set(i, Integer.MAX_VALUE);
+            bucketIds.set(i, -1);
         }
         innerIdx = -1;
-        currMaxBucket.set(-1);
+        currMaxBucket = -1;
     }
 
     public void setBucketId(int entry, int newId) {
         int prevId;
         if (entry < asyncRangeSize) {
             prevId = bucketIds.get(entry);
-            if (prevId > newId) {
+            if (prevId == -1 || prevId > newId) {
                 bucketIds.asyncSet(entry, newId);
             }
         }
         else {
             do {
                 prevId = bucketIds.get(entry);
-                if (prevId <= newId) {
+                if (prevId != -1 && newId >= prevId) {
                     break;
                 }
             }
@@ -68,21 +59,16 @@ public class SSSPPartition extends Partition
     }
 
     public void setCurrMaxBucket(int value) {
-        int currMax;
-        do {
-            currMax = currMaxBucket.get();
-            if (currMax >= value) {
-                break;
-            }
+        if (currMaxBucket < value) {
+            currMaxBucket = value;
         }
-        while (!currMaxBucket.compareAndSet(currMax, value));
     }
 
     public int getCurrMaxBucket() {
-        return currMaxBucket.get();
+        return currMaxBucket;
     }
 
-    public final double getVertexValue(int entry) {
+    public final int getVertexValue(int entry) {
         if (entry < asyncRangeSize) {
             return tables.asyncGet(entry);
         }
@@ -91,22 +77,25 @@ public class SSSPPartition extends Partition
         }
     }
 
-    public final void update(int entry, double newDist) {
-        double currDist;
+    public final boolean update(int entry, int newDist) {
+        int currDist;
         if (entry < asyncRangeSize) { // TODO : think about multiple ranges in a single partition
             currDist = tables.asyncGet(entry);
-            if (currDist == 0 || currDist > newDist) {
-                tables.asyncGetAndAccumulate(entry, newDist, updateFunction);
+            if (newDist < currDist) {
+                tables.asyncSet(entry, newDist);
+                return true;
             }
+            return false;
         }
         else {
             do {
                 currDist = tables.get(entry);
-                if (currDist <= newDist) {
-                    break;
+                if (newDist >= currDist) {
+                    return false;
                 }
             }
             while (!tables.compareAndSet(entry, currDist, newDist));
+            return true;
         }
     }
 

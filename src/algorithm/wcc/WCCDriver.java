@@ -5,29 +5,27 @@ import graph.partition.WCCPartition;
 import task.*;
 import thread.*;
 
+import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
-import java.util.function.IntBinaryOperator;
 
-public class WCCDriver {
+public class WCCDriver
+{
     static final int ACTIVE = 1;
-    static final int IN_ACTIVE = 0;
+    final int numThreads;
 
-    int numThreads;
     boolean isDone;
 
     Graph<WCCPartition> graph;
-    IntBinaryOperator updateFunction;
     LinkedBlockingQueue<Task> taskQueue;
     TaskWaitingRunnable runnable;
     CyclicBarrier barriers;
+    CyclicBarrier barriers2;
 
     Task[] fwTraverseStartTasks;
     Task[] fwTraverseRestTasks;
     Task[] barrierTasks;
-
-    int[] isPartitionActives;
+    Task[] barrier2Tasks;
 
     public WCCDriver(Graph<WCCPartition> graph, int numThreads) {
         this.graph = graph;
@@ -40,15 +38,13 @@ public class WCCDriver {
     public void init() {
         int numPartitions = graph.getNumPartitions();
 
-        updateFunction = getUpdateFunction();
-        WCCPartition.setUpdateFunction(updateFunction);
-
         fwTraverseStartTasks = new Task[numPartitions];
         fwTraverseRestTasks = new Task[numPartitions];
-        isPartitionActives = new int[numPartitions];
         barrierTasks = new Task[numThreads];
+        barrier2Tasks = new Task[numThreads];
 
         barriers = new CyclicBarrier(numThreads);
+        barriers2 = new CyclicBarrier(numThreads + 1);
         taskQueue = new LinkedBlockingQueue<>();
         runnable = new TaskWaitingRunnable(taskQueue);
 
@@ -60,34 +56,28 @@ public class WCCDriver {
         }
 
         for (int i = 0; i < numThreads; i++) {
-            barrierTasks[i] = new Task(new TaskBarrier(barriers));
+            barrierTasks[i] = new Task(new BarrierTask(barriers));
+            barrier2Tasks[i] = new Task(new BarrierTask(barriers2));
         }
     }
 
-    public void run() {
-        runAllTasksOnce(fwTraverseStartTasks);
-        runAllTasksOnce(barrierTasks);
-        runAllTasksOnce(fwTraverseRestTasks);
+    public void run()
+            throws BrokenBarrierException, InterruptedException {
+        pushAllTasks(fwTraverseStartTasks);
+        pushAllTasks(barrierTasks);
+        pushAllTasks(fwTraverseRestTasks);
 
-        while (!isDone) {
-            runAllTasksOnce(barrierTasks);
-            busyWaitForSyncStopMilli(10);
-            runSomeTasksOnce(fwTraverseRestTasks);
-        }
-    }
-
-    public void busyWaitForSyncStopMilli(int millisecond) {
-        while (taskQueue.size() != 0) {
-            try {
-                TimeUnit.MILLISECONDS.sleep(millisecond);
-            }
-            catch (InterruptedException e) {
-                e.printStackTrace();
+        while (true) {
+            pushAllTasks(barrier2Tasks);
+            barriers2.await();
+            pushSomeTasks(fwTraverseRestTasks);
+            if (isDone) {
+                break;
             }
         }
     }
 
-    public void runSomeTasksOnce(Task[] tasks) {
+    public void pushSomeTasks(Task[] tasks) {
         int count = 0;
 
         for (int i = 0; i < tasks.length; i++) {
@@ -102,7 +92,7 @@ public class WCCDriver {
         }
     }
 
-    public void runAllTasksOnce(Task[] tasks) {
+    public void pushAllTasks(Task[] tasks) {
         for (int i = 0; i < tasks.length; i++) {
             taskQueue.offer(tasks[i]);
         }
@@ -110,29 +100,19 @@ public class WCCDriver {
 
     public int getLargestWCC() {
         WCCPartition[] partitions = graph.getPartitions();
-        int[] colors = new int[graph.getMaxNodeId() + 1];
+        int[] compIds = new int[graph.getMaxNodeId() + 1];
         for (int i = 0; i < partitions.length; i++) {
             for (int j = 0; j < partitions[i].getSize(); j++) {
-                int color = partitions[i].getVertexValue(j);
-                colors[color]++;
+                int compId = partitions[i].getNextCompId(j);
+                compIds[compId]++;
             }
         }
+
         int max = 0;
         for (int i = 0; i < graph.getMaxNodeId() + 1; i++) {
-            max = Math.max(max, colors[i]);
+            max = Math.max(max, compIds[i]);
         }
         return max;
-    }
-
-    public IntBinaryOperator getUpdateFunction() {
-        IntBinaryOperator updateFunction = (prev, value) -> {
-            int updateValue = prev;
-            if (prev < value) {
-                updateValue = value;
-            }
-            return updateValue;
-        };
-        return updateFunction;
     }
 
     public void reset() {

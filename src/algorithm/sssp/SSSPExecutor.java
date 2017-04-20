@@ -13,19 +13,19 @@ public class SSSPExecutor implements GraphAlgorithmInterface
     Graph<SSSPPartition> graph;
     SSSPPartition partition;
     int offset;
-    double delta;
+    int delta;
     static volatile boolean isHeavy;
 
     TIntArrayList[] lightEdges;
-    TDoubleArrayList[] lightWeights;
+    TIntArrayList[] lightWeights;
     TIntArrayList[] heavyEdges;
-    TDoubleArrayList[] heavyWeights;
+    TIntArrayList[] heavyWeights;
     TIntArrayList edges = null;
-    TDoubleArrayList weights = null;
+    TIntArrayList weights = null;
 
     final int partitionId;
 
-    SSSPExecutor(int partitionId, Graph<SSSPPartition> graph, double delta) {
+    SSSPExecutor(int partitionId, Graph<SSSPPartition> graph, int delta) {
         this.partitionId = partitionId;
         this.graph = graph;
         this.delta = delta;
@@ -45,10 +45,14 @@ public class SSSPExecutor implements GraphAlgorithmInterface
         for (int i = 0; i < partitionSize; i++) {
             int nodeId = offset + i;
             int currBucket = partition.getBucketId(i);
-
             if (currBucket == bucketIdx) {
                 Node srcNode = graph.getNode(nodeId);
-                update(srcNode, i, bucketIdx);
+
+                if (srcNode == null) {
+                    continue;
+                }
+
+                update(null, i, bucketIdx);
             }
         }
     }
@@ -66,22 +70,24 @@ public class SSSPExecutor implements GraphAlgorithmInterface
         int neighborListSize = edges.size();
         int InnerIdx = SSSPDriver.getInnerIdx();
 
+        int mydist = graph.getPartition(partitionId).getVertexValue(srcNodeIdInPart);
+
         for (int j = 0; j < neighborListSize; j++) {
-            int destId = edges.get(j);
+            int destId = edges.getQuick(j);
             int destPartitionId = graph.getPartitionId(destId);
             SSSPPartition destPartition = graph.getPartition(destPartitionId);
             int destPosition = graph.getNodePositionInPart(destId);
 
-            double currDist = destPartition.getVertexValue(destPosition);
-            double newDist = graph.getPartition(partitionId).getVertexValue(srcNodeIdInPart) + weights.get(j);
-            int newBucketId = (int) (newDist / delta);
+            int newDist = mydist + weights.getQuick(j);
+            boolean updated = destPartition.update(destPosition, newDist);
 
-            destPartition.update(destPosition, newDist);
-            destPartition.setBucketId(destPosition, newBucketId);
-            destPartition.setCurrMaxBucket(newBucketId);
-
-            if (newDist < currDist && newBucketId == bucketIdx) {
-                destPartition.setInnerIdx(InnerIdx);
+            if (updated) {
+                int newBucketId = newDist >> delta;
+                destPartition.setBucketId(destPosition, newBucketId);
+                destPartition.setCurrMaxBucket(newBucketId);
+                if (newBucketId == bucketIdx) {
+                    destPartition.setInnerIdx(InnerIdx);
+                }
             }
         }
     }
@@ -93,9 +99,5 @@ public class SSSPExecutor implements GraphAlgorithmInterface
 
     public static void setIsHeavy(boolean value) {
         isHeavy = value;
-    }
-
-    public static boolean getIsHeavy() {
-        return isHeavy;
     }
 }

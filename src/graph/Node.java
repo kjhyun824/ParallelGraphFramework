@@ -4,13 +4,13 @@ import gnu.trove.list.array.TDoubleArrayList;
 import gnu.trove.list.array.TIntArrayList;
 
 public class Node extends TIntArrayList {
-    TDoubleArrayList weights = null;
+    TIntArrayList weights = null;
 
     int inDegree;
     int outDegree;
 
     Node() {
-        weights = new TDoubleArrayList(10);
+        weights = new TIntArrayList(10);
     }
 
     public boolean addNeighborId(int neighborNodeId) {
@@ -24,7 +24,7 @@ public class Node extends TIntArrayList {
         }
     }
 
-    public boolean addNeighborId(int neighborNodeId, double weight) {
+    public boolean addNeighborId(int neighborNodeId, int weight) {
         int pos = binarySearch(neighborNodeId);
         if (pos >= 0) {
             return false;
@@ -41,7 +41,7 @@ public class Node extends TIntArrayList {
         return getQuick(neighborNodeIdx);
     }
 
-    public double getWeight(int neighborNodeId) {
+    public int getWeight(int neighborNodeId) {
         int pos = binarySearch(neighborNodeId);
         return weights.get(pos);
     }

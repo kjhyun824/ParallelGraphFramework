@@ -1,4 +1,4 @@
-package algorithm.sssp;
+package algorithm.ssspSequential;
 
 import graph.Graph;
 import graph.Node;

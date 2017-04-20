@@ -5,15 +5,17 @@ import graph.GraphAlgorithmInterface;
 import graph.Node;
 import graph.partition.PageRankPartition;
 
-public class PageRankInit implements GraphAlgorithmInterface{
+public class PageRankInit implements GraphAlgorithmInterface
+{
     Graph<PageRankPartition> graph;
-    PageRankPartition doublePartition;
-    Node srcNode;
+    PageRankPartition partition;
 
-    final int partitionId;
+    int partitionId;
+    int partitionSize;
+    int offset;
     double dampingFactor;
     double initialValue;
-    double stopSurfValue;
+    double nextValue;
     boolean isFirst;
 
     PageRankInit(int partitionId, Graph<PageRankPartition> graph, double dampingFactor) {
@@ -21,49 +23,40 @@ public class PageRankInit implements GraphAlgorithmInterface{
         this.graph = graph;
         this.dampingFactor = dampingFactor;
 
+        partition = graph.getPartition(partitionId);
+        partitionSize = partition.getSize();
+        offset = partitionId << graph.getExpOfPartitionSize();
         initialValue = getInitPageRankValue(0); //initial PageRank Value
-        stopSurfValue = getInitPageRankValue(dampingFactor);
+        nextValue = getInitPageRankValue(dampingFactor);
         isFirst = true;
     }
 
     @Override
     public void execute() {
         if (!isFirst) {
-            initialValue = stopSurfValue;
+            initialValue = nextValue;
         }
         else {
             initNextTable();
         }
 
-        doublePartition = graph.getPartition(partitionId);
-        int partitionSize = doublePartition.getSize();
-
         for (int i = 0; i < partitionSize; i++) {
-            int nodeId = graph.getNodeNumberInPart(partitionId, i);
-            srcNode = graph.getNode(nodeId);
-
-            if (srcNode != null) {
-                doublePartition.setVertexValue(i, initialValue);
+            Node node = graph.getNode(offset + i);
+            if (node == null) {
+                continue;
             }
+            partition.setVertexValue(i, initialValue);
         }
 
         if (!isFirst) {
-            doublePartition.initializedCallback();
+            partition.initializedCallback();
         }
         isFirst = false;
     }
 
     public void initNextTable() {
-        PageRankPartition doublePartition = graph.getPartition(partitionId);
-        int partitionSize = doublePartition.getSize();
-
         for (int i = 0; i < partitionSize; i++) {
-            int nodeId = graph.getNodeNumberInPart(partitionId, i);
-            srcNode = graph.getNode(nodeId);
-
-            if (srcNode != null) {
-                doublePartition.setNextVertexValue(i, stopSurfValue);
-            }
+            partition.setNextVertexValue(i, nextValue);
         }
     }
 
@@ -74,8 +67,8 @@ public class PageRankInit implements GraphAlgorithmInterface{
     public void reset() {
         isFirst = true;
         initialValue = getInitPageRankValue(0);
-        if (doublePartition != null) {
-            doublePartition.reset();
+        if (partition != null) {
+            partition.reset();
         }
     }
 }

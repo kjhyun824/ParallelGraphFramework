@@ -5,7 +5,8 @@ import graph.GraphAlgorithmInterface;
 import graph.Node;
 import graph.partition.IntegerPartition;
 
-public class SCCForwardTraversalRest implements GraphAlgorithmInterface {
+public class SCCForwardTraversalRest implements GraphAlgorithmInterface
+{
     Graph<IntegerPartition> graph;
     final int partitionId;
     boolean[] isInActive;
@@ -29,16 +30,14 @@ public class SCCForwardTraversalRest implements GraphAlgorithmInterface {
             if (!isInActive[nodeId]) {
                 Node node = graph.getNode(nodeId);
 
-                if (node != null) {
-                    int neighborListSize = node.neighborListSize();
+                int neighborListSize = node.neighborListSize();
 
-                    for (int j = 0; j < neighborListSize; j++) {
-                        int neighborId = node.getNeighbor(j);
+                for (int j = 0; j < neighborListSize; j++) {
+                    int neighborId = node.getNeighbor(j);
 
-                        if (!isInActive[neighborId]) {
-                            int nodeIdPositionInPart = graph.getNodePositionInPart(neighborId);
-                            partition.update(nodeIdPositionInPart, colorId);
-                        }
+                    if (!isInActive[neighborId]) {
+                        int nodeIdPositionInPart = graph.getNodePositionInPart(neighborId);
+                        partition.update(nodeIdPositionInPart, colorId);
                     }
                 }
             }

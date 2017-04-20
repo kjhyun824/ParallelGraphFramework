@@ -1,0 +1,518 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+ACTIVE	src/algorithm/wcc/WCCDriver.java	/^    static final int ACTIVE = 1;$/;"	f	class:WCCDriver
+ACTIVE	src/algorithm/wcc/WCCForwardTraversalRest.java	/^    static final byte ACTIVE = 1;$/;"	f	class:WCCForwardTraversalRest
+After3level	src/algorithm/bfs/BFSDriver.java	/^    public void After3level() {$/;"	m	class:BFSDriver
+AtomicByteArray	src/atomic/AtomicByteArray.java	/^    public AtomicByteArray(final int length) {$/;"	m	class:AtomicByteArray
+AtomicByteArray	src/atomic/AtomicByteArray.java	/^public class AtomicByteArray {$/;"	c
+AtomicDoubleArray	src/atomic/AtomicDoubleArray.java	/^    public AtomicDoubleArray(int length) {$/;"	m	class:AtomicDoubleArray
+AtomicDoubleArray	src/atomic/AtomicDoubleArray.java	/^public class AtomicDoubleArray implements java.io.Serializable {$/;"	c
+AtomicIntegerArray	src/atomic/AtomicIntegerArray.java	/^    public AtomicIntegerArray(int length) {$/;"	m	class:AtomicIntegerArray
+AtomicIntegerArray	src/atomic/AtomicIntegerArray.java	/^    public AtomicIntegerArray(int[] array) {$/;"	m	class:AtomicIntegerArray
+AtomicIntegerArray	src/atomic/AtomicIntegerArray.java	/^public class AtomicIntegerArray implements java.io.Serializable {$/;"	c
+BFSDriver	src/algorithm/bfs/BFSDriver.java	/^    public BFSDriver(Graph<IntegerPartition> graph, int numThreads) {$/;"	m	class:BFSDriver
+BFSDriver	src/algorithm/bfs/BFSDriver.java	/^public class BFSDriver {$/;"	c
+BFSExecutor	src/algorithm/bfs/BFSExecutor.java	/^    BFSExecutor(int partitionId, Graph<IntegerPartition> graph) {$/;"	m	class:BFSExecutor
+BFSExecutor	src/algorithm/bfs/BFSExecutor.java	/^public class BFSExecutor implements GraphAlgorithmInterface {$/;"	c
+BFSMain	src/BFSMain.java	/^public class BFSMain {$/;"	c
+BackwardTraversalRest	src/algorithm/scc/BackwardTraversalRest.java	/^public class BackwardTraversalRest {}$/;"	c
+BackwardTraversalStart	src/algorithm/scc/BackwardTraversalStart.java	/^    public BackwardTraversalStart (int partitionId, Graph graph, boolean[] isInActive) {$/;"	m	class:BackwardTraversalStart
+BackwardTraversalStart	src/algorithm/scc/BackwardTraversalStart.java	/^public class BackwardTraversalStart implements GraphAlgorithmInterface{$/;"	c
+BellmanFordDriver	src/algorithm/sssp/BellmanFordDriver.java	/^    public BellmanFordDriver(Graph<SSSPPartition> graph, int source) {$/;"	m	class:BellmanFordDriver
+BellmanFordDriver	src/algorithm/sssp/BellmanFordDriver.java	/^public class BellmanFordDriver$/;"	c
+BellmanFordMain	src/BellmanFordMain.java	/^public class BellmanFordMain$/;"	c
+DijkstraDriver	src/algorithm/sssp/DijkstraDriver.java	/^    public DijkstraDriver(Graph<SSSPPartition> graph, int source) {$/;"	m	class:DijkstraDriver
+DijkstraDriver	src/algorithm/sssp/DijkstraDriver.java	/^public class DijkstraDriver$/;"	c
+DijkstraMain	src/DijkstraMain.java	/^public class DijkstraMain {$/;"	c
+Graph	src/graph/Graph.java	/^    Graph(int expOfPartitionSize, boolean isDirected, boolean isWeighted) {$/;"	m	class:Graph
+Graph	src/graph/Graph.java	/^public class Graph<T>$/;"	c
+GraphAlgorithmInterface	src/graph/GraphAlgorithmInterface.java	/^public interface GraphAlgorithmInterface {$/;"	i
+GraphUtil	src/graph/GraphUtil.java	/^public class GraphUtil {$/;"	c
+IN_ACTIVE	src/algorithm/wcc/WCCDriver.java	/^    static final int IN_ACTIVE = 0;$/;"	f	class:WCCDriver
+IN_ACTIVE	src/algorithm/wcc/WCCForwardTraversalRest.java	/^    static final byte IN_ACTIVE = 0;$/;"	f	class:WCCForwardTraversalRest
+IntegerPartition	src/graph/partition/IntegerPartition.java	/^    public IntegerPartition(int partitionId, int maxNodeId, int partitionSize, int asyncRangeSize) {$/;"	m	class:IntegerPartition
+IntegerPartition	src/graph/partition/IntegerPartition.java	/^public class IntegerPartition extends Partition$/;"	c
+Node	src/graph/Node.java	/^    Node() {$/;"	m	class:Node
+Node	src/graph/Node.java	/^public class Node extends TIntArrayList {$/;"	c
+PageRankDriver	src/algorithm/pagerank/PageRankDriver.java	/^    public PageRankDriver(Graph<PageRankPartition> graph, double dampingFactor, int iteration, int numThreads) {$/;"	m	class:PageRankDriver
+PageRankDriver	src/algorithm/pagerank/PageRankDriver.java	/^public class PageRankDriver {$/;"	c
+PageRankExecutor	src/algorithm/pagerank/PageRankExecutor.java	/^    PageRankExecutor(int partitionId, Graph<PageRankPartition> graph, double dampingFactor) {$/;"	m	class:PageRankExecutor
+PageRankExecutor	src/algorithm/pagerank/PageRankExecutor.java	/^public class PageRankExecutor implements GraphAlgorithmInterface{$/;"	c
+PageRankInit	src/algorithm/pagerank/PageRankInit.java	/^    PageRankInit(int partitionId, Graph<PageRankPartition> graph, double dampingFactor) {$/;"	m	class:PageRankInit
+PageRankInit	src/algorithm/pagerank/PageRankInit.java	/^public class PageRankInit implements GraphAlgorithmInterface{$/;"	c
+PageRankMain	src/PageRankMain.java	/^public class PageRankMain$/;"	c
+PageRankPartition	src/graph/partition/PageRankPartition.java	/^    public PageRankPartition(int partitionId, int maxNodeId, int partitionSize, int asyncRangeSize) {$/;"	m	class:PageRankPartition
+PageRankPartition	src/graph/partition/PageRankPartition.java	/^public class PageRankPartition extends Partition {$/;"	c
+Partition	src/graph/partition/Partition.java	/^    Partition(int partitionId, int maxNodeId, int partitionSize, int asyncRangeSize) {$/;"	m	class:Partition
+Partition	src/graph/partition/Partition.java	/^public abstract class Partition$/;"	c
+SCCDriver	src/algorithm/scc/SCCDriver.java	/^    public SCCDriver(Graph<IntegerPartition> graph, int numThreads) {$/;"	m	class:SCCDriver
+SCCDriver	src/algorithm/scc/SCCDriver.java	/^public class SCCDriver {$/;"	c
+SCCForwardTraversalRest	src/algorithm/scc/SCCForwardTraversalRest.java	/^    public SCCForwardTraversalRest(int partitionId, Graph<IntegerPartition> graph, boolean[] isInActive) {$/;"	m	class:SCCForwardTraversalRest
+SCCForwardTraversalRest	src/algorithm/scc/SCCForwardTraversalRest.java	/^public class SCCForwardTraversalRest implements GraphAlgorithmInterface {$/;"	c
+SCCForwardTraversalStart	src/algorithm/scc/SCCForwardTraversalStart.java	/^    public SCCForwardTraversalStart(int partitionId, Graph<IntegerPartition> graph) {$/;"	m	class:SCCForwardTraversalStart
+SCCForwardTraversalStart	src/algorithm/scc/SCCForwardTraversalStart.java	/^public class SCCForwardTraversalStart implements GraphAlgorithmInterface {$/;"	c
+SCCMain	src/SCCMain.java	/^public class SCCMain {$/;"	c
+SCCTrim	src/algorithm/scc/SCCTrim.java	/^    public SCCTrim(int partitionId, Graph<IntegerPartition> graph, boolean[] isInActive) {$/;"	m	class:SCCTrim
+SCCTrim	src/algorithm/scc/SCCTrim.java	/^public class SCCTrim implements GraphAlgorithmInterface {$/;"	c
+SSSPDriver	src/algorithm/sssp/SSSPDriver.java	/^    public SSSPDriver(Graph<SSSPPartition> graph, int numThreads, double delta, int source) {$/;"	m	class:SSSPDriver
+SSSPDriver	src/algorithm/sssp/SSSPDriver.java	/^public class SSSPDriver$/;"	c
+SSSPExecutor	src/algorithm/sssp/SSSPExecutor.java	/^    SSSPExecutor(int partitionId, Graph<SSSPPartition> graph, double delta) {$/;"	m	class:SSSPExecutor
+SSSPExecutor	src/algorithm/sssp/SSSPExecutor.java	/^public class SSSPExecutor implements GraphAlgorithmInterface$/;"	c
+SSSPMain	src/SSSPMain.java	/^public class SSSPMain {$/;"	c
+SSSPPartition	src/graph/partition/SSSPPartition.java	/^    public SSSPPartition(int partitionId, int maxNodeId, int partitionSize, int asyncRangeSize) {$/;"	m	class:SSSPPartition
+SSSPPartition	src/graph/partition/SSSPPartition.java	/^public class SSSPPartition extends Partition$/;"	c
+SSSPTaskWaitingRunnable	src/thread/SSSPTaskWaitingRunnable.java	/^    public SSSPTaskWaitingRunnable(LinkedBlockingQueue<Task> taskQueue, ReentrantLock lock, Condition condition) {$/;"	m	class:SSSPTaskWaitingRunnable
+SSSPTaskWaitingRunnable	src/thread/SSSPTaskWaitingRunnable.java	/^public class SSSPTaskWaitingRunnable implements Runnable$/;"	c
+TIntLinkedListQueue	src/util/list/TIntLinkedListQueue.java	/^    public TIntLinkedListQueue() {$/;"	m	class:TIntLinkedListQueue
+TIntLinkedListQueue	src/util/list/TIntLinkedListQueue.java	/^public class TIntLinkedListQueue extends TIntLinkedList {$/;"	c
+Task	src/task/Task.java	/^    public Task(GraphAlgorithmInterface algorithm) {$/;"	m	class:Task
+Task	src/task/Task.java	/^public class Task {$/;"	c
+TaskBarrier	src/task/TaskBarrier.java	/^    public TaskBarrier(CyclicBarrier barrier) {$/;"	m	class:TaskBarrier
+TaskBarrier	src/task/TaskBarrier.java	/^public class TaskBarrier implements GraphAlgorithmInterface {$/;"	c
+TaskWaitingRunnable	src/thread/TaskWaitingRunnable.java	/^    public TaskWaitingRunnable(LinkedBlockingQueue<Task> taskQueue) {$/;"	m	class:TaskWaitingRunnable
+TaskWaitingRunnable	src/thread/TaskWaitingRunnable.java	/^public class TaskWaitingRunnable implements Runnable$/;"	c
+ThreadUtil	src/thread/ThreadUtil.java	/^public class ThreadUtil {$/;"	c
+UpdateFunction	src/function/UpdateFunction.java	/^public interface UpdateFunction$/;"	i
+WCCDriver	src/algorithm/wcc/WCCDriver.java	/^    public WCCDriver(Graph<WCCPartition> graph, int numThreads) {$/;"	m	class:WCCDriver
+WCCDriver	src/algorithm/wcc/WCCDriver.java	/^public class WCCDriver {$/;"	c
+WCCForwardTraversalRest	src/algorithm/wcc/WCCForwardTraversalRest.java	/^    public WCCForwardTraversalRest(int partitionId, Graph<WCCPartition> graph) {$/;"	m	class:WCCForwardTraversalRest
+WCCForwardTraversalRest	src/algorithm/wcc/WCCForwardTraversalRest.java	/^public class WCCForwardTraversalRest implements GraphAlgorithmInterface {$/;"	c
+WCCForwardTraversalStart	src/algorithm/wcc/WCCForwardTraversalStart.java	/^    public WCCForwardTraversalStart(int partitionId, Graph<WCCPartition> graph) {$/;"	m	class:WCCForwardTraversalStart
+WCCForwardTraversalStart	src/algorithm/wcc/WCCForwardTraversalStart.java	/^public class WCCForwardTraversalStart implements GraphAlgorithmInterface {$/;"	c
+WCCMain	src/WCCMain.java	/^public class WCCMain$/;"	c
+WCCPartition	src/graph/partition/WCCPartition.java	/^    public WCCPartition(int partitionId, int maxNodeId, int partitionSize, int asyncRangeSize) {$/;"	m	class:WCCPartition
+WCCPartition	src/graph/partition/WCCPartition.java	/^public class WCCPartition extends Partition$/;"	c
+_getPageRank	src/algorithm/pagerank/PageRankDriver.java	/^    public double[] _getPageRank(int[] sampleData) {$/;"	m	class:PageRankDriver
+_printPageRankSum	src/algorithm/pagerank/PageRankDriver.java	/^    public void _printPageRankSum() {$/;"	m	class:PageRankDriver
+accumulateAndGet	src/atomic/AtomicIntegerArray.java	/^    public final int accumulateAndGet(int i, int x,$/;"	m	class:AtomicIntegerArray
+activeNodeCheckArray	src/graph/partition/Partition.java	/^    int[] activeNodeCheckArray;$/;"	f	class:Partition
+activeQueue	src/algorithm/sssp/DijkstraDriver.java	/^    PriorityQueue<Integer> activeQueue;$/;"	f	class:DijkstraDriver
+addAndGet	src/atomic/AtomicByteArray.java	/^    public final byte addAndGet(int i, int delta) {$/;"	m	class:AtomicByteArray
+addAndGet	src/atomic/AtomicIntegerArray.java	/^    public final int addAndGet(int i, int delta) {$/;"	m	class:AtomicIntegerArray
+addEdge	src/graph/Graph.java	/^    public boolean addEdge(int srcNodeId, int destNodeId) {$/;"	m	class:Graph
+addEdge	src/graph/Graph.java	/^    public boolean addEdge(int srcNodeId, int destNodeId, double weight) {$/;"	m	class:Graph
+addNeighborId	src/graph/Node.java	/^    public boolean addNeighborId(int neighborNodeId) {$/;"	m	class:Node
+addNeighborId	src/graph/Node.java	/^    public boolean addNeighborId(int neighborNodeId, double weight) {$/;"	m	class:Node
+algorithm	src/task/Task.java	/^	GraphAlgorithmInterface algorithm;$/;"	f	class:Task
+algorithm.bfs	src/algorithm/bfs/BFSDriver.java	/^package algorithm.bfs;$/;"	p
+algorithm.bfs	src/algorithm/bfs/BFSExecutor.java	/^package algorithm.bfs;$/;"	p
+algorithm.pagerank	src/algorithm/pagerank/PageRankDriver.java	/^package algorithm.pagerank;$/;"	p
+algorithm.pagerank	src/algorithm/pagerank/PageRankExecutor.java	/^package algorithm.pagerank;$/;"	p
+algorithm.pagerank	src/algorithm/pagerank/PageRankInit.java	/^package algorithm.pagerank;$/;"	p
+algorithm.scc	src/algorithm/scc/BackwardTraversalRest.java	/^package algorithm.scc;$/;"	p
+algorithm.scc	src/algorithm/scc/BackwardTraversalStart.java	/^package algorithm.scc;$/;"	p
+algorithm.scc	src/algorithm/scc/SCCDriver.java	/^package algorithm.scc;$/;"	p
+algorithm.scc	src/algorithm/scc/SCCForwardTraversalRest.java	/^package algorithm.scc;$/;"	p
+algorithm.scc	src/algorithm/scc/SCCForwardTraversalStart.java	/^package algorithm.scc;$/;"	p
+algorithm.scc	src/algorithm/scc/SCCTrim.java	/^package algorithm.scc;$/;"	p
+algorithm.sssp	src/algorithm/sssp/BellmanFordDriver.java	/^package algorithm.sssp;$/;"	p
+algorithm.sssp	src/algorithm/sssp/DijkstraDriver.java	/^package algorithm.sssp;$/;"	p
+algorithm.sssp	src/algorithm/sssp/SSSPDriver.java	/^package algorithm.sssp;$/;"	p
+algorithm.sssp	src/algorithm/sssp/SSSPExecutor.java	/^package algorithm.sssp;$/;"	p
+algorithm.wcc	src/algorithm/wcc/WCCDriver.java	/^package algorithm.wcc;$/;"	p
+algorithm.wcc	src/algorithm/wcc/WCCForwardTraversalRest.java	/^package algorithm.wcc;$/;"	p
+algorithm.wcc	src/algorithm/wcc/WCCForwardTraversalStart.java	/^package algorithm.wcc;$/;"	p
+array	src/atomic/AtomicByteArray.java	/^    private final AtomicIntegerArray array;$/;"	f	class:AtomicByteArray	file:
+array	src/atomic/AtomicDoubleArray.java	/^    private final long[] array;$/;"	f	class:AtomicDoubleArray	file:
+array	src/atomic/AtomicIntegerArray.java	/^    private final int[] array;$/;"	f	class:AtomicIntegerArray	file:
+asyncGet	src/atomic/AtomicByteArray.java	/^    public byte asyncGet(final int i) {$/;"	m	class:AtomicByteArray
+asyncGet	src/atomic/AtomicDoubleArray.java	/^    public final double asyncGet(int i) {$/;"	m	class:AtomicDoubleArray
+asyncGet	src/atomic/AtomicIntegerArray.java	/^    public final int asyncGet(int i) {$/;"	m	class:AtomicIntegerArray
+asyncGetAndAccumulate	src/atomic/AtomicDoubleArray.java	/^    public final double asyncGetAndAccumulate(int i, double x, DoubleBinaryOperator accumulatorFunction) {$/;"	m	class:AtomicDoubleArray
+asyncGetAndAccumulate	src/atomic/AtomicIntegerArray.java	/^    public final int asyncGetAndAccumulate(int i, int x, IntBinaryOperator accumulatorFunction) {$/;"	m	class:AtomicIntegerArray
+asyncRangeSize	src/graph/partition/Partition.java	/^    final int asyncRangeSize;$/;"	f	class:Partition
+asyncSet	src/atomic/AtomicDoubleArray.java	/^    public final void asyncSet(int i, double newValue) {$/;"	m	class:AtomicDoubleArray
+asyncSet	src/atomic/AtomicIntegerArray.java	/^    public final void asyncSet(int i, int newValue) {$/;"	m	class:AtomicIntegerArray
+atomic	src/atomic/AtomicByteArray.java	/^package atomic;$/;"	p
+atomic	src/atomic/AtomicDoubleArray.java	/^package atomic;$/;"	p
+atomic	src/atomic/AtomicIntegerArray.java	/^package atomic;$/;"	p
+barrierTasks	src/algorithm/bfs/BFSDriver.java	/^    Task[] barrierTasks;$/;"	f	class:BFSDriver
+barrierTasks	src/algorithm/pagerank/PageRankDriver.java	/^    Task[] barrierTasks;$/;"	f	class:PageRankDriver
+barrierTasks	src/algorithm/scc/SCCDriver.java	/^    Task[] barrierTasks;$/;"	f	class:SCCDriver
+barrierTasks	src/algorithm/sssp/SSSPDriver.java	/^    Task[] barrierTasks;$/;"	f	class:SSSPDriver
+barrierTasks	src/algorithm/wcc/WCCDriver.java	/^    Task[] barrierTasks;$/;"	f	class:WCCDriver
+barriers	src/algorithm/bfs/BFSDriver.java	/^    CyclicBarrier barriers;$/;"	f	class:BFSDriver
+barriers	src/algorithm/pagerank/PageRankDriver.java	/^    CyclicBarrier barriers;$/;"	f	class:PageRankDriver
+barriers	src/algorithm/scc/SCCDriver.java	/^    CyclicBarrier barriers;$/;"	f	class:SCCDriver
+barriers	src/algorithm/sssp/SSSPDriver.java	/^    CyclicBarrier barriers;$/;"	f	class:SSSPDriver
+barriers	src/algorithm/wcc/WCCDriver.java	/^    CyclicBarrier barriers;$/;"	f	class:WCCDriver
+barriers	src/task/TaskBarrier.java	/^    CyclicBarrier barriers;$/;"	f	class:TaskBarrier
+base	src/atomic/AtomicDoubleArray.java	/^    private static final int base = unsafe.arrayBaseOffset(long[].class);$/;"	f	class:AtomicDoubleArray	file:
+base	src/atomic/AtomicIntegerArray.java	/^    private static final int base = unsafe.arrayBaseOffset(int[].class);$/;"	f	class:AtomicIntegerArray	file:
+bfsExecutors	src/algorithm/bfs/BFSDriver.java	/^    BFSExecutor[] bfsExecutors;$/;"	f	class:BFSDriver
+bitMaskForRemain	src/graph/Graph.java	/^    final int bitMaskForRemain;$/;"	f	class:Graph
+bucketIds	src/graph/partition/SSSPPartition.java	/^    AtomicIntegerArray bucketIds;$/;"	f	class:SSSPPartition
+bucketIdx	src/algorithm/sssp/SSSPDriver.java	/^    static int bucketIdx;$/;"	f	class:SSSPDriver
+busyWaitForSyncStopMilli	src/algorithm/bfs/BFSDriver.java	/^    public void busyWaitForSyncStopMilli(int millisecond) {$/;"	m	class:BFSDriver
+busyWaitForSyncStopMilli	src/algorithm/pagerank/PageRankDriver.java	/^    public void busyWaitForSyncStopMilli(int millisecond) {$/;"	m	class:PageRankDriver
+busyWaitForSyncStopMilli	src/algorithm/scc/SCCDriver.java	/^    public void busyWaitForSyncStopMilli(int millisecond) {$/;"	m	class:SCCDriver
+busyWaitForSyncStopMilli	src/algorithm/wcc/WCCDriver.java	/^    public void busyWaitForSyncStopMilli(int millisecond) {$/;"	m	class:WCCDriver
+bwTraverseTasks	src/algorithm/scc/SCCDriver.java	/^    Task[] bwTraverseTasks;$/;"	f	class:SCCDriver
+byteOffset	src/atomic/AtomicDoubleArray.java	/^    private static long byteOffset(int i) {$/;"	m	class:AtomicDoubleArray	file:
+byteOffset	src/atomic/AtomicIntegerArray.java	/^    private static long byteOffset(int i) {$/;"	m	class:AtomicIntegerArray	file:
+checkAndCreateNodes	src/graph/Graph.java	/^    void checkAndCreateNodes(int srcNodeId, int destNodeId) {$/;"	m	class:Graph
+checkPartitionIsActive	src/graph/partition/Partition.java	/^    public boolean checkPartitionIsActive(int compareValue) {$/;"	m	class:Partition
+checkedByteOffset	src/atomic/AtomicDoubleArray.java	/^    private long checkedByteOffset(int i) {$/;"	m	class:AtomicDoubleArray	file:
+checkedByteOffset	src/atomic/AtomicIntegerArray.java	/^    private long checkedByteOffset(int i) {$/;"	m	class:AtomicIntegerArray	file:
+compareAndSet	src/atomic/AtomicByteArray.java	/^    public boolean compareAndSet(int i, byte expect, byte update) {$/;"	m	class:AtomicByteArray
+compareAndSet	src/atomic/AtomicDoubleArray.java	/^    public final boolean compareAndSet(int i, double expect, double update) {$/;"	m	class:AtomicDoubleArray
+compareAndSet	src/atomic/AtomicIntegerArray.java	/^    public final boolean compareAndSet(int i, int expect, int update) {$/;"	m	class:AtomicIntegerArray
+compareAndSetRaw	src/atomic/AtomicDoubleArray.java	/^    private boolean compareAndSetRaw(long offset, long expect, long update) {$/;"	m	class:AtomicDoubleArray	file:
+compareAndSetRaw	src/atomic/AtomicIntegerArray.java	/^    private boolean compareAndSetRaw(long offset, int expect, int update) {$/;"	m	class:AtomicIntegerArray	file:
+condition	src/algorithm/sssp/SSSPDriver.java	/^    Condition condition = lock.newCondition();$/;"	f	class:SSSPDriver
+condition	src/thread/SSSPTaskWaitingRunnable.java	/^    Condition condition;$/;"	f	class:SSSPTaskWaitingRunnable
+createAndStartThreads	src/thread/ThreadUtil.java	/^    public static Thread[] createAndStartThreads(int num, Runnable runnable) {$/;"	m	class:ThreadUtil
+currMaxBucket	src/graph/partition/SSSPPartition.java	/^    AtomicInteger currMaxBucket;$/;"	f	class:SSSPPartition
+currentLevel	src/algorithm/bfs/BFSExecutor.java	/^    static int currentLevel;$/;"	f	class:BFSExecutor
+dampingFactor	src/algorithm/pagerank/PageRankDriver.java	/^    double dampingFactor;$/;"	f	class:PageRankDriver
+dampingFactor	src/algorithm/pagerank/PageRankExecutor.java	/^    double dampingFactor;$/;"	f	class:PageRankExecutor
+dampingFactor	src/algorithm/pagerank/PageRankInit.java	/^    double dampingFactor;$/;"	f	class:PageRankInit
+decrementAndGet	src/atomic/AtomicByteArray.java	/^    public final byte decrementAndGet(int i) {$/;"	m	class:AtomicByteArray
+decrementAndGet	src/atomic/AtomicIntegerArray.java	/^    public final int decrementAndGet(int i) {$/;"	m	class:AtomicIntegerArray
+defaultSize	src/graph/Graph.java	/^    final static int defaultSize = 10;$/;"	f	class:Graph
+delta	src/algorithm/sssp/SSSPDriver.java	/^    double delta;$/;"	f	class:SSSPDriver
+delta	src/algorithm/sssp/SSSPExecutor.java	/^    double delta;$/;"	f	class:SSSPExecutor
+dist	src/algorithm/sssp/BellmanFordDriver.java	/^    double[] dist;$/;"	f	class:BellmanFordDriver
+dist	src/algorithm/sssp/DijkstraDriver.java	/^    double[] dist;$/;"	f	class:DijkstraDriver
+doublePartition	src/algorithm/pagerank/PageRankExecutor.java	/^    PageRankPartition doublePartition;$/;"	f	class:PageRankExecutor
+doublePartition	src/algorithm/pagerank/PageRankInit.java	/^    PageRankPartition doublePartition;$/;"	f	class:PageRankInit
+edges	src/algorithm/sssp/SSSPExecutor.java	/^    TIntArrayList edges = null;$/;"	f	class:SSSPExecutor
+ensureNodeEntry	src/graph/Graph.java	/^    void ensureNodeEntry(int entry) {$/;"	m	class:Graph
+ensureNodesCapacity	src/graph/Graph.java	/^    void ensureNodesCapacity(int capacity) { \/\/ TODO : vertex ID may not start with 1 but 10,000,000$/;"	m	class:Graph
+execute	src/algorithm/bfs/BFSExecutor.java	/^    public void execute() {$/;"	m	class:BFSExecutor
+execute	src/algorithm/pagerank/PageRankExecutor.java	/^    public void execute() {$/;"	m	class:PageRankExecutor
+execute	src/algorithm/pagerank/PageRankInit.java	/^    public void execute() {$/;"	m	class:PageRankInit
+execute	src/algorithm/scc/BackwardTraversalStart.java	/^    public void execute() {$/;"	m	class:BackwardTraversalStart
+execute	src/algorithm/scc/SCCForwardTraversalRest.java	/^    public void execute() {$/;"	m	class:SCCForwardTraversalRest
+execute	src/algorithm/scc/SCCForwardTraversalStart.java	/^    public void execute() {$/;"	m	class:SCCForwardTraversalStart
+execute	src/algorithm/scc/SCCTrim.java	/^    public void execute() {$/;"	m	class:SCCTrim
+execute	src/algorithm/sssp/SSSPExecutor.java	/^    public void execute() {$/;"	m	class:SSSPExecutor
+execute	src/algorithm/wcc/WCCForwardTraversalRest.java	/^    public void execute() {$/;"	m	class:WCCForwardTraversalRest
+execute	src/algorithm/wcc/WCCForwardTraversalStart.java	/^    public void execute() {$/;"	m	class:WCCForwardTraversalStart
+execute	src/graph/GraphAlgorithmInterface.java	/^	void execute();$/;"	m	interface:GraphAlgorithmInterface
+execute	src/task/TaskBarrier.java	/^    public void execute() {$/;"	m	class:TaskBarrier
+expOfPartitionSize	src/graph/Graph.java	/^    final int expOfPartitionSize;$/;"	f	class:Graph
+function	src/function/UpdateFunction.java	/^package function;$/;"	p
+fwTraverseRestTasks	src/algorithm/wcc/WCCDriver.java	/^    Task[] fwTraverseRestTasks;$/;"	f	class:WCCDriver
+fwTraverseStartTasks	src/algorithm/scc/SCCDriver.java	/^    Task[] fwTraverseStartTasks;$/;"	f	class:SCCDriver
+fwTraverseStartTasks	src/algorithm/wcc/WCCDriver.java	/^    Task[] fwTraverseStartTasks;$/;"	f	class:WCCDriver
+fwTraverseStopTasks	src/algorithm/scc/SCCDriver.java	/^    Task[] fwTraverseStopTasks;$/;"	f	class:SCCDriver
+generatePartition	src/graph/Graph.java	/^    public void generatePartition(int asyncRangeSize, Class<T> partitionClass) {$/;"	m	class:Graph
+get	src/atomic/AtomicByteArray.java	/^    public byte get(final int i) {$/;"	m	class:AtomicByteArray
+get	src/atomic/AtomicDoubleArray.java	/^    public final double get(int i) {$/;"	m	class:AtomicDoubleArray
+get	src/atomic/AtomicIntegerArray.java	/^    public final int get(int i) {$/;"	m	class:AtomicIntegerArray
+getAndAccumulate	src/atomic/AtomicDoubleArray.java	/^    public final double getAndAccumulate(int i, double x, DoubleBinaryOperator accumulatorFunction) {$/;"	m	class:AtomicDoubleArray
+getAndAccumulate	src/atomic/AtomicIntegerArray.java	/^    public final int getAndAccumulate(int i, int x,$/;"	m	class:AtomicIntegerArray
+getAndAdd	src/atomic/AtomicByteArray.java	/^    public final byte getAndAdd(int i, int delta) {$/;"	m	class:AtomicByteArray
+getAndAdd	src/atomic/AtomicIntegerArray.java	/^    public final int getAndAdd(int i, int delta) {$/;"	m	class:AtomicIntegerArray
+getAndDecrement	src/atomic/AtomicByteArray.java	/^    public final byte getAndDecrement(int i) {$/;"	m	class:AtomicByteArray
+getAndDecrement	src/atomic/AtomicIntegerArray.java	/^    public final int getAndDecrement(int i) {$/;"	m	class:AtomicIntegerArray
+getAndIncrement	src/atomic/AtomicByteArray.java	/^    public final byte getAndIncrement(int i) {$/;"	m	class:AtomicByteArray
+getAndIncrement	src/atomic/AtomicIntegerArray.java	/^    public final int getAndIncrement(int i) {$/;"	m	class:AtomicIntegerArray
+getAndSet	src/atomic/AtomicIntegerArray.java	/^    public final int getAndSet(int i, int newValue) {$/;"	m	class:AtomicIntegerArray
+getAndUpdate	src/atomic/AtomicIntegerArray.java	/^    public final int getAndUpdate(int i, IntUnaryOperator updateFunction) {$/;"	m	class:AtomicIntegerArray
+getBucketId	src/graph/partition/SSSPPartition.java	/^    public int getBucketId(int entry) {$/;"	m	class:SSSPPartition
+getBucketIdx	src/algorithm/sssp/SSSPDriver.java	/^    public static int getBucketIdx() {$/;"	m	class:SSSPDriver
+getCurrMaxBucket	src/graph/partition/SSSPPartition.java	/^    public int getCurrMaxBucket() {$/;"	m	class:SSSPPartition
+getExpOfPartitionSize	src/graph/Graph.java	/^    public int getExpOfPartitionSize() {$/;"	m	class:Graph
+getHeavyEdges	src/algorithm/sssp/SSSPDriver.java	/^    public static TIntArrayList[] getHeavyEdges() {$/;"	m	class:SSSPDriver
+getHeavyWeights	src/algorithm/sssp/SSSPDriver.java	/^    public static TDoubleArrayList[] getHeavyWeights() {$/;"	m	class:SSSPDriver
+getInDegree	src/graph/Node.java	/^    public int getInDegree() {$/;"	m	class:Node
+getInitPageRankValue	src/algorithm/pagerank/PageRankInit.java	/^    public double getInitPageRankValue(double dampingFactor) {$/;"	m	class:PageRankInit
+getInnerIdx	src/algorithm/sssp/SSSPDriver.java	/^    public static int getInnerIdx() {$/;"	m	class:SSSPDriver
+getInnerIdx	src/graph/partition/SSSPPartition.java	/^    public int getInnerIdx() {$/;"	m	class:SSSPPartition
+getInstance	src/graph/Graph.java	/^    public static Graph getInstance(int expOfPartitionSize, boolean isDirected, boolean isWeighted) {$/;"	m	class:Graph
+getIsHeavy	src/algorithm/sssp/SSSPExecutor.java	/^    public static boolean getIsHeavy() {$/;"	m	class:SSSPExecutor
+getLargestWCC	src/algorithm/wcc/WCCDriver.java	/^    public int getLargestWCC() {$/;"	m	class:WCCDriver
+getLevel	src/algorithm/bfs/BFSExecutor.java	/^    public static int getLevel() {$/;"	m	class:BFSExecutor
+getLightEdges	src/algorithm/sssp/SSSPDriver.java	/^    public static TIntArrayList[] getLightEdges() {$/;"	m	class:SSSPDriver
+getLightWeights	src/algorithm/sssp/SSSPDriver.java	/^    public static TDoubleArrayList[] getLightWeights() {$/;"	m	class:SSSPDriver
+getMaxNodeId	src/graph/Graph.java	/^    public int getMaxNodeId() {$/;"	m	class:Graph
+getNeighbor	src/graph/Node.java	/^    public int getNeighbor(int neighborNodeIdx) {$/;"	m	class:Node
+getNode	src/graph/Graph.java	/^    public Node getNode(int nodeId) {$/;"	m	class:Graph
+getNodeActiveValue	src/graph/partition/Partition.java	/^    public int getNodeActiveValue(int pos) {$/;"	m	class:Partition
+getNodeNumberInPart	src/graph/Graph.java	/^    public int getNodeNumberInPart(int partitionNumber, int position) {$/;"	m	class:Graph
+getNodePositionInPart	src/graph/Graph.java	/^    public int getNodePositionInPart(int nodeId) {$/;"	m	class:Graph
+getNumNodes	src/graph/Graph.java	/^    public int getNumNodes() {$/;"	m	class:Graph
+getNumPartitions	src/graph/Graph.java	/^    public int getNumPartitions() {$/;"	m	class:Graph
+getOutDegree	src/graph/Node.java	/^    public int getOutDegree() {$/;"	m	class:Node
+getPartition	src/graph/Graph.java	/^    public T getPartition(int partitionId) {$/;"	m	class:Graph
+getPartitionActiveValue	src/graph/partition/Partition.java	/^    public int getPartitionActiveValue() {$/;"	m	class:Partition
+getPartitionId	src/graph/Graph.java	/^    public int getPartitionId(int nodeId) {$/;"	m	class:Graph
+getPartitions	src/graph/Graph.java	/^    public T[] getPartitions() {$/;"	m	class:Graph
+getRaw	src/atomic/AtomicDoubleArray.java	/^    private long getRaw(long offset) {$/;"	m	class:AtomicDoubleArray	file:
+getRaw	src/atomic/AtomicIntegerArray.java	/^    private int getRaw(long offset) {$/;"	m	class:AtomicIntegerArray	file:
+getScatteredPageRank	src/algorithm/pagerank/PageRankExecutor.java	/^    public double getScatteredPageRank(PageRankPartition doublePartition, int index, int neighborListSize) {$/;"	m	class:PageRankExecutor
+getSize	src/graph/partition/Partition.java	/^    public int getSize() {$/;"	m	class:Partition
+getUnsafe	src/atomic/AtomicDoubleArray.java	/^    private static sun.misc.Unsafe getUnsafe() {$/;"	m	class:AtomicDoubleArray	file:
+getUnsafe	src/atomic/AtomicIntegerArray.java	/^    private static sun.misc.Unsafe getUnsafe() {$/;"	m	class:AtomicIntegerArray	file:
+getUpdateFunction	src/algorithm/bfs/BFSDriver.java	/^    public IntBinaryOperator getUpdateFunction() {$/;"	m	class:BFSDriver
+getUpdateFunction	src/algorithm/pagerank/PageRankDriver.java	/^    public DoubleBinaryOperator getUpdateFunction() {$/;"	m	class:PageRankDriver
+getUpdateFunction	src/algorithm/scc/SCCDriver.java	/^    public IntBinaryOperator getUpdateFunction() {$/;"	m	class:SCCDriver
+getUpdateFunction	src/algorithm/wcc/WCCDriver.java	/^    public IntBinaryOperator getUpdateFunction() {$/;"	m	class:WCCDriver
+getVertexValue	src/graph/partition/IntegerPartition.java	/^    public final int getVertexValue(int entry) {$/;"	m	class:IntegerPartition
+getVertexValue	src/graph/partition/PageRankPartition.java	/^    public final double getVertexValue(int entry) {$/;"	m	class:PageRankPartition
+getVertexValue	src/graph/partition/SSSPPartition.java	/^    public final double getVertexValue(int entry) {$/;"	m	class:SSSPPartition
+getVertexValue	src/graph/partition/WCCPartition.java	/^    public int getVertexValue(int entry) {$/;"	m	class:WCCPartition
+getWeight	src/graph/Node.java	/^    public double getWeight(int neighborNodeId) {$/;"	m	class:Node
+graph	src/algorithm/bfs/BFSDriver.java	/^    Graph<IntegerPartition> graph;$/;"	f	class:BFSDriver
+graph	src/algorithm/bfs/BFSExecutor.java	/^    Graph<IntegerPartition> graph;$/;"	f	class:BFSExecutor
+graph	src/algorithm/pagerank/PageRankDriver.java	/^    Graph<PageRankPartition> graph;$/;"	f	class:PageRankDriver
+graph	src/algorithm/pagerank/PageRankExecutor.java	/^    Graph<PageRankPartition> graph;$/;"	f	class:PageRankExecutor
+graph	src/algorithm/pagerank/PageRankInit.java	/^    Graph<PageRankPartition> graph;$/;"	f	class:PageRankInit
+graph	src/algorithm/scc/BackwardTraversalStart.java	/^    Graph graph;$/;"	f	class:BackwardTraversalStart
+graph	src/algorithm/scc/SCCDriver.java	/^    Graph<IntegerPartition> graph;$/;"	f	class:SCCDriver
+graph	src/algorithm/scc/SCCForwardTraversalRest.java	/^    Graph<IntegerPartition> graph;$/;"	f	class:SCCForwardTraversalRest
+graph	src/algorithm/scc/SCCForwardTraversalStart.java	/^    Graph<IntegerPartition> graph;$/;"	f	class:SCCForwardTraversalStart
+graph	src/algorithm/scc/SCCTrim.java	/^    Graph<IntegerPartition> graph;$/;"	f	class:SCCTrim
+graph	src/algorithm/sssp/BellmanFordDriver.java	/^    Graph<SSSPPartition> graph;$/;"	f	class:BellmanFordDriver
+graph	src/algorithm/sssp/DijkstraDriver.java	/^    Graph<SSSPPartition> graph;$/;"	f	class:DijkstraDriver
+graph	src/algorithm/sssp/SSSPDriver.java	/^    Graph<SSSPPartition> graph;$/;"	f	class:SSSPDriver
+graph	src/algorithm/sssp/SSSPExecutor.java	/^    Graph<SSSPPartition> graph;$/;"	f	class:SSSPExecutor
+graph	src/algorithm/wcc/WCCDriver.java	/^    Graph<WCCPartition> graph;$/;"	f	class:WCCDriver
+graph	src/algorithm/wcc/WCCForwardTraversalRest.java	/^    Graph<WCCPartition> graph;$/;"	f	class:WCCForwardTraversalRest
+graph	src/algorithm/wcc/WCCForwardTraversalStart.java	/^    Graph<WCCPartition> graph;$/;"	f	class:WCCForwardTraversalStart
+graph	src/graph/Graph.java	/^package graph;$/;"	p
+graph	src/graph/GraphAlgorithmInterface.java	/^package graph;$/;"	p
+graph	src/graph/GraphUtil.java	/^package graph;$/;"	p
+graph	src/graph/Node.java	/^package graph;$/;"	p
+graph.partition	src/graph/partition/IntegerPartition.java	/^package graph.partition;$/;"	p
+graph.partition	src/graph/partition/PageRankPartition.java	/^package graph.partition;$/;"	p
+graph.partition	src/graph/partition/Partition.java	/^package graph.partition;$/;"	p
+graph.partition	src/graph/partition/SSSPPartition.java	/^package graph.partition;$/;"	p
+graph.partition	src/graph/partition/WCCPartition.java	/^package graph.partition;$/;"	p
+heavyEdges	src/algorithm/sssp/SSSPDriver.java	/^    static TIntArrayList[] heavyEdges;$/;"	f	class:SSSPDriver
+heavyEdges	src/algorithm/sssp/SSSPExecutor.java	/^    TIntArrayList[] heavyEdges;$/;"	f	class:SSSPExecutor
+heavyWeights	src/algorithm/sssp/SSSPDriver.java	/^    static TDoubleArrayList[] heavyWeights;$/;"	f	class:SSSPDriver
+heavyWeights	src/algorithm/sssp/SSSPExecutor.java	/^    TDoubleArrayList[] heavyWeights;$/;"	f	class:SSSPExecutor
+inDegree	src/graph/Node.java	/^    int inDegree;$/;"	f	class:Node
+incrementAndGet	src/atomic/AtomicByteArray.java	/^    public final byte incrementAndGet(int i) {$/;"	m	class:AtomicByteArray
+incrementAndGet	src/atomic/AtomicIntegerArray.java	/^    public final int incrementAndGet(int i) {$/;"	m	class:AtomicIntegerArray
+incrementInDegree	src/graph/Node.java	/^    public void incrementInDegree() {$/;"	m	class:Node
+incrementOutDegree	src/graph/Node.java	/^    public void incrementOutDegree() {$/;"	m	class:Node
+init	src/algorithm/bfs/BFSDriver.java	/^    public void init() {$/;"	m	class:BFSDriver
+init	src/algorithm/pagerank/PageRankDriver.java	/^    public void init() {$/;"	m	class:PageRankDriver
+init	src/algorithm/scc/SCCDriver.java	/^    public void init() {$/;"	m	class:SCCDriver
+init	src/algorithm/sssp/SSSPDriver.java	/^    public void init() {$/;"	m	class:SSSPDriver
+init	src/algorithm/wcc/WCCDriver.java	/^    public void init() {$/;"	m	class:WCCDriver
+initNextTable	src/algorithm/pagerank/PageRankInit.java	/^    public void initNextTable() {$/;"	m	class:PageRankInit
+initTasks	src/algorithm/pagerank/PageRankDriver.java	/^    Task[] initTasks;$/;"	f	class:PageRankDriver
+initialValue	src/algorithm/pagerank/PageRankInit.java	/^    double initialValue;$/;"	f	class:PageRankInit
+initializeTable	src/graph/partition/IntegerPartition.java	/^    public final void initializeTable() {$/;"	m	class:IntegerPartition
+initializeTable	src/graph/partition/PageRankPartition.java	/^    public final void initializeTable() {$/;"	m	class:PageRankPartition
+initializeTable	src/graph/partition/Partition.java	/^    public abstract void initializeTable();$/;"	m	class:Partition
+initializeTable	src/graph/partition/SSSPPartition.java	/^    public final void initializeTable() {$/;"	m	class:SSSPPartition
+initializeTable	src/graph/partition/WCCPartition.java	/^    public void initializeTable() {$/;"	m	class:WCCPartition
+initializedCallback	src/graph/partition/PageRankPartition.java	/^    public final void initializedCallback() {$/;"	m	class:PageRankPartition
+innerIdx	src/algorithm/sssp/SSSPDriver.java	/^    static int innerIdx;$/;"	f	class:SSSPDriver
+innerIdx	src/graph/partition/SSSPPartition.java	/^    int innerIdx;$/;"	f	class:SSSPPartition
+instance	src/graph/Graph.java	/^    static Graph instance = null;$/;"	f	class:Graph
+isDirected	src/graph/Graph.java	/^    boolean isDirected;$/;"	f	class:Graph
+isDirected	src/graph/Graph.java	/^    public boolean isDirected() {$/;"	m	class:Graph
+isDone	src/algorithm/bfs/BFSDriver.java	/^    boolean isDone;$/;"	f	class:BFSDriver
+isDone	src/algorithm/wcc/WCCDriver.java	/^    boolean isDone;$/;"	f	class:WCCDriver
+isFirst	src/algorithm/pagerank/PageRankInit.java	/^    boolean isFirst;$/;"	f	class:PageRankInit
+isHeavy	src/algorithm/sssp/SSSPExecutor.java	/^    static volatile boolean isHeavy;$/;"	f	class:SSSPExecutor
+isHeavy	src/thread/SSSPTaskWaitingRunnable.java	/^    boolean isHeavy;$/;"	f	class:SSSPTaskWaitingRunnable
+isInActive	src/algorithm/scc/BackwardTraversalStart.java	/^    boolean[] isInActive;$/;"	f	class:BackwardTraversalStart
+isInActive	src/algorithm/scc/SCCForwardTraversalRest.java	/^    boolean[] isInActive;$/;"	f	class:SCCForwardTraversalRest
+isInActive	src/algorithm/scc/SCCTrim.java	/^    boolean[] isInActive;$/;"	f	class:SCCTrim
+isInActiveNode	src/algorithm/scc/SCCDriver.java	/^    boolean[] isInActiveNode;$/;"	f	class:SCCDriver
+isLightEdgesDone	src/algorithm/sssp/SSSPDriver.java	/^    public boolean isLightEdgesDone(int partitionId) {$/;"	m	class:SSSPDriver
+isPartitionActives	src/algorithm/wcc/WCCDriver.java	/^    int[] isPartitionActives;$/;"	f	class:WCCDriver
+isWeighted	src/graph/Graph.java	/^    boolean isWeighted;$/;"	f	class:Graph
+isWeighted	src/graph/Graph.java	/^    public boolean isWeighted() {$/;"	m	class:Graph
+iteration	src/algorithm/pagerank/PageRankDriver.java	/^    int iteration;$/;"	f	class:PageRankDriver
+lazySet	src/atomic/AtomicDoubleArray.java	/^    public final void lazySet(int i, double newValue) {$/;"	m	class:AtomicDoubleArray
+lazySet	src/atomic/AtomicIntegerArray.java	/^    public final void lazySet(int i, int newValue) {$/;"	m	class:AtomicIntegerArray
+length	src/atomic/AtomicByteArray.java	/^    private final int length;$/;"	f	class:AtomicByteArray	file:
+length	src/atomic/AtomicByteArray.java	/^    public int length() {$/;"	m	class:AtomicByteArray
+length	src/atomic/AtomicDoubleArray.java	/^    public final int length() {$/;"	m	class:AtomicDoubleArray
+length	src/atomic/AtomicIntegerArray.java	/^    public final int length() {$/;"	m	class:AtomicIntegerArray
+lightEdges	src/algorithm/sssp/SSSPDriver.java	/^    static TIntArrayList[] lightEdges;$/;"	f	class:SSSPDriver
+lightEdges	src/algorithm/sssp/SSSPExecutor.java	/^    TIntArrayList[] lightEdges;$/;"	f	class:SSSPExecutor
+lightIsDone	src/algorithm/sssp/SSSPDriver.java	/^    boolean lightIsDone;$/;"	f	class:SSSPDriver
+lightWeights	src/algorithm/sssp/SSSPDriver.java	/^    static TDoubleArrayList[] lightWeights;$/;"	f	class:SSSPDriver
+lightWeights	src/algorithm/sssp/SSSPExecutor.java	/^    TDoubleArrayList[] lightWeights;$/;"	f	class:SSSPExecutor
+load	src/graph/GraphUtil.java	/^    public static Graph load(Graph graph, String inputFile) {$/;"	m	class:GraphUtil
+lock	src/algorithm/sssp/SSSPDriver.java	/^    ReentrantLock lock = new ReentrantLock();$/;"	f	class:SSSPDriver
+lock	src/thread/SSSPTaskWaitingRunnable.java	/^    ReentrantLock lock;$/;"	f	class:SSSPTaskWaitingRunnable
+main	src/BFSMain.java	/^    public static void main(String[] args) {$/;"	m	class:BFSMain
+main	src/BellmanFordMain.java	/^    public static void main(String[] args) {$/;"	m	class:BellmanFordMain
+main	src/DijkstraMain.java	/^    public static void main(String[] args) {$/;"	m	class:DijkstraMain
+main	src/PageRankMain.java	/^    public static void main(String[] args)$/;"	m	class:PageRankMain
+main	src/SCCMain.java	/^    public static void main(String[] args) {$/;"	m	class:SCCMain
+main	src/SSSPMain.java	/^    public static void main(String[] args)$/;"	m	class:SSSPMain
+main	src/WCCMain.java	/^    public static void main(String[] args) {$/;"	m	class:WCCMain
+maxNodeId	src/algorithm/sssp/BellmanFordDriver.java	/^    final int maxNodeId;$/;"	f	class:BellmanFordDriver
+maxNodeId	src/algorithm/sssp/DijkstraDriver.java	/^    final int maxNodeId;$/;"	f	class:DijkstraDriver
+maxNodeId	src/graph/Graph.java	/^    int maxNodeId;$/;"	f	class:Graph
+neighborListSize	src/graph/Node.java	/^    public int neighborListSize() {$/;"	m	class:Node
+nodes	src/graph/Graph.java	/^    Node[] nodes;$/;"	f	class:Graph
+numEdges	src/graph/Graph.java	/^    int numEdges;$/;"	f	class:Graph
+numNodes	src/graph/Graph.java	/^    int numNodes;$/;"	f	class:Graph
+numPartitions	src/graph/Graph.java	/^    int numPartitions;$/;"	f	class:Graph
+numThreads	src/algorithm/bfs/BFSDriver.java	/^    int numThreads;$/;"	f	class:BFSDriver
+numThreads	src/algorithm/pagerank/PageRankDriver.java	/^    int numThreads;$/;"	f	class:PageRankDriver
+numThreads	src/algorithm/scc/SCCDriver.java	/^    int numThreads;$/;"	f	class:SCCDriver
+numThreads	src/algorithm/sssp/SSSPDriver.java	/^    int numThreads;$/;"	f	class:SSSPDriver
+numThreads	src/algorithm/wcc/WCCDriver.java	/^    int numThreads;$/;"	f	class:WCCDriver
+offset	src/algorithm/sssp/SSSPExecutor.java	/^    int offset;$/;"	f	class:SSSPExecutor
+offset	src/algorithm/wcc/WCCForwardTraversalRest.java	/^    final int offset;$/;"	f	class:WCCForwardTraversalRest
+offset	src/algorithm/wcc/WCCForwardTraversalStart.java	/^    int offset;$/;"	f	class:WCCForwardTraversalStart
+outDegree	src/graph/Node.java	/^    int outDegree;$/;"	f	class:Node
+partition	src/algorithm/bfs/BFSExecutor.java	/^    IntegerPartition partition;$/;"	f	class:BFSExecutor
+partition	src/algorithm/sssp/SSSPExecutor.java	/^    SSSPPartition partition;$/;"	f	class:SSSPExecutor
+partition	src/algorithm/wcc/WCCForwardTraversalRest.java	/^    WCCPartition partition;$/;"	f	class:WCCForwardTraversalRest
+partition	src/algorithm/wcc/WCCForwardTraversalStart.java	/^    WCCPartition partition;$/;"	f	class:WCCForwardTraversalStart
+partitionActiveValue	src/graph/partition/Partition.java	/^    int partitionActiveValue;$/;"	f	class:Partition
+partitionCapacity	src/graph/Graph.java	/^    final int partitionCapacity;$/;"	f	class:Graph
+partitionId	src/algorithm/bfs/BFSExecutor.java	/^    final int partitionId;$/;"	f	class:BFSExecutor
+partitionId	src/algorithm/pagerank/PageRankExecutor.java	/^    final int partitionId;$/;"	f	class:PageRankExecutor
+partitionId	src/algorithm/pagerank/PageRankInit.java	/^    final int partitionId;$/;"	f	class:PageRankInit
+partitionId	src/algorithm/scc/BackwardTraversalStart.java	/^    final int partitionId;$/;"	f	class:BackwardTraversalStart
+partitionId	src/algorithm/scc/SCCForwardTraversalRest.java	/^    final int partitionId;$/;"	f	class:SCCForwardTraversalRest
+partitionId	src/algorithm/scc/SCCForwardTraversalStart.java	/^    final int partitionId;$/;"	f	class:SCCForwardTraversalStart
+partitionId	src/algorithm/scc/SCCTrim.java	/^    final int partitionId;$/;"	f	class:SCCTrim
+partitionId	src/algorithm/sssp/SSSPExecutor.java	/^    final int partitionId;$/;"	f	class:SSSPExecutor
+partitionId	src/algorithm/wcc/WCCForwardTraversalRest.java	/^    final int partitionId;$/;"	f	class:WCCForwardTraversalRest
+partitionId	src/algorithm/wcc/WCCForwardTraversalStart.java	/^    final int partitionId;$/;"	f	class:WCCForwardTraversalStart
+partitionId	src/graph/partition/Partition.java	/^    int partitionId;$/;"	f	class:Partition
+partitionSize	src/algorithm/wcc/WCCForwardTraversalRest.java	/^    final int partitionSize;$/;"	f	class:WCCForwardTraversalRest
+partitionSize	src/algorithm/wcc/WCCForwardTraversalStart.java	/^    int partitionSize;$/;"	f	class:WCCForwardTraversalStart
+partitionSize	src/graph/partition/Partition.java	/^    int partitionSize;$/;"	f	class:Partition
+partitions	src/graph/Graph.java	/^    T[] partitions;$/;"	f	class:Graph
+poll	src/util/list/TIntLinkedListQueue.java	/^    public int poll() {$/;"	m	class:TIntLinkedListQueue
+print	src/algorithm/sssp/SSSPDriver.java	/^    public void print() {$/;"	m	class:SSSPDriver
+printDist	src/algorithm/sssp/BellmanFordDriver.java	/^    public void printDist() {$/;"	m	class:BellmanFordDriver
+printDist	src/algorithm/sssp/DijkstraDriver.java	/^    public void printDist() {$/;"	m	class:DijkstraDriver
+pushBarriers	src/algorithm/sssp/SSSPDriver.java	/^    public void pushBarriers(Task[] tasks) {$/;"	m	class:SSSPDriver
+readEdgeFromFile	src/graph/GraphUtil.java	/^    static void readEdgeFromFile(Graph graph, BufferedReader reader)$/;"	m	class:GraphUtil
+relax	src/algorithm/sssp/BellmanFordDriver.java	/^    public void relax(int src, int dest, double weight) {$/;"	m	class:BellmanFordDriver
+relax	src/algorithm/sssp/DijkstraDriver.java	/^    public void relax(int src, int dest, double weight) {$/;"	m	class:DijkstraDriver
+reset	src/algorithm/bfs/BFSDriver.java	/^    public void reset() {$/;"	m	class:BFSDriver
+reset	src/algorithm/bfs/BFSExecutor.java	/^    public void reset() {$/;"	m	class:BFSExecutor
+reset	src/algorithm/pagerank/PageRankDriver.java	/^    public void reset() {$/;"	m	class:PageRankDriver
+reset	src/algorithm/pagerank/PageRankExecutor.java	/^    public void reset() {$/;"	m	class:PageRankExecutor
+reset	src/algorithm/pagerank/PageRankInit.java	/^    public void reset() {$/;"	m	class:PageRankInit
+reset	src/algorithm/scc/BackwardTraversalStart.java	/^    public void reset() {$/;"	m	class:BackwardTraversalStart
+reset	src/algorithm/scc/SCCForwardTraversalRest.java	/^    public void reset() {$/;"	m	class:SCCForwardTraversalRest
+reset	src/algorithm/scc/SCCForwardTraversalStart.java	/^    public void reset() {$/;"	m	class:SCCForwardTraversalStart
+reset	src/algorithm/scc/SCCTrim.java	/^    public void reset() {$/;"	m	class:SCCTrim
+reset	src/algorithm/sssp/SSSPDriver.java	/^    public void reset() {$/;"	m	class:SSSPDriver
+reset	src/algorithm/sssp/SSSPExecutor.java	/^    public void reset() {$/;"	m	class:SSSPExecutor
+reset	src/algorithm/wcc/WCCDriver.java	/^    public void reset() {$/;"	m	class:WCCDriver
+reset	src/algorithm/wcc/WCCForwardTraversalRest.java	/^    public void reset() {$/;"	m	class:WCCForwardTraversalRest
+reset	src/algorithm/wcc/WCCForwardTraversalStart.java	/^    public void reset( ) {$/;"	m	class:WCCForwardTraversalStart
+reset	src/graph/GraphAlgorithmInterface.java	/^	void reset(); \/\/ this is for testing$/;"	m	interface:GraphAlgorithmInterface
+reset	src/graph/partition/Partition.java	/^    public void reset() {$/;"	m	class:Partition
+reset	src/graph/partition/SSSPPartition.java	/^    public void reset() {$/;"	m	class:SSSPPartition
+reset	src/task/Task.java	/^    public void reset() {$/;"	m	class:Task
+reset	src/task/TaskBarrier.java	/^    public void reset() {$/;"	m	class:TaskBarrier
+run	src/algorithm/bfs/BFSDriver.java	/^    public void run() {$/;"	m	class:BFSDriver
+run	src/algorithm/pagerank/PageRankDriver.java	/^    public void run() {$/;"	m	class:PageRankDriver
+run	src/algorithm/scc/SCCDriver.java	/^    public void run() {$/;"	m	class:SCCDriver
+run	src/algorithm/sssp/BellmanFordDriver.java	/^    public void run() {$/;"	m	class:BellmanFordDriver
+run	src/algorithm/sssp/DijkstraDriver.java	/^    public void run() {$/;"	m	class:DijkstraDriver
+run	src/algorithm/sssp/SSSPDriver.java	/^    public void run()$/;"	m	class:SSSPDriver
+run	src/algorithm/wcc/WCCDriver.java	/^    public void run() {$/;"	m	class:WCCDriver
+run	src/task/Task.java	/^    public void run() {$/;"	m	class:Task
+run	src/thread/SSSPTaskWaitingRunnable.java	/^    public void run() {$/;"	m	class:SSSPTaskWaitingRunnable
+run	src/thread/TaskWaitingRunnable.java	/^    public void run() {$/;"	m	class:TaskWaitingRunnable
+runAllTasksOnce	src/algorithm/wcc/WCCDriver.java	/^    public void runAllTasksOnce(Task[] tasks) {$/;"	m	class:WCCDriver
+runBarrierOnce	src/algorithm/bfs/BFSDriver.java	/^    public void runBarrierOnce(Task[] tasks) {$/;"	m	class:BFSDriver
+runHeavyEdges	src/algorithm/sssp/SSSPDriver.java	/^    public void runHeavyEdges(Task[] tasks) {$/;"	m	class:SSSPDriver
+runLightEdges	src/algorithm/sssp/SSSPDriver.java	/^    public void runLightEdges(Task[] tasks) {$/;"	m	class:SSSPDriver
+runOnce	src/algorithm/pagerank/PageRankDriver.java	/^    public void runOnce(Task[] tasks) {$/;"	m	class:PageRankDriver
+runOnce	src/algorithm/scc/SCCDriver.java	/^    public void runOnce(Task[] tasks) {$/;"	m	class:SCCDriver
+runSomeTasksOnce	src/algorithm/wcc/WCCDriver.java	/^    public void runSomeTasksOnce(Task[] tasks) {$/;"	m	class:WCCDriver
+runWorkerOnce	src/algorithm/bfs/BFSDriver.java	/^    public void runWorkerOnce(Task[] tasks) {$/;"	m	class:BFSDriver
+runnable	src/algorithm/bfs/BFSDriver.java	/^    TaskWaitingRunnable runnable;$/;"	f	class:BFSDriver
+runnable	src/algorithm/pagerank/PageRankDriver.java	/^    TaskWaitingRunnable runnable;$/;"	f	class:PageRankDriver
+runnable	src/algorithm/scc/SCCDriver.java	/^    TaskWaitingRunnable runnable;$/;"	f	class:SCCDriver
+runnable	src/algorithm/sssp/SSSPDriver.java	/^    SSSPTaskWaitingRunnable runnable;$/;"	f	class:SSSPDriver
+runnable	src/algorithm/wcc/WCCDriver.java	/^    TaskWaitingRunnable runnable;$/;"	f	class:WCCDriver
+serialVersionUID	src/atomic/AtomicDoubleArray.java	/^    private static final long serialVersionUID = -2308431214976778248L;$/;"	f	class:AtomicDoubleArray	file:
+serialVersionUID	src/atomic/AtomicIntegerArray.java	/^    private static final long serialVersionUID = 2862133569453604235L;$/;"	f	class:AtomicIntegerArray	file:
+set	src/atomic/AtomicByteArray.java	/^    public void set(int i, byte newValue) {$/;"	m	class:AtomicByteArray
+set	src/atomic/AtomicDoubleArray.java	/^    public final void set(int i, double newValue) {$/;"	m	class:AtomicDoubleArray
+set	src/atomic/AtomicIntegerArray.java	/^    public final void set(int i, int newValue) {$/;"	m	class:AtomicIntegerArray
+setBucketId	src/graph/partition/SSSPPartition.java	/^    public void setBucketId(int entry, int newId) {$/;"	m	class:SSSPPartition
+setCurrMaxBucket	src/graph/partition/SSSPPartition.java	/^    public void setCurrMaxBucket(int value) {$/;"	m	class:SSSPPartition
+setInnerIdx	src/graph/partition/SSSPPartition.java	/^    public void setInnerIdx(int value) {$/;"	m	class:SSSPPartition
+setIsHeavy	src/algorithm/sssp/SSSPExecutor.java	/^    public static void setIsHeavy(boolean value) {$/;"	m	class:SSSPExecutor
+setLevel	src/algorithm/bfs/BFSExecutor.java	/^    public static void setLevel(int level) {$/;"	m	class:BFSExecutor
+setMaxNodeId	src/graph/Graph.java	/^    public void setMaxNodeId(int nodeId) {$/;"	m	class:Graph
+setNextVertexValue	src/graph/partition/PageRankPartition.java	/^    public final void setNextVertexValue(int entry, double value) {$/;"	m	class:PageRankPartition
+setNodeIsActive	src/graph/partition/Partition.java	/^    public void setNodeIsActive(int pos, int value) {$/;"	m	class:Partition
+setPartitionActiveValue	src/graph/partition/Partition.java	/^    public final void setPartitionActiveValue(int value) {$/;"	m	class:Partition
+setUpdateFunction	src/graph/partition/IntegerPartition.java	/^    public static void setUpdateFunction(IntBinaryOperator function) {$/;"	m	class:IntegerPartition
+setUpdateFunction	src/graph/partition/PageRankPartition.java	/^    public static void setUpdateFunction(DoubleBinaryOperator function) {$/;"	m	class:PageRankPartition
+setUpdateFunction	src/graph/partition/WCCPartition.java	/^    public static void setUpdateFunction(IntBinaryOperator function) {$/;"	m	class:WCCPartition
+setVertexValue	src/graph/partition/IntegerPartition.java	/^    public final void setVertexValue(int entry, int value) {$/;"	m	class:IntegerPartition
+setVertexValue	src/graph/partition/PageRankPartition.java	/^    public final void setVertexValue(int entry, double value) {$/;"	m	class:PageRankPartition
+setVertexValue	src/graph/partition/WCCPartition.java	/^    public void setVertexValue(int entry, int value) {$/;"	m	class:WCCPartition
+shift	src/atomic/AtomicDoubleArray.java	/^    private static final int shift;$/;"	f	class:AtomicDoubleArray	file:
+shift	src/atomic/AtomicIntegerArray.java	/^    private static final int shift;$/;"	f	class:AtomicIntegerArray	file:
+source	src/algorithm/sssp/BellmanFordDriver.java	/^    final int source;$/;"	f	class:BellmanFordDriver
+source	src/algorithm/sssp/DijkstraDriver.java	/^    final int source;$/;"	f	class:DijkstraDriver
+srcNode	src/algorithm/pagerank/PageRankExecutor.java	/^    Node srcNode;$/;"	f	class:PageRankExecutor
+srcNode	src/algorithm/pagerank/PageRankInit.java	/^    Node srcNode;$/;"	f	class:PageRankInit
+ssspExecutors	src/algorithm/sssp/SSSPDriver.java	/^    SSSPExecutor[] ssspExecutors;$/;"	f	class:SSSPDriver
+stopSurfValue	src/algorithm/pagerank/PageRankInit.java	/^    double stopSurfValue;$/;"	f	class:PageRankInit
+swapConsecutiveTwoTables	src/graph/partition/PageRankPartition.java	/^    public final void swapConsecutiveTwoTables() {$/;"	m	class:PageRankPartition
+table	src/graph/partition/IntegerPartition.java	/^    AtomicIntegerArray table;$/;"	f	class:IntegerPartition
+tablePos	src/graph/partition/Partition.java	/^    int tablePos;$/;"	f	class:Partition
+tables	src/graph/partition/PageRankPartition.java	/^    AtomicDoubleArray[] tables;$/;"	f	class:PageRankPartition
+tables	src/graph/partition/SSSPPartition.java	/^    AtomicDoubleArray tables;$/;"	f	class:SSSPPartition
+tables	src/graph/partition/WCCPartition.java	/^    AtomicIntegerArray tables;$/;"	f	class:WCCPartition
+task	src/task/Task.java	/^package task;$/;"	p
+task	src/task/TaskBarrier.java	/^package task;$/;"	p
+taskQueue	src/algorithm/bfs/BFSDriver.java	/^    LinkedBlockingQueue<Task> taskQueue;$/;"	f	class:BFSDriver
+taskQueue	src/algorithm/pagerank/PageRankDriver.java	/^    LinkedBlockingQueue<Task> taskQueue;$/;"	f	class:PageRankDriver
+taskQueue	src/algorithm/scc/SCCDriver.java	/^    LinkedBlockingQueue<Task> taskQueue;$/;"	f	class:SCCDriver
+taskQueue	src/algorithm/sssp/SSSPDriver.java	/^    LinkedBlockingQueue<Task> taskQueue;$/;"	f	class:SSSPDriver
+taskQueue	src/algorithm/wcc/WCCDriver.java	/^    LinkedBlockingQueue<Task> taskQueue;$/;"	f	class:WCCDriver
+taskQueue	src/thread/SSSPTaskWaitingRunnable.java	/^    LinkedBlockingQueue<Task> taskQueue;$/;"	f	class:SSSPTaskWaitingRunnable
+taskQueue	src/thread/TaskWaitingRunnable.java	/^    LinkedBlockingQueue<Task> taskQueue;$/;"	f	class:TaskWaitingRunnable
+thread	src/thread/SSSPTaskWaitingRunnable.java	/^package thread;$/;"	p
+thread	src/thread/TaskWaitingRunnable.java	/^package thread;$/;"	p
+thread	src/thread/ThreadUtil.java	/^package thread;$/;"	p
+toString	src/atomic/AtomicDoubleArray.java	/^    public String toString() {$/;"	m	class:AtomicDoubleArray
+toString	src/atomic/AtomicIntegerArray.java	/^    public String toString() {$/;"	m	class:AtomicIntegerArray
+totalDone	src/algorithm/sssp/SSSPDriver.java	/^    public boolean totalDone() {$/;"	m	class:SSSPDriver
+trimTasks	src/algorithm/scc/SCCDriver.java	/^    Task[] trimTasks;$/;"	f	class:SCCDriver
+unsafe	src/atomic/AtomicDoubleArray.java	/^    private static final sun.misc.Unsafe unsafe = getUnsafe();$/;"	f	class:AtomicDoubleArray	file:
+unsafe	src/atomic/AtomicIntegerArray.java	/^    private static final sun.misc.Unsafe unsafe = getUnsafe();$/;"	f	class:AtomicIntegerArray	file:
+update	src/algorithm/bfs/BFSExecutor.java	/^    public void update(Node srcNode) {$/;"	m	class:BFSExecutor
+update	src/algorithm/pagerank/PageRankExecutor.java	/^    public void update(int entry) {$/;"	m	class:PageRankExecutor
+update	src/algorithm/sssp/SSSPExecutor.java	/^    public void update(Node srcNode, int srcNodeIdInPart, int bucketIdx) {$/;"	m	class:SSSPExecutor
+update	src/function/UpdateFunction.java	/^    void update();$/;"	m	interface:UpdateFunction
+update	src/graph/partition/IntegerPartition.java	/^    public final void update(int entry, int value) {$/;"	m	class:IntegerPartition
+update	src/graph/partition/PageRankPartition.java	/^    public final void update(int entry, double value) {$/;"	m	class:PageRankPartition
+update	src/graph/partition/PageRankPartition.java	/^    public final void update(int pos, int entry, double value) {$/;"	m	class:PageRankPartition
+update	src/graph/partition/SSSPPartition.java	/^    public final void update(int entry, double newDist) {$/;"	m	class:SSSPPartition
+update	src/graph/partition/WCCPartition.java	/^    public void update(int entry, int value) {$/;"	m	class:WCCPartition
+updateAndGet	src/atomic/AtomicIntegerArray.java	/^    public final int updateAndGet(int i, IntUnaryOperator updateFunction) {$/;"	m	class:AtomicIntegerArray
+updateFunction	src/algorithm/bfs/BFSDriver.java	/^    IntBinaryOperator updateFunction;$/;"	f	class:BFSDriver
+updateFunction	src/algorithm/pagerank/PageRankDriver.java	/^    DoubleBinaryOperator updateFunction;$/;"	f	class:PageRankDriver
+updateFunction	src/algorithm/scc/SCCDriver.java	/^    IntBinaryOperator updateFunction;$/;"	f	class:SCCDriver
+updateFunction	src/algorithm/wcc/WCCDriver.java	/^    IntBinaryOperator updateFunction;$/;"	f	class:WCCDriver
+updateFunction	src/graph/partition/IntegerPartition.java	/^    public static IntBinaryOperator updateFunction;$/;"	f	class:IntegerPartition
+updateFunction	src/graph/partition/PageRankPartition.java	/^    public static DoubleBinaryOperator updateFunction;$/;"	f	class:PageRankPartition
+updateFunction	src/graph/partition/SSSPPartition.java	/^    public static DoubleBinaryOperator updateFunction;$/;"	f	class:SSSPPartition
+updateFunction	src/graph/partition/WCCPartition.java	/^    public static IntBinaryOperator updateFunction;$/;"	f	class:WCCPartition
+updateLevel	src/algorithm/bfs/BFSExecutor.java	/^    public static void updateLevel() {$/;"	m	class:BFSExecutor
+updateNextTable	src/graph/partition/PageRankPartition.java	/^    public final void updateNextTable(int entry, double value) {$/;"	m	class:PageRankPartition
+util.list	src/util/list/TIntLinkedListQueue.java	/^package util.list;$/;"	p
+weakCompareAndSet	src/atomic/AtomicIntegerArray.java	/^    public final boolean weakCompareAndSet(int i, int expect, int update) {$/;"	m	class:AtomicIntegerArray
+weights	src/algorithm/sssp/SSSPExecutor.java	/^    TDoubleArrayList weights = null;$/;"	f	class:SSSPExecutor
+weights	src/graph/Node.java	/^    TDoubleArrayList weights = null;$/;"	f	class:Node
+workTasks	src/algorithm/bfs/BFSDriver.java	/^    Task[] workTasks;$/;"	f	class:BFSDriver
+workTasks	src/algorithm/pagerank/PageRankDriver.java	/^    Task[] workTasks;$/;"	f	class:PageRankDriver
+workTasks	src/algorithm/sssp/SSSPDriver.java	/^    Task[] workTasks;$/;"	f	class:SSSPDriver
+writeGraph	src/graph/GraphUtil.java	/^    public static void writeGraph(Graph graph, String fileName) {$/;"	m	class:GraphUtil
