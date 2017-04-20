@@ -29,9 +29,14 @@ public class PageRankExecutor implements GraphAlgorithmInterface
     @Override
     public void execute() {
         for (int i = 0; i < partitionSize; i++) {
-            srcNode = graph.getNode(i);
+            srcNode = graph.getNode(offset + i);
+
+            if (srcNode == null) {
+                continue;
+            }
+
             int neighborListSize = srcNode.neighborListSize();
-            double scatterPageRank = getScatterPageRank(partition, i, neighborListSize);
+            double scatterPageRank = dampingFactor * (partition.getVertexValue(i) / (double) neighborListSize);
 
             for (int j = 0; j < neighborListSize; j++) {
                 int dest = srcNode.getNeighbor(j);
@@ -39,14 +44,9 @@ public class PageRankExecutor implements GraphAlgorithmInterface
 
                 PageRankPartition destPartition = graph.getPartition(destPartitionId);
                 int destPosition = graph.getNodePositionInPart(dest);
-
                 destPartition.updateNextTable(destPosition, scatterPageRank);
             }
         }
-    }
-
-    public double getScatterPageRank(PageRankPartition partition, int index, int neighborListSize) {
-        return dampingFactor * partition.getVertexValue(index) / (double) neighborListSize;
     }
 
     @Override

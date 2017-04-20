@@ -3,11 +3,8 @@ import graph.Graph;
 import graph.partition.PageRankPartition;
 import graph.GraphUtil;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.TimeUnit;
 
 public class PageRankMain
 {
@@ -43,18 +40,19 @@ public class PageRankMain
         double timeSum = 0;
 
         System.err.println("PageRank Running ... ");
-        for (int i = 0; i < 20; i++) {
+        final int numRun = 20;
+        for (int i = 0; i < numRun; i++) {
             driver.reset();
             start = System.currentTimeMillis();
             driver.run();
             elapsedTime[i] = System.currentTimeMillis() - start;
+            System.err.println("elapsed time for iteration" + i + " : " + ((elapsedTime[i]) / (1000.0)));
 
-            break;
-//            if (i >= 10) {
-//                timeSum += (elapsedTime[i] / 1000.0);
-//            }
+            if (i >= 10) {
+                timeSum += (elapsedTime[i] / 1000.0);
+            }
         }
-        System.err.println("PageRank Complete : ");
+        System.err.println("PageRank Complete ");
         String averageTime = String.format("%.3f", (timeSum / 10));
         System.out.println(driver._printPageRankSum() + "/" + averageTime);
 

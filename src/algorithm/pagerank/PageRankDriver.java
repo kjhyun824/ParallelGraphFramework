@@ -16,7 +16,8 @@ import java.util.function.DoubleBinaryOperator;
 /**
  * PageRank Algorithm Implementation
  **/
-public class PageRankDriver {
+public class PageRankDriver
+{
     int numThreads;
     int iteration;
     double dampingFactor;
@@ -32,7 +33,6 @@ public class PageRankDriver {
     Task[] workTasks;
     Task[] barrierTasks;
     Task[] exitBarrierTasks;
-    Task[] barrierResetTasks;
 
     public PageRankDriver(Graph<PageRankPartition> graph, double dampingFactor, int iteration, int numThreads) {
         this.graph = graph;
@@ -45,14 +45,13 @@ public class PageRankDriver {
     public void init() {
         int numPartitions = graph.getNumPartitions();
 
-        updateFunction = getUpdateFunction();
+        updateFunction = (prev, value) -> prev + value;
         PageRankPartition.setUpdateFunction(updateFunction);
 
         initTasks = new Task[numPartitions];
         workTasks = new Task[numPartitions];
         barrierTasks = new Task[numThreads];
         exitBarrierTasks = new Task[numThreads];
-        barrierResetTasks = new Task[1];
 
         barriers = new CyclicBarrier(numThreads);
         exitBarriers = new CyclicBarrier(numThreads + 1);
@@ -71,18 +70,14 @@ public class PageRankDriver {
             barrierTasks[i] = new Task(new BarrierTask(barriers));
             exitBarrierTasks[i] = new Task(new BarrierTask(exitBarriers));
         }
-        barrierResetTasks[0] = new Task(new BarrierResetTask(barriers));
     }
 
-    public void run()
-            throws BrokenBarrierException, InterruptedException {
+    public void run() throws BrokenBarrierException, InterruptedException {
         for (int i = 0; i < iteration; i++) {
             pushTasks(initTasks);
             pushTasks(barrierTasks);
-            pushTasks(barrierResetTasks);
             pushTasks(workTasks);
             pushTasks(barrierTasks);
-            pushTasks(barrierResetTasks);
         }
         pushTasks(exitBarrierTasks);
         exitBarriers.await();
@@ -94,14 +89,8 @@ public class PageRankDriver {
         }
     }
 
-    public DoubleBinaryOperator getUpdateFunction() {
-        DoubleBinaryOperator updateFunction = (prev, value) -> prev + value;
-        return updateFunction;
-    }
-
     //For JIT Test
     public void reset() {
-        exitBarriers.reset();
         for (int i = 0; i < initTasks.length; i++) {
             initTasks[i].reset();
         }
@@ -130,7 +119,6 @@ public class PageRankDriver {
 
         return pageRanksum;
     }
-
 
     public double[] _getPageRank(int[] sampleData) {
         double[] pageRank = new double[sampleData.length];

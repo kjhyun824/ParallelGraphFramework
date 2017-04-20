@@ -15,7 +15,7 @@ public class PageRankInit implements GraphAlgorithmInterface
     int offset;
     double dampingFactor;
     double initialValue;
-    double stopSurfValue;
+    double nextValue;
     boolean isFirst;
 
     PageRankInit(int partitionId, Graph<PageRankPartition> graph, double dampingFactor) {
@@ -27,20 +27,24 @@ public class PageRankInit implements GraphAlgorithmInterface
         partitionSize = partition.getSize();
         offset = partitionId << graph.getExpOfPartitionSize();
         initialValue = getInitPageRankValue(0); //initial PageRank Value
-        stopSurfValue = getInitPageRankValue(dampingFactor);
+        nextValue = getInitPageRankValue(dampingFactor);
         isFirst = true;
     }
 
     @Override
     public void execute() {
         if (!isFirst) {
-            initialValue = stopSurfValue;
+            initialValue = nextValue;
         }
         else {
             initNextTable();
         }
 
         for (int i = 0; i < partitionSize; i++) {
+            Node node = graph.getNode(offset + i);
+            if (node == null) {
+                continue;
+            }
             partition.setVertexValue(i, initialValue);
         }
 
@@ -52,7 +56,7 @@ public class PageRankInit implements GraphAlgorithmInterface
 
     public void initNextTable() {
         for (int i = 0; i < partitionSize; i++) {
-            partition.setNextVertexValue(i, stopSurfValue);
+            partition.setNextVertexValue(i, nextValue);
         }
     }
 
