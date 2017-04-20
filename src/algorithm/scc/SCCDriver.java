@@ -1,10 +1,9 @@
 package algorithm.scc;
 
 import graph.Graph;
-import graph.Node;
 import graph.partition.IntegerPartition;
 import task.Task;
-import task.TaskBarrier;
+import task.BarrierTask;
 import thread.TaskWaitingRunnable;
 import thread.ThreadUtil;
 
@@ -64,7 +63,7 @@ public class SCCDriver {
         }
 
         for (int i = 0; i < numThreads; i++) {
-            barrierTasks[i] = new Task(new TaskBarrier( barriers));
+            barrierTasks[i] = new Task(new BarrierTask( barriers));
         }
     }
 
