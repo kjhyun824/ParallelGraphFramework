@@ -28,7 +28,7 @@ public class GraphUtil {
             int srcNodeId = Integer.parseInt(nodeId[0]);
             int destNodeId = Integer.parseInt(nodeId[1]);
             if (graph.isWeighted()) {
-                double weight = Double.parseDouble(nodeId[2]);
+                int weight = Integer.parseInt(nodeId[2]);
                 graph.addEdge(srcNodeId, destNodeId, weight);
             } else {
                 graph.addEdge(srcNodeId, destNodeId);
