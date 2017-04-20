@@ -5,9 +5,9 @@ public abstract class Partition
     final int asyncRangeSize;
     int partitionId;
     int partitionSize;
-
-    int partitionActiveValue;
     int[] activeNodeCheckArray;
+
+    volatile int partitionActiveValue;
 
     Partition(int partitionId, int maxNodeId, int partitionSize, int asyncRangeSize) {
         this.partitionId = partitionId;
@@ -17,7 +17,6 @@ public abstract class Partition
             this.partitionSize = (maxNodeId % partitionSize) + 1;
         }
         this.asyncRangeSize = asyncRangeSize;
-        activeNodeCheckArray = new int[partitionSize];
         initializeTable();
     }
 
@@ -35,18 +34,6 @@ public abstract class Partition
 
     public boolean checkPartitionIsActive(int compareValue) {
         return partitionActiveValue == compareValue;
-    }
-
-    public int getPartitionActiveValue() {
-        return partitionActiveValue;
-    }
-
-    public int getNodeActiveValue(int pos) {
-        return activeNodeCheckArray[pos];
-    }
-
-    public void setNodeIsActive(int pos, int value) {
-        activeNodeCheckArray[pos] = value;
     }
 
     public void reset() {
