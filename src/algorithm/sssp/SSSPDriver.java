@@ -9,6 +9,10 @@ import task.BarrierTask;
 import thread.TaskWaitingRunnable;
 import thread.ThreadUtil;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -55,19 +59,19 @@ public class SSSPDriver
         ssspExecutors = new SSSPExecutor[numPartitions];
         barrierTasks = new Task[numThreads];
 
-        barriers = new CyclicBarrier(numThreads);
-
+        barriers = new CyclicBarrier(numThreads + 1);
 
         taskQueue = new LinkedBlockingQueue<>();
         runnable = new TaskWaitingRunnable(taskQueue);
 
-        int numNodes = graph.getNumNodes();
-        lightEdges = new TIntArrayList[numNodes];
-        lightWeights = new TIntArrayList[numNodes];
-        heavyEdges = new TIntArrayList[numNodes];
-        heavyWeights = new TIntArrayList[numNodes];
+//        int numNodes = graph.getNumNodes();
+        int maxNodeId = graph.getMaxNodeId();
+        lightEdges = new TIntArrayList[maxNodeId + 1];
+        lightWeights = new TIntArrayList[maxNodeId + 1];
+        heavyEdges = new TIntArrayList[maxNodeId + 1];
+        heavyWeights = new TIntArrayList[maxNodeId + 1];
 
-        for (int i = 0; i < numNodes; i++) {
+        for (int i = 0; i <= maxNodeId; i++) {
             lightEdges[i] = new TIntArrayList();
             lightWeights[i] = new TIntArrayList();
             heavyEdges[i] = new TIntArrayList();
@@ -79,10 +83,11 @@ public class SSSPDriver
                 continue;
             }
 
+            int exp_delta = 1 << delta;
             for (int j = 0; j < srcNode.getOutDegree(); j++) {
                 int destId = srcNode.getNeighbor(j);
                 int weight = srcNode.getWeight(destId);
-                if (weight > delta) {
+                if (weight > exp_delta) {
                     heavyEdges[i].add(destId);
                     heavyWeights[i].add(weight);
                 }
@@ -107,8 +112,7 @@ public class SSSPDriver
         System.err.println("[DEBUG] SSSP Driver Init Done");
     }
 
-    public void run()
-            throws BrokenBarrierException, InterruptedException {
+    public void run() throws BrokenBarrierException, InterruptedException {
         // TODO:
         graph.getPartition(0).update(0, 0);
         graph.getPartition(0).setBucketId(0, bucketIdx);
@@ -134,7 +138,7 @@ public class SSSPDriver
                 barriers.await();
                 innerIdx++;
             }
-            System.err.println("[DEBUG] inner : " + innerIdx);
+            //System.err.println("[DEBUG] inner : " + innerIdx);
 
             SSSPExecutor.setIsHeavy(true);
             runHeavyEdges(workTasks);
@@ -148,14 +152,24 @@ public class SSSPDriver
     }
 
     public void print() {
-        for (int i = 0; i < graph.getNumPartitions(); i++) {
-            SSSPPartition partition = graph.getPartition(i);
-            int offset = i << graph.getExpOfPartitionSize();
-            for (int j = 0; j < partition.getSize(); j++) {
-                int nodeId = offset + j;
-                String distance = String.format("%.3f", partition.getVertexValue(j));
-                System.out.println(nodeId + "   " + distance);
+        try (FileWriter fw = new FileWriter("SSSP.txt", true); BufferedWriter bw = new BufferedWriter(fw); PrintWriter out = new PrintWriter(bw)) {
+            for (int i = 0; i < graph.getNumPartitions(); i++) {
+                SSSPPartition partition = graph.getPartition(i);
+                int offset = i << graph.getExpOfPartitionSize();
+//            for (int j = 0; j < partition.getSize(); j++) {
+//                int nodeId = offset + j;
+//                String distance = String.format("%.3f", partition.getVertexValue(j));
+//                System.out.println(nodeId + "   " + distance);
+//            }
+
+                for (int j = 0; j < partition.getSize(); j++) {
+                    int nodeId = offset + j;
+                    out.println(nodeId + "," + partition.getVertexValue(j));
+                }
             }
+        }
+        catch (IOException e) {
+
         }
     }
 
@@ -200,7 +214,9 @@ public class SSSPDriver
             if (partitions[i].getCurrMaxBucket() >= bucketIdx) {
                 return false;
             }
+        }
 
+        for (int i = 0; i < graph.getNumPartitions(); i++) {
             int partitionSize = partitions[i].getSize();
             for (int j = 0; j < partitionSize; j++) {
                 if (partitions[i].getBucketId(j) >= bucketIdx) {

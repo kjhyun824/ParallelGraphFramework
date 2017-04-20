@@ -49,6 +49,7 @@ public class SSSPMain
         }
         System.err.println("SSSP Complete : ");
         System.err.println("File Write ...");
+        driver.print();
 
         String averageTime = String.format("%.3f", (timeSum / 10));
         System.out.println(averageTime);

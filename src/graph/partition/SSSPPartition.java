@@ -19,7 +19,7 @@ public class SSSPPartition extends Partition
 
         for (int i = 0; i < partitionSize; i++) {
             tables.set(i, Integer.MAX_VALUE);
-            bucketIds.set(i, Integer.MAX_VALUE);
+            bucketIds.set(i, -1);
         }
         innerIdx = -1;
         currMaxBucket = -1;
@@ -29,14 +29,14 @@ public class SSSPPartition extends Partition
         int prevId;
         if (entry < asyncRangeSize) {
             prevId = bucketIds.get(entry);
-            if (prevId > newId) {
+            if (prevId == -1 || prevId > newId) {
                 bucketIds.asyncSet(entry, newId);
             }
         }
         else {
             do {
                 prevId = bucketIds.get(entry);
-                if (newId >= prevId) {
+                if (prevId != -1 && newId >= prevId) {
                     break;
                 }
             }
