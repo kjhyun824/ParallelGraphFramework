@@ -15,7 +15,7 @@ public class DijkstraDriver
 {
     Graph<SSSPPartition> graph;
     PriorityQueue<Integer> activeQueue;
-    double[] dist;
+    int [] dist;
 
     final int source;
     final int maxNodeId;
@@ -32,12 +32,12 @@ public class DijkstraDriver
 
         this.source = source;
         this.maxNodeId = graph.getMaxNodeId();
-        dist = new double[maxNodeId + 1];
+        dist = new int[maxNodeId + 1];
     }
 
     public void run() {
         for (int i = 0; i <= maxNodeId; i++) {
-            dist[i] = Double.POSITIVE_INFINITY;
+            dist[i] = Integer.MAX_VALUE;
         }
         dist[source] = 0;
         activeQueue.add(source);
@@ -58,7 +58,7 @@ public class DijkstraDriver
         }
     }
 
-    public void relax(int src, int dest, double weight) {
+    public void relax(int src, int dest, int weight) {
         if (dist[dest] > dist[src] + weight) {
             dist[dest] = dist[src] + weight;
             activeQueue.add(dest);
@@ -68,8 +68,9 @@ public class DijkstraDriver
     public void printDist() {
         try (FileWriter fw = new FileWriter("sssp.txt", true); BufferedWriter bw = new BufferedWriter(fw); PrintWriter out = new PrintWriter(bw)) {
             for (int i = 0; i < dist.length; i++) {
-                String distance = String.format("%.3f", dist[i]);
-                out.println(i + " " + distance);
+//                String distance = String.format("%.3f", dist[i]);
+//                out.println(i + " " + distance);
+                out.println(i + "   " + dist[i]);
             }
         }
         catch (IOException e) {
