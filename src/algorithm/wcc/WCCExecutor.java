@@ -7,9 +7,6 @@ import graph.partition.WCCPartition;
 
 public class WCCExecutor implements GraphAlgorithmInterface
 {
-    static final byte ACTIVE = 1;
-    static final byte IN_ACTIVE = 0;
-
     final Graph<WCCPartition> graph;
     final WCCPartition partition;
     final int partitionId;
@@ -26,7 +23,8 @@ public class WCCExecutor implements GraphAlgorithmInterface
 
     @Override
     public void execute() {
-        partition.setPartitionActiveValue(IN_ACTIVE);
+        int epoch = WCCDriver.getCurrentEpoch();
+
         for (int i = 0; i < partitionSize; i++) {
             int srcId = offset + i;
             Node srcNode = graph.getNode(srcId);
@@ -48,13 +46,18 @@ public class WCCExecutor implements GraphAlgorithmInterface
 
             for (int j = 0; j < neighborListSize; j++) {
                 int destId = srcNode.getNeighbor(j);
+
+                if (destId <= nextCompId) {
+                    continue;
+                }
+
                 int destPartitionId = graph.getPartitionId(destId);
 
                 WCCPartition destPartition = graph.getPartition(destPartitionId);
                 int destPosition = graph.getNodePositionInPart(destId);
 
                 if (destPartition.update(destPosition, nextCompId)) {
-                    destPartition.setPartitionActiveValue(ACTIVE);
+                    destPartition.setUpdatedEpoch(epoch);
                 }
             }
         }

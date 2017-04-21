@@ -12,7 +12,7 @@ public abstract class Partition
     Partition(int partitionId, int maxNodeId, int partitionSize, int asyncRangeSize) {
         this.partitionId = partitionId;
         this.partitionSize = partitionSize;
-        this.partitionActiveValue = 1;
+        this.partitionActiveValue = 0;
         if ((partitionId + 1) * this.partitionSize > maxNodeId) {
             this.partitionSize = (maxNodeId % partitionSize) + 1;
         }
@@ -38,6 +38,6 @@ public abstract class Partition
 
     public void reset() {
         initializeTable();
-        partitionActiveValue = 1;
+        partitionActiveValue = 0;
     }
 }

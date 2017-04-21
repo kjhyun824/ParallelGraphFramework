@@ -15,9 +15,13 @@ public class WCCMain
         String inputFile = args[0];
         int numThreads = Integer.parseInt(args[1]);
         double asyncPercent = Double.parseDouble(args[2]);
+        int expOfPartitionSize = Integer.parseInt(args[3]);
 
-        int expOfPartitionSize = 16;
-        int asyncRangeSize = (int) ((1 << 16) * asyncPercent);
+        System.err.println("NUM_THREAD : " + numThreads);
+        System.err.println("EXP_OF_PARTITION_SIZE : " + expOfPartitionSize);
+
+        int asyncRangeSize = (int) ((1 << expOfPartitionSize) * asyncPercent);
+        System.err.println("ASYNC_SIZE : " + asyncRangeSize);
 
         Graph<WCCPartition> graph = Graph.getInstance(expOfPartitionSize, isDirected, isWeighted);
 
@@ -31,11 +35,12 @@ public class WCCMain
 
         WCCDriver driver = new WCCDriver(graph, numThreads);
 
-        long[] elapsedTime = new long[15];
+        final int numRun = 20;
+        long[] elapsedTime = new long[numRun];
         double timeSum = 0;
 
         System.err.println("WCC Running ... ");
-        for (int i = 0; i < elapsedTime.length; i++) {
+        for (int i = 0; i < numRun; i++) {
             driver.reset();
 
             start = System.currentTimeMillis();
@@ -45,10 +50,23 @@ public class WCCMain
             System.err.println("elapsed time for iteration" + i + " : " + ((elapsedTime[i]) / (1000.0)));
             System.err.println("Nodes in Largest WCC : " + driver.getLargestWCC());
 
+            if (i == 10) {
+//                System.gc();
+//                System.gc();
+//                System.gc();
+            }
+
             if (i >= 10) {
                 timeSum += (elapsedTime[i] / 1000.0);
             }
         }
+        System.err.println("");
+        if (asyncPercent == 1) {
+            System.err.println("ASYNC");
+        } else {
+            System.err.println("ATOMIC");
+        }
+        System.err.println("");
         System.err.println("WCC Complete : " + driver.getLargestWCC());
 
         String averageTime = String.format("%.3f", (timeSum / 10));
