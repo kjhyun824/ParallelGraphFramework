@@ -5,18 +5,18 @@ import graph.GraphAlgorithmInterface;
 import graph.Node;
 import graph.partition.WCCPartition;
 
-public class WCCForwardTraversalRest implements GraphAlgorithmInterface
+public class WCCExecutor implements GraphAlgorithmInterface
 {
     static final byte ACTIVE = 1;
     static final byte IN_ACTIVE = 0;
 
-    Graph<WCCPartition> graph;
-    WCCPartition partition;
+    final Graph<WCCPartition> graph;
+    final WCCPartition partition;
     final int partitionId;
     final int offset;
     final int partitionSize;
 
-    public WCCForwardTraversalRest(int partitionId, Graph<WCCPartition> graph) {
+    public WCCExecutor(int partitionId, Graph<WCCPartition> graph) {
         this.partitionId = partitionId;
         this.graph = graph;
         partition = graph.getPartition(partitionId);

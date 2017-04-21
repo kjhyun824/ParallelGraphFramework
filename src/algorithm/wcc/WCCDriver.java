@@ -6,8 +6,8 @@ import task.*;
 import thread.*;
 
 import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.LinkedBlockingQueue;
 
 public class WCCDriver
 {
@@ -16,16 +16,16 @@ public class WCCDriver
 
     boolean isDone;
 
-    Graph<WCCPartition> graph;
-    LinkedBlockingQueue<Task> taskQueue;
-    TaskWaitingRunnable runnable;
-    CyclicBarrier barriers;
-    CyclicBarrier barriers2;
+    final Graph<WCCPartition> graph;
+//    LinkedBlockingQueue<Task> taskQueue;
+    ConcurrentLinkedQueue<Task> taskQueue;
+//    TaskWaitingRunnable runnable;
+    ConTaskWaitingRunnable runnable;
 
-    Task[] fwTraverseStartTasks;
-    Task[] fwTraverseRestTasks;
+    CyclicBarrier barriers;
+
+    Task[] workerTasks;
     Task[] barrierTasks;
-    Task[] barrier2Tasks;
 
     public WCCDriver(Graph<WCCPartition> graph, int numThreads) {
         this.graph = graph;
@@ -38,39 +38,30 @@ public class WCCDriver
     public void init() {
         int numPartitions = graph.getNumPartitions();
 
-        fwTraverseStartTasks = new Task[numPartitions];
-        fwTraverseRestTasks = new Task[numPartitions];
+        workerTasks = new Task[numPartitions];
         barrierTasks = new Task[numThreads];
-        barrier2Tasks = new Task[numThreads];
 
-        barriers = new CyclicBarrier(numThreads);
-        barriers2 = new CyclicBarrier(numThreads + 1);
-        taskQueue = new LinkedBlockingQueue<>();
-        runnable = new TaskWaitingRunnable(taskQueue);
+        barriers = new CyclicBarrier(numThreads + 1);
+        taskQueue = new ConcurrentLinkedQueue<>();
+        runnable = new ConTaskWaitingRunnable(taskQueue);
 
         ThreadUtil.createAndStartThreads(numThreads, runnable);
 
         for (int i = 0; i < numPartitions; i++) {
-            fwTraverseStartTasks[i] = new Task(new WCCForwardTraversalStart(i, graph));
-            fwTraverseRestTasks[i] = new Task(new WCCForwardTraversalRest(i, graph));
+            workerTasks[i] = new Task(new WCCExecutor(i, graph));
         }
 
         for (int i = 0; i < numThreads; i++) {
             barrierTasks[i] = new Task(new BarrierTask(barriers));
-            barrier2Tasks[i] = new Task(new BarrierTask(barriers2));
         }
     }
 
-    public void run()
-            throws BrokenBarrierException, InterruptedException {
-        pushAllTasks(fwTraverseStartTasks);
-        pushAllTasks(barrierTasks);
-        pushAllTasks(fwTraverseRestTasks);
-
+    public void run() throws BrokenBarrierException, InterruptedException {
+        pushAllTasks(workerTasks);
         while (true) {
-            pushAllTasks(barrier2Tasks);
-            barriers2.await();
-            pushSomeTasks(fwTraverseRestTasks);
+            pushAllTasks(barrierTasks);
+            barriers.await();
+            pushSomeTasks(workerTasks);
             if (isDone) {
                 break;
             }
@@ -100,17 +91,17 @@ public class WCCDriver
 
     public int getLargestWCC() {
         WCCPartition[] partitions = graph.getPartitions();
-        int[] compIds = new int[graph.getMaxNodeId() + 1];
+        int[] compIdCount = new int[graph.getMaxNodeId() + 1];
         for (int i = 0; i < partitions.length; i++) {
             for (int j = 0; j < partitions[i].getSize(); j++) {
                 int compId = partitions[i].getNextCompId(j);
-                compIds[compId]++;
+                compIdCount[compId]++;
             }
         }
 
         int max = 0;
         for (int i = 0; i < graph.getMaxNodeId() + 1; i++) {
-            max = Math.max(max, compIds[i]);
+            max = Math.max(max, compIdCount[i]);
         }
         return max;
     }
