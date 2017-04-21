@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/PartitionBasedGraph.iml" filepath="$PROJECT_DIR$/PartitionBasedGraph.iml" />
+      <module fileurl="file://$PROJECT_DIR$/JungBong.iml" filepath="$PROJECT_DIR$/JungBong.iml" />
     </modules>
   </component>
 </project>

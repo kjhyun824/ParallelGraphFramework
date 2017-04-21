@@ -22,11 +22,11 @@ public class SSSPMain
         long start = System.currentTimeMillis();
 
         Graph<SSSPPartition> graph = Graph.getInstance(expOfPartitionSize, isDirected, isWeighted);
-        System.err.println("Graph Loading ... ");
+        System.out.println("Graph Loading ... ");
         GraphUtil.load(graph, inputFile);
         graph.generatePartition(asyncRangeSize, SSSPPartition.class);
 
-        System.err.println("Loading Time : " + (System.currentTimeMillis() - start) / 1000.0);
+        System.out.println("Loading Time : " + (System.currentTimeMillis() - start) / 1000.0);
 
         SSSPDriver driver = new SSSPDriver(graph, numThreads, delta, 0);
 
@@ -34,30 +34,33 @@ public class SSSPMain
         long[] elapsedTime = new long[numRun];
         double timeSum = 0;
 
-        System.err.println("SSSP Running ... ");
+        System.out.println("SSSP Running ... ");
 
         for (int i = 0; i < numRun; i++) {
             driver.reset();
             start = System.currentTimeMillis();
             driver.run();
             elapsedTime[i] = System.currentTimeMillis() - start;
-            System.err.println("elapsed time for iteration" + i + " : " + ((elapsedTime[i]) / (1000.0)));
+            System.out.println("elapsed time for iteration" + i + " : " + ((elapsedTime[i]) / (1000.0)));
 
+						if(i == 10) {
+							System.out.println("[DEBUG] Garbage Collecting");
+							for(int j = 0; j < 3; j++) {
+								System.gc();
+							}
+						}
             if (i >= 10) {
                 timeSum += (elapsedTime[i] / 1000.0);
             }
         }
-<<<<<<< HEAD
         System.out.println("[DEBUG] SSSP END");
-=======
-        System.err.println("SSSP Complete : ");
-        System.err.println("File Write ...");
-        driver.print();
+        System.out.println("SSSP Complete : ");
+//        System.err.println("File Write ...");
+//				driver.print();
 
         String averageTime = String.format("%.3f", (timeSum / 10));
         System.out.println(averageTime);
 
->>>>>>> 27b56c1789fe2bf8dcb73a5e5cef0a01c2e6029e
         System.exit(1);
     }
 }
