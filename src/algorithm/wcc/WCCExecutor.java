@@ -7,6 +7,9 @@ import graph.partition.WCCPartition;
 
 public class WCCExecutor implements GraphAlgorithmInterface
 {
+    static final byte ACTIVE = 1;
+    static final byte IN_ACTIVE = 0;
+
     final Graph<WCCPartition> graph;
     final WCCPartition partition;
     final int partitionId;
@@ -23,8 +26,16 @@ public class WCCExecutor implements GraphAlgorithmInterface
 
     @Override
     public void execute() {
-        int epoch = WCCDriver.getCurrentEpoch();
+        partition.setPartitionActiveValue(IN_ACTIVE);
+        outerLoop();
+    }
 
+    @Override
+    public void reset() {
+
+    }
+
+    public void outerLoop() {
         for (int i = 0; i < partitionSize; i++) {
             int srcId = offset + i;
             Node srcNode = graph.getNode(srcId);
@@ -34,7 +45,7 @@ public class WCCExecutor implements GraphAlgorithmInterface
             }
 
             int curCompId = partition.getCurCompId(i);
-            int nextCompId = partition.getNextCompId(i);
+            int nextCompId = partition.getNextCompId(i);    //  2%
 
             if (curCompId == nextCompId) {
                 continue;
@@ -42,29 +53,27 @@ public class WCCExecutor implements GraphAlgorithmInterface
 
             partition.setCurComponentId(i, nextCompId);
 
-            int neighborListSize = srcNode.neighborListSize();
-
-            for (int j = 0; j < neighborListSize; j++) {
-                int destId = srcNode.getNeighbor(j);
-
-                if (destId <= nextCompId) {
-                    continue;
-                }
-
-                int destPartitionId = graph.getPartitionId(destId);
-
-                WCCPartition destPartition = graph.getPartition(destPartitionId);
-                int destPosition = graph.getNodePositionInPart(destId);
-
-                if (destPartition.update(destPosition, nextCompId)) {
-                    destPartition.setUpdatedEpoch(epoch);
-                }
-            }
+            innerLoop(srcNode, nextCompId);
         }
     }
 
-    @Override
-    public void reset() {
+    public void innerLoop(Node srcNode, int nextCompId) {                     // 81%
+        int neighborListSize = srcNode.neighborListSize();                    // 2%
+        for (int j = 0; j < neighborListSize; j++) {
+            int destId = srcNode.getNeighbor(j);                              // 4%
 
+            if (destId <= nextCompId) {
+                continue;
+            }
+
+            int destPartitionId = graph.getPartitionId(destId);               // 2%
+
+            WCCPartition destPartition = graph.getPartition(destPartitionId); // 5%
+            int destPosition = graph.getNodePositionInPart(destId);           // 14%
+
+            if (destPartition.update(destPosition, nextCompId)) {             // 50%
+                destPartition.setPartitionActiveValue(ACTIVE);
+            }
+        }
     }
 }

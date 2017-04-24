@@ -11,8 +11,7 @@ import java.util.concurrent.CyclicBarrier;
 
 public class WCCDriver
 {
-    static volatile int currentEpoch;
-    //    static int currentEpoch;
+    static final int ACTIVE = 1;
     final int numThreads;
 
     boolean isDone;
@@ -32,7 +31,6 @@ public class WCCDriver
         this.graph = graph;
         this.numThreads = numThreads;
         isDone = false;
-        currentEpoch = 1;
 
         init();
     }
@@ -59,30 +57,30 @@ public class WCCDriver
     }
 
     public void run() throws BrokenBarrierException, InterruptedException {
-        boolean isDone = false;
         pushAllTasks(workerTasks);
-        while (!isDone) {
+        while (true) {
             pushAllTasks(barrierTasks);
             barriers.await();
-            currentEpoch++;
-            isDone = pushSomeTasks(workerTasks);
+            pushSomeTasks(workerTasks);
+            if (isDone) {
+                break;
+            }
         }
     }
 
-    public boolean pushSomeTasks(Task[] tasks) {
+    public void pushSomeTasks(Task[] tasks) {
         int count = 0;
 
         for (int i = 0; i < tasks.length; i++) {
-            if (graph.getPartition(i).getUpdatedEpoch() >= (currentEpoch - 1)) {
+            if (graph.getPartition(i).checkPartitionIsActive(ACTIVE)) {
                 taskQueue.offer(tasks[i]);
                 count++;
             }
         }
 
         if (count == 0) {
-            return true;
+            isDone = true;
         }
-        return false;
     }
 
     public void pushAllTasks(Task[] tasks) {
@@ -95,13 +93,7 @@ public class WCCDriver
         WCCPartition[] partitions = graph.getPartitions();
         int[] compIdCount = new int[graph.getMaxNodeId() + 1];
         for (int i = 0; i < partitions.length; i++) {
-            int offset = i << graph.getExpOfPartitionSize();
             for (int j = 0; j < partitions[i].getSize(); j++) {
-
-                if (graph.getNode(offset + j) == null) {
-                    continue;
-                }
-
                 int compId = partitions[i].getNextCompId(j);
                 compIdCount[compId]++;
             }
@@ -119,10 +111,5 @@ public class WCCDriver
             graph.getPartition(i).reset();
         }
         isDone = false;
-        currentEpoch = 1;
-    }
-
-    public static int getCurrentEpoch() {
-        return currentEpoch;
     }
 }
