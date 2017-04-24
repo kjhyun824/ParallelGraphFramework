@@ -58,15 +58,20 @@ public class WCCPartition extends Partition
         else {
 //            tryUpdate++;
             do {
-                prev = nextCompIds.get(entry);
-                if (prev <= value) {
-//                    notUpdated++;
-                    return false;
+                prev = nextCompIds.get(entry);      // 40 %
+
+                if (!compareCompIds(prev, value)) {  // 2%
+                    return false;                    // 1%
                 }
+
             }
-            while (!nextCompIds.compareAndSet(entry, prev, value));
+            while (!nextCompIds.compareAndSet(entry, prev, value));     // 1%
             return true;
         }
+    }
+
+    public boolean compareCompIds (int prev, int value) {
+        return prev > value;
     }
 
     public void setCurComponentId(int pos, int value) {

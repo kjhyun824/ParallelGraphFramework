@@ -66,11 +66,11 @@ public class DijkstraDriver
     }
 
     public void printDist() {
-        try (FileWriter fw = new FileWriter("sssp.txt", true); BufferedWriter bw = new BufferedWriter(fw); PrintWriter out = new PrintWriter(bw)) {
+        try (FileWriter fw = new FileWriter("Dijkstra.txt", true); BufferedWriter bw = new BufferedWriter(fw); PrintWriter out = new PrintWriter(bw)) {
             for (int i = 0; i < dist.length; i++) {
 //                String distance = String.format("%.3f", dist[i]);
 //                out.println(i + " " + distance);
-                out.println(i + "   " + dist[i]);
+                out.println(i + "," + dist[i]);
             }
         }
         catch (IOException e) {

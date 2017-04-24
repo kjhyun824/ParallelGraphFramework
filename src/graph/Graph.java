@@ -56,16 +56,14 @@ public class Graph<T>
         boolean isAdded = srcNode.addNeighborId(destNodeId); // Do not allow duplication
 
         if (isAdded) {
+            srcNode.incrementOutDegree();
+            destNode.incrementInDegree();
             if (isDirected) {
-                srcNode.incrementOutDegree();
-                destNode.incrementInDegree();
                 numEdges++;
             }
             else {
                 destNode.addNeighborId(srcNodeId);
                 srcNode.incrementInDegree();
-                srcNode.incrementOutDegree();
-                destNode.incrementInDegree();
                 destNode.incrementOutDegree();
                 numEdges++;
             }
@@ -83,16 +81,14 @@ public class Graph<T>
         boolean isAdded = srcNode.addNeighborId(destNodeId, weight);
 
         if (isAdded) {
+            srcNode.incrementOutDegree();
+            destNode.incrementInDegree();
             if (isDirected) {
-                srcNode.incrementOutDegree();
-                destNode.incrementInDegree();
                 numEdges++;
             }
             else {
                 destNode.addNeighborId(srcNodeId, weight);
                 srcNode.incrementInDegree();
-                srcNode.incrementOutDegree();
-                destNode.incrementInDegree();
                 destNode.incrementOutDegree();
                 numEdges++;
             }

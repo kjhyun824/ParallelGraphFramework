@@ -3,12 +3,13 @@ import graph.Graph;
 import graph.GraphUtil;
 import graph.partition.WCCPartition;
 
+import java.io.IOException;
 import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.TimeUnit;
 
 public class WCCMain
 {
-    public static void main(String[] args)
-            throws BrokenBarrierException, InterruptedException {
+    public static void main(String[] args) throws BrokenBarrierException, InterruptedException, IOException {
 
         final boolean isDirected = false;
         final boolean isWeighted = false;
@@ -43,34 +44,38 @@ public class WCCMain
         for (int i = 0; i < numRun; i++) {
             driver.reset();
 
+//            if (i == 10) {
+//                System.gc();
+//                System.gc();
+//                System.gc();
+//                System.err.println("JIT COMPILER FINISH");
+//                System.err.println("GO ?? (ENTER)");
+//                System.in.read();
+//            }
+
             start = System.currentTimeMillis();
             driver.run();
             elapsedTime[i] = System.currentTimeMillis() - start;
 
-            System.err.println("elapsed time for iteration" + i + " : " + ((elapsedTime[i]) / (1000.0)));
-            System.err.println("Nodes in Largest WCC : " + driver.getLargestWCC());
-
-            if (i == 10) {
-//                System.gc();
-//                System.gc();
-//                System.gc();
-            }
-
-            if (i >= 10) {
-                timeSum += (elapsedTime[i] / 1000.0);
-            }
+//            System.err.println("elapsed time for iteration" + i + " : " + ((elapsedTime[i]) / (1000.0)));
+//            System.err.println("Nodes in Largest WCC : " + driver.getLargestWCC());
+//
+//            if (i >= 10) {
+//                timeSum += (elapsedTime[i] / 1000.0);
+//            }
         }
-        System.err.println("");
-        if (asyncPercent == 1) {
-            System.err.println("ASYNC");
-        } else {
-            System.err.println("ATOMIC");
-        }
-        System.err.println("");
-        System.err.println("WCC Complete : " + driver.getLargestWCC());
+//        System.err.println("");
+//        if (asyncPercent == 1) {
+//            System.err.println("ASYNC");
+//        }
+//        else {
+//            System.err.println("ATOMIC");
+//        }
+//        System.err.println("");
+//        System.err.println("WCC Complete : " + driver.getLargestWCC());
 
-        String averageTime = String.format("%.3f", (timeSum / 10));
-        System.out.println(driver.getLargestWCC() + "/" + averageTime);
+//        String averageTime = String.format("%.3f", (timeSum / 10));
+//        System.out.println(driver.getLargestWCC() + "/" + averageTime);
 
         System.exit(1);
     }

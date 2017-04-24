@@ -1,6 +1,5 @@
 package graph;
 
-import gnu.trove.list.array.TDoubleArrayList;
 import gnu.trove.list.array.TIntArrayList;
 
 public class Node extends TIntArrayList {
@@ -47,7 +46,7 @@ public class Node extends TIntArrayList {
     }
 
     public int neighborListSize() {
-        return size();
+        return this._pos;
     }
 
     public void incrementInDegree() {

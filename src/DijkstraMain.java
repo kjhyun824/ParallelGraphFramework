@@ -12,7 +12,7 @@ public class DijkstraMain {
         GraphUtil.load(graph, inputFile);
         System.out.println("[DEBUG] Graph Complete");
 
-        DijkstraDriver driver = new DijkstraDriver(graph, 1);
+        DijkstraDriver driver = new DijkstraDriver(graph, 0);
 
         System.out.println("[DEBUG] Dijkstra Start");
         driver.run();
