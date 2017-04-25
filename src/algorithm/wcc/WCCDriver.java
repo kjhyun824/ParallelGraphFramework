@@ -62,10 +62,11 @@ public class WCCDriver
         boolean isDone = false;
         int prevLength = 1;
         int currentLength = 2;
+        int numPartitions = graph.getNumPartitions();
 
         do {
-            if (currentLength > workerTasks.length) {
-                currentLength = workerTasks.length;
+            if (currentLength > numPartitions) {
+                currentLength = numPartitions;
             }
 
             for (int i = prevLength; i < currentLength; i++) {
@@ -76,13 +77,13 @@ public class WCCDriver
             currentLength = currentLength << 1;
             barriers.await();
         }
-        while (prevLength != workerTasks.length);
+        while (prevLength != numPartitions);
 
         do {
             pushAllTasks(barrierTasks);
             barriers.await();
             currentEpoch++;
-            isDone = pushSomeTasks(workerTasks);
+            isDone = pushSomeTasks(workerTasks, numPartitions);
         }
         while (!isDone);
     }
@@ -91,7 +92,7 @@ public class WCCDriver
     public void run() throws BrokenBarrierException, InterruptedException {
         WCCPartition[] partitions = graph.getPartitions();
         int numPartitions = partitions.length;
-        int numActivePartition = partitions.length / 16;
+        int numActivePartition = partitions.length / 32;
         boolean isDone;
 
         for (int i = 0; i < numActivePartition; i++) {
@@ -116,6 +117,7 @@ public class WCCDriver
         while (!isDone);
     }
 
+
 /*
     public void run() throws BrokenBarrierException, InterruptedException {
         int numPartitions = graph.getNumPartitions();
@@ -130,7 +132,22 @@ public class WCCDriver
         while (!isDone);
     }
 */
+/*
+    public void run() throws BrokenBarrierException, InterruptedException {
+        int numPartitions = graph.getNumPartitions();
+        boolean isDone;
 
+        taskQueue.offer(workerTasks[0]);
+
+        do {
+            pushAllTasks(barrierTasks);
+            barriers.await();
+            currentEpoch++;
+            isDone = pushSomeTasks(workerTasks, numPartitions);
+        }
+        while (!isDone);
+    }
+*/
     public boolean pushSomeTasks(Task[] tasks, int numTasks) {
         int count = 0;
 
@@ -177,6 +194,16 @@ public class WCCDriver
     }
 
     public void reset() {
+        int tryUpdated = 0;
+        int actualUpdated = 0;
+        for (int i = 0; i < graph.getNumPartitions(); i++) {
+            tryUpdated += graph.getPartition(i).getTryUpdated();
+            actualUpdated += graph.getPartition(i).getActualUpdated();
+        }
+        System.out.println("TryUpdated : " + tryUpdated);
+        System.out.println("ActualUpdated : " + actualUpdated);
+        System.out.println("Diff : " + (tryUpdated - actualUpdated));
+
         for (int i = 0; i < graph.getNumPartitions(); i++) {
             graph.getPartition(i).reset();
         }

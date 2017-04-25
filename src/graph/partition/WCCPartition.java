@@ -7,6 +7,8 @@ public class WCCPartition extends Partition
     AtomicIntegerArray nextCompIds;
     int[] curCompIds;
     volatile int updatedEpoch;
+    int tryUpdated;
+    int actualUpdated;
 
     public WCCPartition(int partitionId, int maxNodeId, int partitionSize, int asyncRangeSize) {
         super(partitionId, maxNodeId, partitionSize, asyncRangeSize);
@@ -22,12 +24,30 @@ public class WCCPartition extends Partition
             nextCompIds.set(i, offset + i);
         }
         updatedEpoch = 1;
+        tryUpdated = 0;
+        actualUpdated = 0;
     }
 
     public void setUpdatedEpoch(int value) {
         if (updatedEpoch != value) {
             updatedEpoch = value;
         }
+    }
+
+    public void incrementTryUpdated() {
+        tryUpdated++;
+    }
+
+    public void incrementActualUpdated() {
+        actualUpdated++;
+    }
+
+    public int getTryUpdated() {
+        return tryUpdated;
+    }
+
+    public int getActualUpdated() {
+        return actualUpdated;
     }
 
     public int getUpdatedEpoch() {
@@ -43,8 +63,6 @@ public class WCCPartition extends Partition
         }
     }
 
-    volatile int tryUpdate = 0;
-    volatile int notUpdated = 0;
 
     public final boolean update(int entry, int value) {
         int prev;

@@ -57,8 +57,10 @@ public class WCCExecutor implements GraphAlgorithmInterface
                 WCCPartition destPartition = graph.getPartition(destPartitionId);
                 int destPosition = graph.getNodePositionInPart(destId);
 
+                partition.incrementTryUpdated();
                 if (destPartition.update(destPosition, nextCompId)) {
                     destPartition.setUpdatedEpoch(epoch);
+                    partition.incrementActualUpdated();
                 }
             }
         }
