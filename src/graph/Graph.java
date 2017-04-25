@@ -21,6 +21,7 @@ public class Graph<T>
     int numNodes;
     int numEdges;
     int maxNodeId;
+    int selfCount = 0;
 
     // related to partition
     T[] partitions;
@@ -47,7 +48,14 @@ public class Graph<T>
         return instance;
     }
 
+    public int getSelfCount() {
+        return selfCount;
+    }
     public boolean addEdge(int srcNodeId, int destNodeId) {
+        if (srcNodeId == destNodeId) {
+//            selfCount++;
+            return false;
+        }
         checkAndCreateNodes(srcNodeId, destNodeId);
 
         Node srcNode = nodes[srcNodeId];
