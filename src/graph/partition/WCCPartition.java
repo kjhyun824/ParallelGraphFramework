@@ -21,7 +21,7 @@ public class WCCPartition extends Partition
             curCompIds[i] = -1;
             nextCompIds.set(i, offset + i);
         }
-        updatedEpoch = 0;
+        updatedEpoch = 1;
     }
 
     public void setUpdatedEpoch(int value) {
@@ -43,34 +43,35 @@ public class WCCPartition extends Partition
         }
     }
 
-    //    volatile int tryUpdate = 0;
-//    volatile int notUpdated = 0;
+    volatile int tryUpdate = 0;
+    volatile int notUpdated = 0;
+
     public final boolean update(int entry, int value) {
         int prev;
         if (entry < asyncRangeSize) { // TODO : think about multiple ranges in a single partition
             prev = nextCompIds.asyncGet(entry);
-            if (prev > value) {
-                nextCompIds.asyncSet(entry, value);
-                return true;
+            if (prev <= value) {
+                return false;
             }
-            return false;
+            nextCompIds.asyncSet(entry, value);
+            return true;
         }
         else {
 //            tryUpdate++;
             do {
                 prev = nextCompIds.get(entry);      // 40 %
 
-                if (!compareCompIds(prev, value)) {  // 2%
+                if (prev <= value) {  // 2%
+//                    notUpdated++;
                     return false;                    // 1%
                 }
-
             }
             while (!nextCompIds.compareAndSet(entry, prev, value));     // 1%
             return true;
         }
     }
 
-    public boolean compareCompIds (int prev, int value) {
+    public boolean compareCompIds(int prev, int value) {
         return prev > value;
     }
 
@@ -88,5 +89,6 @@ public class WCCPartition extends Partition
         updatedEpoch = 0;
 
 //        System.out.println("tryUpdate = "+tryUpdate+", notUpdated:"+notUpdated);
+//        System.out.println("tryUpdate - notUpdated :  " + (tryUpdate - notUpdated));
     }
 }
