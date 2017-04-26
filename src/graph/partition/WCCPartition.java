@@ -46,7 +46,15 @@ public class WCCPartition extends Partition
     //    volatile int tryUpdate = 0;
 //    volatile int notUpdated = 0;
     public final boolean update(int entry, int value) {
-        int prev;
+        int prev; /*= nextCompIds.asyncGet(entry);
+        if(prev == 0) {
+            return false;
+        } else if(value == 0) {
+            nextCompIds.asyncSet(entry,value);
+            return true;
+        }
+        */
+
         if (entry < asyncRangeSize) { // TODO : think about multiple ranges in a single partition
             prev = nextCompIds.asyncGet(entry);
             if (prev > value) {
@@ -58,15 +66,20 @@ public class WCCPartition extends Partition
         else {
 //            tryUpdate++;
             do {
-                prev = nextCompIds.get(entry);
-                if (prev <= value) {
-//                    notUpdated++;
-                    return false;
+                prev = nextCompIds.get(entry);      // 40 %
+
+                if (prev <= value) {  // 2%
+                    return false;                    // 1%
                 }
+
             }
-            while (!nextCompIds.compareAndSet(entry, prev, value));
+            while (!nextCompIds.compareAndSet(entry, prev, value));     // 1%
             return true;
         }
+    }
+
+    public boolean compareCompIds (int prev, int value) {
+        return prev > value;
     }
 
     public void setCurComponentId(int pos, int value) {

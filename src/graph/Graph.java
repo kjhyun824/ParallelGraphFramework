@@ -7,7 +7,7 @@ import graph.partition.WCCPartition;
 
 import java.lang.reflect.Array;
 
-public class Graph<T>
+public final class Graph<T>
 {
     final static int defaultSize = 10;
     static Graph instance = null;
@@ -49,6 +49,7 @@ public class Graph<T>
 
     public boolean addEdge(int srcNodeId, int destNodeId) {
         checkAndCreateNodes(srcNodeId, destNodeId);
+        if(srcNodeId == destNodeId) return false;
 
         Node srcNode = nodes[srcNodeId];
         Node destNode = nodes[destNodeId];
@@ -189,12 +190,12 @@ public class Graph<T>
         return partitions.length;
     }
 
-    public int getPartitionId(int nodeId) {
+    public final int getPartitionId(int nodeId) {
         //  = nodeNumber / partitionCapacity
         return nodeId >> expOfPartitionSize;
     }
 
-    public int getNodePositionInPart(int nodeId) {
+    public final int getNodePositionInPart(int nodeId) {
         //  = nodeNumber % partitionCapacity
         return nodeId & bitMaskForRemain;
     }

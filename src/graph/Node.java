@@ -38,7 +38,7 @@ public class Node extends TIntArrayList {
 
 
     public int getNeighbor(int neighborNodeIdx) {
-        return getQuick(neighborNodeIdx);
+        return this._data[neighborNodeIdx];
     }
 
     public int getWeight(int neighborNodeId) {

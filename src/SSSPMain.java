@@ -43,12 +43,6 @@ public class SSSPMain
             elapsedTime[i] = System.currentTimeMillis() - start;
             System.out.println("elapsed time for iteration" + i + " : " + ((elapsedTime[i]) / (1000.0)));
 
-						if(i == 10) {
-							System.out.println("[DEBUG] Garbage Collecting");
-							for(int j = 0; j < 3; j++) {
-								System.gc();
-							}
-						}
             if (i >= 10) {
                 timeSum += (elapsedTime[i] / 1000.0);
             }
