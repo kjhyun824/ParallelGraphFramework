@@ -48,9 +48,9 @@ public class WCCExecutor implements GraphAlgorithmInterface
             int curCompId = partition.getCurCompId(i);
             int nextCompId = partition.getNextCompId(i);
 
-            if (predicate.test(nextCompId, threshold)) {
-                continue;
-            }
+//            if (predicate.test(nextCompId, threshold)) {
+//                continue;
+//            }
 
             if (curCompId == nextCompId) {
                 continue;
@@ -71,10 +71,10 @@ public class WCCExecutor implements GraphAlgorithmInterface
                 WCCPartition destPartition = graph.getPartition(destPartitionId);
                 int destPosition = graph.getNodePositionInPart(destId);
 
-                partition.incrementTryUpdated();
+//                partition.incrementTryUpdated();
                 if (destPartition.update(destPosition, nextCompId)) {
                     destPartition.setUpdatedEpoch(epoch);
-                    partition.incrementActualUpdated();
+//                    partition.incrementActualUpdated();
                 }
             }
         }
