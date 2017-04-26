@@ -1,5 +1,6 @@
 package algorithm.wcc;
 
+import function.PredicateFunction;
 import graph.Graph;
 import graph.GraphAlgorithmInterface;
 import graph.Node;
@@ -12,7 +13,17 @@ public class WCCExecutor implements GraphAlgorithmInterface
     final int partitionId;
     final int offset;
     final int partitionSize;
+    static int threshold;
+    static PredicateFunction predicate;
 
+
+    public static void setThreshold(int value) {
+        threshold = value;
+    }
+
+    public static void setPredicateFunction(PredicateFunction predicateFunction) {
+        predicate = predicateFunction;
+    }
 
     public WCCExecutor(int partitionId, Graph<WCCPartition> graph) {
         this.partitionId = partitionId;
@@ -37,6 +48,10 @@ public class WCCExecutor implements GraphAlgorithmInterface
             int curCompId = partition.getCurCompId(i);
             int nextCompId = partition.getNextCompId(i);
 
+            if (predicate.test(nextCompId, threshold)) {
+                continue;
+            }
+
             if (curCompId == nextCompId) {
                 continue;
             }
@@ -53,7 +68,6 @@ public class WCCExecutor implements GraphAlgorithmInterface
                 }
 
                 int destPartitionId = graph.getPartitionId(destId);
-
                 WCCPartition destPartition = graph.getPartition(destPartitionId);
                 int destPosition = graph.getNodePositionInPart(destId);
 

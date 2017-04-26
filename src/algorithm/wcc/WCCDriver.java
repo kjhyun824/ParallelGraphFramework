@@ -92,9 +92,13 @@ public class WCCDriver
     public void run() throws BrokenBarrierException, InterruptedException {
         WCCPartition[] partitions = graph.getPartitions();
         int numPartitions = partitions.length;
-        int numActivePartition = partitions.length / 32;
+        int numActivePartition = partitions.length / 128;
         boolean isDone;
 
+        WCCExecutor.setThreshold(numActivePartition << graph.getExpOfPartitionSize());
+        WCCExecutor.setPredicateFunction((nextCompId, threshold) -> nextCompId >= threshold);
+
+        System.out.println(numActivePartition << graph.getExpOfPartitionSize());
         for (int i = 0; i < numActivePartition; i++) {
             taskQueue.offer(workerTasks[i]);
         }
@@ -103,35 +107,38 @@ public class WCCDriver
             pushAllTasks(barrierTasks);
             barriers.await();
             currentEpoch++;
-            isDone = pushSomeTasks(workerTasks, numActivePartition);
-        } while (!isDone);
+            isDone = pushSomeTasks(workerTasks, numPartitions);
+        }
+        while (!isDone);
 
         currentEpoch = 1;
+        WCCExecutor.setPredicateFunction((nextCompId, threshold) -> nextCompId < threshold);
 
-        do {
-            pushAllTasks(barrierTasks);
-            barriers.await();
+        while (true) {
             currentEpoch++;
             isDone = pushSomeTasks(workerTasks, numPartitions);
-        }
-        while (!isDone);
-    }
-
-
-/*
-    public void run() throws BrokenBarrierException, InterruptedException {
-        int numPartitions = graph.getNumPartitions();
-        boolean isDone;
-        pushAllTasks(workerTasks);
-        do {
+            if (isDone) {
+                break;
+            }
             pushAllTasks(barrierTasks);
             barriers.await();
-            currentEpoch++;
-            isDone = pushSomeTasks(workerTasks, numPartitions);
         }
-        while (!isDone);
     }
-*/
+
+    /*
+        public void run() throws BrokenBarrierException, InterruptedException {
+            int numPartitions = graph.getNumPartitions();
+            boolean isDone;
+            pushAllTasks(workerTasks);
+            do {
+                pushAllTasks(barrierTasks);
+                barriers.await();
+                currentEpoch++;
+                isDone = pushSomeTasks(workerTasks, numPartitions);
+            }
+            while (!isDone);
+        }
+    */
 /*
     public void run() throws BrokenBarrierException, InterruptedException {
         int numPartitions = graph.getNumPartitions();
