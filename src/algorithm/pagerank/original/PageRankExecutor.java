@@ -1,4 +1,4 @@
-package algorithm.pagerank;
+package algorithm.pagerank.original;
 
 import graph.Graph;
 import graph.GraphAlgorithmInterface;

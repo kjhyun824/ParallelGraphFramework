@@ -31,7 +31,32 @@ public class PersonalPageRankExecutor implements GraphAlgorithmInterface
         for (int i = 0; i < partitionSize; i++) {
             srcNode = graph.getNode(offset + i);
 
-            if (srcNode == null || !partition.isNodeActive(i)) {
+            if (srcNode == null) {
+                continue;
+            }
+
+            int neighborListSize = srcNode.neighborListSize();
+            double scatterPageRank = dampingFactor * (partition.getVertexValue(i) / (double) neighborListSize);
+
+            for (int j = 0; j < neighborListSize; j++) {
+                int destId = srcNode.getNeighbor(j);
+                int destPartitionId = graph.getPartitionId(destId);
+
+                PersonalPageRankPartition destPartition = graph.getPartition(destPartitionId);
+                int destPosition = graph.getNodePositionInPart(destId);
+                destPartition.updateNextTable(destPosition, scatterPageRank);
+            }
+        }
+    }
+
+/*
+// Active Node Check version
+    @Override
+    public void execute() {
+        for (int i = 0; i < partitionSize; i++) {
+            srcNode = graph.getNode(offset + i);
+
+            if (srcNode == null || !partition.isNodeSeed(i)) {
                 continue;
             }
 
@@ -44,11 +69,12 @@ public class PersonalPageRankExecutor implements GraphAlgorithmInterface
 
                 PersonalPageRankPartition destPartition = graph.getPartition(destPartitionId);
                 int destPosition = graph.getNodePositionInPart(dest);
+                // need active Check
                 destPartition.updateNextTable(destPosition, scatterPageRank);
             }
         }
     }
-
+*/
     @Override
     public void reset() {
 

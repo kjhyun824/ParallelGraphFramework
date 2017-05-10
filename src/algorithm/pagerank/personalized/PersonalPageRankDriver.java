@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
@@ -40,7 +41,6 @@ public class PersonalPageRankDriver
     Task[] initTasks;
     Task[] workTasks;
     Task[] barrierTasks;
-    Task[] barrierTasks2;
     Task[] exitBarrierTasks;
 
     public PersonalPageRankDriver(Graph<PersonalPageRankPartition> graph, double dampingFactor, int iteration, int numThreads, String seedFile, int numSeeds) {
@@ -62,7 +62,6 @@ public class PersonalPageRankDriver
         initTasks = new Task[numPartitions];
         workTasks = new Task[numPartitions];
         barrierTasks = new Task[numThreads];
-        barrierTasks2 = new Task[numThreads];
         exitBarrierTasks = new Task[numThreads];
 
         barriers = new CyclicBarrier(numThreads);
@@ -80,28 +79,18 @@ public class PersonalPageRankDriver
 
         for (int i = 0; i < numThreads; i++) {
             barrierTasks[i] = new Task(new BarrierTask(barriers));
-            barrierTasks2[i] = new Task(new BarrierTask(exitBarriers));
             exitBarrierTasks[i] = new Task(new BarrierTask(exitBarriers));
         }
     }
 
     public void run() throws BrokenBarrierException, InterruptedException {
-        int numPartitions = graph.getNumPartitions();
-        PersonalPageRankPartition[] partitions = graph.getPartitions();
-
         for (int i = 0; i < iteration; i++) {
             pushTasks(initTasks);
             pushTasks(barrierTasks);
             pushTasks(workTasks);
-            pushTasks(barrierTasks2);
-            exitBarriers.await();
-
-            int activeNumNodes = 0;
-            for (int j = 0; j < numPartitions; j++) {
-                activeNumNodes += partitions[j].getActiveNumNodes();
-            }
-            PersonalPageRankInit.setActiveNumNodes(activeNumNodes);
+            pushTasks(barrierTasks);
         }
+
         pushTasks(exitBarrierTasks);
         exitBarriers.await();
     }
@@ -112,31 +101,19 @@ public class PersonalPageRankDriver
         }
     }
 
-    //For JIT Test
+    //For JIT
     public void reset() {
-
         for (int i = 0; i < initTasks.length; i++) {
             initTasks[i].reset();
         }
 
-        for (int i = 0; i < numSeeds; i++) {
-            int seed = seedSet[i];
-            int partitionId = graph.getPartitionId(seed);
-            int posInPart = graph.getNodePositionInPart(seed);
-            graph.getPartition(partitionId).setActive(posInPart);
-        }
-    }
-
-    public int getNumActiveNodes() {
-        int activeNumNodes = 0;
-        int numPartitions = graph.getNumPartitions();
         PersonalPageRankPartition[] partitions = graph.getPartitions();
-
-        for (int j = 0; j < numPartitions; j++) {
-            activeNumNodes += partitions[j].getActiveNumNodes();
+        for (int i = 0; i < numSeeds; i++) {
+            int nodeId = seedSet[i];
+            int partitionId = graph.getPartitionId(nodeId);
+            int posInPart = graph.getNodePositionInPart(nodeId);
+            partitions[partitionId].setSeedNode(posInPart);
         }
-        return activeNumNodes;
-
     }
 
     public void seedFileRead(String seedFile) {
@@ -154,6 +131,7 @@ public class PersonalPageRankDriver
         catch (IOException e) {
             e.printStackTrace();
         }
+        Arrays.sort(seedSet);
     }
 
     public double _printPageRankSum() {
@@ -196,4 +174,22 @@ public class PersonalPageRankDriver
         return pageRank;
     }
 }
+
+
+
+/*
+    public int getNumActiveNodes() {
+        int activeNumNodes = 0;
+        int numPartitions = graph.getNumPartitions();
+        PersonalPageRankPartition[] partitions = graph.getPartitions();
+
+        for (int j = 0; j < numPartitions; j++) {
+            activeNumNodes += partitions[j].getActiveNumNodes();
+        }
+        return activeNumNodes;
+
+    }
+
+    */
+
 

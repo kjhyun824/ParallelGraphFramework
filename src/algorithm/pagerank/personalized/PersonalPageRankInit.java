@@ -9,20 +9,16 @@ public class PersonalPageRankInit implements GraphAlgorithmInterface
 {
     Graph<PersonalPageRankPartition> graph;
     PersonalPageRankPartition partition;
-    static int activeNumNodes;
 
-    int numSeeds;
-    int partitionId;
-    int partitionSize;
-    int offset;
-    double dampingFactor;
+    final int numSeeds;
+    final int partitionId;
+    final int partitionSize;
+    final int offset;
+    final double dampingFactor;
+
     double initialValue;
-    double nextValue;
+    double randomTeleportValue;
     boolean isFirst;
-
-    public static void setActiveNumNodes (int value) {
-        activeNumNodes = value;
-    }
 
     PersonalPageRankInit(int partitionId, Graph<PersonalPageRankPartition> graph, double dampingFactor, int numSeeds) {
         this.numSeeds = numSeeds;
@@ -34,14 +30,14 @@ public class PersonalPageRankInit implements GraphAlgorithmInterface
         partitionSize = partition.getSize();
         offset = partitionId << graph.getExpOfPartitionSize();
         initialValue = getInitPageRankValue(numSeeds, 0); //initial PageRank Value
+        randomTeleportValue = getInitPageRankValue(numSeeds, dampingFactor);
         isFirst = true;
     }
 
     @Override
     public void execute() {
         if (!isFirst) {
-            nextValue = getInitPageRankValue(activeNumNodes, dampingFactor);
-            initialValue = nextValue;
+            initialValue = randomTeleportValue;
         }
         else {
             initNextTable();
@@ -49,10 +45,15 @@ public class PersonalPageRankInit implements GraphAlgorithmInterface
 
         for (int i = 0; i < partitionSize; i++) {
             Node node = graph.getNode(offset + i);
-            if (node == null || !partition.isNodeActive(i)) {
+            if (node == null) {
                 continue;
             }
-            partition.setVertexValue(i, initialValue);
+
+            if (partition.isNodeSeed(i)) {
+                partition.setVertexValue(i, initialValue);
+            } else {
+                partition.setVertexValue(i, 0);
+            }
         }
 
         if (!isFirst) {
@@ -64,10 +65,10 @@ public class PersonalPageRankInit implements GraphAlgorithmInterface
     public void initNextTable() {
         for (int i = 0; i < partitionSize; i++) {
             Node node = graph.getNode(offset + i);
-            if (node == null || !partition.isNodeActive(i)) {
+            if (node == null || !partition.isNodeSeed(i)) {
                 continue;
             }
-            partition.setNextVertexValue(i, nextValue);
+            partition.setNextVertexValue(i, randomTeleportValue);
         }
     }
 

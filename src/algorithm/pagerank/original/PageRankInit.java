@@ -1,4 +1,4 @@
-package algorithm.pagerank;
+package algorithm.pagerank.original;
 
 import graph.Graph;
 import graph.GraphAlgorithmInterface;
@@ -56,6 +56,10 @@ public class PageRankInit implements GraphAlgorithmInterface
 
     public void initNextTable() {
         for (int i = 0; i < partitionSize; i++) {
+            Node node = graph.getNode(offset + i);
+            if (node == null) {
+                continue;
+            }
             partition.setNextVertexValue(i, nextValue);
         }
     }
