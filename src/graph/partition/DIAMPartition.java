@@ -38,7 +38,7 @@ public class DIAMPartition extends Partition {
         else {
             do {
                 prevId = bucketIds.get(entry);
-                if (prevId != -1 && newId >= prevId) {
+                if (prevId != -1 && newId <= prevId) {
                     break;
                 }
             }
@@ -103,6 +103,6 @@ public class DIAMPartition extends Partition {
 
     public void reset() {
         initializeTable();
-        partitionActiveValue = 1;
+        setPartitionActiveValue(1);
     }
 }

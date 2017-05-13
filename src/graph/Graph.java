@@ -1,14 +1,10 @@
 package graph;
 
-import graph.partition.PageRankPartition;
-import graph.partition.IntegerPartition;
-import graph.partition.SSSPPartition;
-import graph.partition.WCCPartition;
+import graph.partition.*;
 
 import java.lang.reflect.Array;
 
-public final class Graph<T>
-{
+public final class Graph<T> {
     final static int defaultSize = 10;
     static Graph instance = null;
 
@@ -48,8 +44,8 @@ public final class Graph<T>
     }
 
     public boolean addEdge(int srcNodeId, int destNodeId) {
+        if (srcNodeId == destNodeId) return false;
         checkAndCreateNodes(srcNodeId, destNodeId);
-        if(srcNodeId == destNodeId) return false;
 
         Node srcNode = nodes[srcNodeId];
         Node destNode = nodes[destNodeId];
@@ -61,8 +57,7 @@ public final class Graph<T>
                 srcNode.incrementOutDegree();
                 destNode.incrementInDegree();
                 numEdges++;
-            }
-            else {
+            } else {
                 destNode.addNeighborId(srcNodeId);
                 srcNode.incrementInDegree();
                 srcNode.incrementOutDegree();
@@ -76,6 +71,7 @@ public final class Graph<T>
     }
 
     public boolean addEdge(int srcNodeId, int destNodeId, int weight) {
+        if (srcNodeId == destNodeId) return false;
         checkAndCreateNodes(srcNodeId, destNodeId);
 
         Node srcNode = nodes[srcNodeId];
@@ -84,20 +80,17 @@ public final class Graph<T>
         boolean isAdded = srcNode.addNeighborId(destNodeId, weight);
 
         if (isAdded) {
-            if (isDirected) {
-                srcNode.incrementOutDegree();
-                destNode.incrementInDegree();
-                numEdges++;
-            }
-            else {
+            srcNode.incrementOutDegree();
+            destNode.incrementInDegree();
+            numEdges++;
+
+            if (!isDirected) {
                 destNode.addNeighborId(srcNodeId, weight);
-                srcNode.incrementInDegree();
-                srcNode.incrementOutDegree();
                 destNode.incrementInDegree();
                 destNode.incrementOutDegree();
-                numEdges++;
             }
         }
+
         return isAdded;
     }
 
@@ -156,20 +149,21 @@ public final class Graph<T>
             for (int i = 0; i < numPartitions; i++) {
                 partitions[i] = (T) new IntegerPartition(i, maxNodeId, partitionCapacity, asyncRangeSize);
             }
-        }
-        else if (partitionClass == PageRankPartition.class) {
+        } else if (partitionClass == PageRankPartition.class) {
             for (int i = 0; i < numPartitions; i++) {
                 partitions[i] = (T) new PageRankPartition(i, maxNodeId, partitionCapacity, asyncRangeSize);
             }
-        }
-        else if (partitionClass == SSSPPartition.class) {
+        } else if (partitionClass == SSSPPartition.class) {
             for (int i = 0; i < numPartitions; i++) {
                 partitions[i] = (T) new SSSPPartition(i, maxNodeId, partitionCapacity, asyncRangeSize);
             }
-        }
-        else if (partitionClass == WCCPartition.class) {
+        } else if (partitionClass == WCCPartition.class) {
             for (int i = 0; i < numPartitions; i++) {
                 partitions[i] = (T) new WCCPartition(i, maxNodeId, partitionCapacity, asyncRangeSize);
+            }
+        } else if (partitionClass == DIAMPartition.class) {
+            for (int i = 0; i < numPartitions; i++) {
+                partitions[i] = (T) new DIAMPartition(i, maxNodeId, partitionCapacity, asyncRangeSize);
             }
         }
     }

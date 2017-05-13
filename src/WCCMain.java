@@ -16,6 +16,7 @@ public class WCCMain {
         double asyncPercent = Double.parseDouble(args[2]);
         int expOfPartitionSize = Integer.parseInt(args[3]);
         int seed = Integer.parseInt(args[4]);
+        int numCheck = Integer.parseInt(args[5]);
 
         System.out.println("[DEBUG] Input File : " + inputFile);
         System.out.println("[DEBUG] NUM_THREAD : " + numThreads);
@@ -39,7 +40,7 @@ public class WCCMain {
         System.out.println("[DEBUG] Loading Time : " + ((double) loadingTime / 1000.0));
         System.out.println("[DEBUG] Num Partitions : " + graph.getNumPartitions());
 
-        WCCDriver driver = new WCCDriver(graph, numThreads, seed);
+        WCCDriver driver = new WCCDriver(graph, numThreads, seed, numCheck);
 
         final int numRun = 20;
         long[] elapsedTime = new long[numRun];
@@ -54,7 +55,7 @@ public class WCCMain {
             elapsedTime[i] = System.currentTimeMillis() - start;
 
             System.out.println("[DEBUG] elapsed time for iteration" + i + " : " + ((elapsedTime[i]) / (1000.0)));
-            System.out.println("[DEBUG] Largest WCC : " + driver.getLargestWCC());
+            System.out.println("[DEBUG] Number of WCC : " + driver.getNumWCC());
 
 /*
             if (i == 9) {
@@ -74,6 +75,8 @@ public class WCCMain {
 
         String averageTime = String.format("%.3f", (timeSum / 10));
         System.out.println("[DEBUG] Average Elapsed time : " + averageTime);
+        System.out.println("[DEBUG] File Write...");
+        driver.print();
 
         System.exit(1);
     }

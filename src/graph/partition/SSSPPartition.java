@@ -36,7 +36,7 @@ public class SSSPPartition extends Partition
         else {
             do {
                 prevId = bucketIds.get(entry);
-                if (prevId != -1 && newId >= prevId) {
+                if (prevId != -1 && newId <= prevId) {
                     break;
                 }
             }

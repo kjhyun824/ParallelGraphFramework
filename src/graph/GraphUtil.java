@@ -24,12 +24,13 @@ public class GraphUtil {
             throws IOException {
         String line;
         while ((line = reader.readLine()) != null) {
-            String[] nodeId = line.trim().split(" ");
+            String[] nodeId = line.trim().split("\t");
             int srcNodeId = Integer.parseInt(nodeId[0]);
             int destNodeId = Integer.parseInt(nodeId[1]);
             if (graph.isWeighted()) {
                 int weight = Integer.parseInt(nodeId[2]);
                 graph.addEdge(srcNodeId, destNodeId, weight);
+//                graph.addEdge(srcNodeId, destNodeId, 1);
             } else {
                 graph.addEdge(srcNodeId, destNodeId);
             }

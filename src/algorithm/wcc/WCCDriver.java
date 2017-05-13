@@ -5,6 +5,10 @@ import graph.partition.WCCPartition;
 import task.*;
 import thread.*;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CyclicBarrier;
@@ -15,6 +19,7 @@ public class WCCDriver {
     final int numThreads;
     final int seed;
     final int initPart;
+    final int numCheck;
 
     boolean isDone;
 
@@ -29,10 +34,11 @@ public class WCCDriver {
 
     static AtomicInteger before, after;
 
-    public WCCDriver(Graph<WCCPartition> graph, int numThreads, int seed) {
+    public WCCDriver(Graph<WCCPartition> graph, int numThreads, int seed, int numCheck) {
         this.graph = graph;
         this.numThreads = numThreads;
         this.seed = seed;
+        this.numCheck = numCheck;
         isDone = false;
         currentEpoch = 1;
 
@@ -57,7 +63,7 @@ public class WCCDriver {
         ThreadUtil.createAndStartThreads(numThreads, runnable);
 
         for (int i = 0; i < numPartitions; i++) {
-            workerTasks[i] = new Task(new WCCExecutor(i, graph, initPart));
+            workerTasks[i] = new Task(new WCCExecutor(i, graph, initPart, numCheck));
         }
 
         for (int i = 0; i < numThreads; i++) {
@@ -66,6 +72,16 @@ public class WCCDriver {
     }
 
     public void run() throws BrokenBarrierException, InterruptedException {
+        pushAllTasks(workerTasks);
+        pushAllTasks(barrierTasks);
+        barriers.await();
+        while (!isDone) {
+            currentEpoch++;
+            isDone = pushSomeTasks(workerTasks);
+            pushAllTasks(barrierTasks);
+            barriers.await();
+        }
+        /*
         int count = 0;
         WCCExecutor.setIsFront(true);
         pushFrontTasks(workerTasks,initPart);
@@ -80,10 +96,9 @@ public class WCCDriver {
             count++;
         }
         System.out.println("[DEBUG] Num Iter on Front : " + count);
-//        System.out.println("[DEBUG] before / after : " + before + " / " + after);
+        System.out.println("[DEBUG] before / after : " + before + " / " + after);
         count = 0;
 
-        /*
         WCCExecutor.setIsFront(false);
         pushBackTasks(workerTasks,initPart);
         pushAllTasks(barrierTasks);
@@ -99,6 +114,32 @@ public class WCCDriver {
         System.out.println("[DEBUG] Num Iter on Back : " + count);
 //        System.out.println("[DEBUG] before / after : " + before + " / " + after);
         */
+    }
+
+    public void print() {
+        String fileName = "WCC_Thr" + numThreads + "_Check" + numCheck + ".txt";
+        try (FileWriter fw = new FileWriter(fileName, true); BufferedWriter bw = new BufferedWriter(fw); PrintWriter out = new PrintWriter(bw)) {
+            for (int i = 0; i < graph.getNumPartitions(); i++) {
+                WCCPartition partition = graph.getPartition(i);
+                int offset = i << graph.getExpOfPartitionSize();
+//            for (int j = 0; j < partition.getSize(); j++) {
+//                int nodeId = offset + j;
+//                String distance = String.format("%.3f", partition.getVertexValue(j));
+//                System.out.println(nodeId + "   " + distance);
+//            }
+
+                for (int j = 0; j < partition.getSize(); j++) {
+                    int nodeId = offset + j;
+                    int dist = partition.getNextCompId(j);
+                    if (dist == Integer.MAX_VALUE) {
+                        dist = -1;
+                    }
+                    out.println(nodeId + "," + dist);
+                }
+            }
+        } catch (IOException e) {
+
+        }
     }
 
     public void pushFrontTasks(Task[] tasks, int numTasks) {
@@ -135,9 +176,40 @@ public class WCCDriver {
         }
     }
 
+    public int getNumWCC() {
+        WCCPartition[] partitions = graph.getPartitions();
+        int count = 0;
+        boolean[] compExists = new boolean[graph.getMaxNodeId() + 1];
+        for (int i = 0; i < graph.getMaxNodeId() + 1; i++) {
+            compExists[i] = false;
+        }
+
+        for (int i = 0; i < partitions.length; i++) {
+            int offset = i << graph.getExpOfPartitionSize();
+            for (int j = 0; j < partitions[i].getSize(); j++) {
+
+                if (graph.getNode(offset + j) == null) {
+                    continue;
+                }
+
+                int compId = partitions[i].getNextCompId(j);
+                if (!compExists[compId]) {
+                    compExists[compId] = true;
+                }
+            }
+        }
+
+        for (int i = 0; i < graph.getMaxNodeId() + 1; i++) {
+            if (compExists[i]) {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
     public int getLargestWCC() {
         WCCPartition[] partitions = graph.getPartitions();
-        int count=0;
         int[] compIdCount = new int[graph.getMaxNodeId() + 1];
         for (int i = 0; i < partitions.length; i++) {
             int offset = i << graph.getExpOfPartitionSize();
@@ -154,13 +226,9 @@ public class WCCDriver {
 
         int max = 0;
         for (int i = 0; i < graph.getMaxNodeId() + 1; i++) {
-            if(compIdCount[i] != 0) {
-                count++;
-            }
             max = Math.max(max, compIdCount[i]);
         }
 
-        System.out.println("[DEBUG] Number of Connected Components : " + count);
         return max;
     }
 

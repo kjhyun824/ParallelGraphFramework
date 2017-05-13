@@ -16,15 +16,21 @@ import java.io.PrintWriter;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class SSSPDriver
 {
-    int numThreads;
-    int delta;
+    final int numThreads;
+    final int delta;
+    final int numCheck;
+    final int sourceId;
     boolean lightIsDone;
 
     static int innerIdx;
     static int bucketIdx;
+
+    static AtomicInteger before, after;
+    static AtomicInteger killAfterFive;
 
     static TIntArrayList[] lightEdges;
     static TIntArrayList[] lightWeights;
@@ -41,13 +47,18 @@ public class SSSPDriver
 
     SSSPExecutor[] ssspExecutors;
 
-    public SSSPDriver(Graph<SSSPPartition> graph, int numThreads, int delta, int source) {
+    public SSSPDriver(Graph<SSSPPartition> graph, int numThreads, int delta, int source, int numCheck) {
         this.graph = graph;
         this.numThreads = numThreads;
         this.delta = delta;
+        this.sourceId = source;
+        this.numCheck = numCheck;
         this.lightIsDone = false;
         this.bucketIdx = 0;
         this.innerIdx = 1;
+//        before = new AtomicInteger(0);
+//        after = new AtomicInteger(0);
+//        killAfterFive = new AtomicInteger(0);
 
         init();
     }
@@ -101,7 +112,7 @@ public class SSSPDriver
         ThreadUtil.createAndStartThreads(numThreads, runnable);
 
         for (int i = 0; i < numPartitions; i++) {
-            ssspExecutors[i] = new SSSPExecutor(i, graph, delta);
+            ssspExecutors[i] = new SSSPExecutor(i, graph, delta, numCheck);
             workTasks[i] = new Task(ssspExecutors[i]);
         }
 
@@ -119,10 +130,14 @@ public class SSSPDriver
         graph.getPartition(0).setCurrMaxBucket(bucketIdx);
         graph.getPartition(0).setInnerIdx(innerIdx - 1);
 
+        int count = 0;
         while (true) {
             if (totalDone()) {
+                System.out.println("[DEBUG] Total Iteration Count : " + count);
                 break;
             }
+            count++;
+
             for (int i = 0; i < graph.getNumPartitions(); i++) {
                 graph.getPartition(i).setInnerIdx(0);
             }
@@ -149,10 +164,14 @@ public class SSSPDriver
             innerIdx = 1;
             lightIsDone = false;
         }
+
+//        System.out.println("[DEBUG] Killed After Five non-updates : " + killAfterFive);
+//        System.out.println("[DEBUG] Before / After : " + before + " / " + after);
     }
 
     public void print() {
-        try (FileWriter fw = new FileWriter("SSSP.txt", true); BufferedWriter bw = new BufferedWriter(fw); PrintWriter out = new PrintWriter(bw)) {
+        String fileName = "SSSP_Thr" + numThreads + "_Delta" + delta + "_Check"+numCheck+".txt";
+        try (FileWriter fw = new FileWriter(fileName, true); BufferedWriter bw = new BufferedWriter(fw); PrintWriter out = new PrintWriter(bw)) {
             for (int i = 0; i < graph.getNumPartitions(); i++) {
                 SSSPPartition partition = graph.getPartition(i);
                 int offset = i << graph.getExpOfPartitionSize();
@@ -164,7 +183,11 @@ public class SSSPDriver
 
                 for (int j = 0; j < partition.getSize(); j++) {
                     int nodeId = offset + j;
-                    out.println(nodeId + "," + partition.getVertexValue(j));
+                    int dist = partition.getVertexValue(j);
+                    if(dist == Integer.MAX_VALUE) {
+                       dist = -1;
+                    }
+                    out.println(nodeId + "," + dist);
                 }
             }
         }
@@ -206,6 +229,10 @@ public class SSSPDriver
         lightIsDone = false;
         bucketIdx = 0;
         innerIdx = 1;
+
+//        before.set(0);
+//        after.set(0);
+//        killAfterFive.set(0);
     }
 
     public boolean totalDone() {
@@ -260,5 +287,26 @@ public class SSSPDriver
 
     public static int getBucketIdx() {
         return bucketIdx;
+    }
+
+    public static void incBefore() {
+        int temp;
+        do {
+            temp = before.get();
+        } while (!before.compareAndSet(temp, temp + 1));
+    }
+
+    public static void incAfter() {
+        int temp;
+        do {
+            temp = after.get();
+        } while (!after.compareAndSet(temp, temp + 1));
+    }
+
+    public static void incKillAfterFive() {
+        int temp;
+        do {
+            temp = killAfterFive.get();
+        } while (!killAfterFive.compareAndSet(temp,temp+1));
     }
 }

@@ -73,6 +73,7 @@ public class DIAMDriver {
         heavyEdges = new TIntArrayList[maxNodeId + 1];
         heavyWeights = new TIntArrayList[maxNodeId + 1];
 
+        int exp_delta = 1 << delta;
         for (int i = 0; i <= maxNodeId; i++) {
             lightEdges[i] = new TIntArrayList();
             lightWeights[i] = new TIntArrayList();
@@ -88,7 +89,7 @@ public class DIAMDriver {
             for (int j = 0; j < srcNode.getOutDegree(); j++) {
                 int destId = srcNode.getNeighbor(j);
                 int weight = srcNode.getWeight(destId);
-                if (weight > delta) {
+                if (weight > exp_delta) {
                     heavyEdges[i].add(destId);
                     heavyWeights[i].add(weight);
                 } else {
@@ -119,12 +120,15 @@ public class DIAMDriver {
             3. If it's bigger than current diameter, update diameter and run again from the maximum vertex
          */
         Random random = new Random();
-        int startId = random.nextInt() % graph.getNumNodes();
+//        int startId = 17331;
+        int startId = Math.abs(random.nextInt() % graph.getNumNodes());
         diameter = 0;
 
         // TODO: startId Set
         while (true) {
+//            System.out.println("[DEBUG] startId : " + startId);
             int startPartId = graph.getPartitionId(startId);
+//            System.out.println("[DEBUG] startPartId : " + startPartId);
             DIAMPartition startPart = graph.getPartition(startPartId);
             int startPartPos = graph.getNodePositionInPart(startId);
 
@@ -167,6 +171,7 @@ public class DIAMDriver {
             TODO: Check the Longest SSSP is bigger than Current diameter. -> If true, set diameter and reset the shortest path table & run again from the maximum vertex.
          */
             int maxId = getMaxDistId();
+//            System.out.println("[DEBUG] maxId : " + maxId);
             int maxDist = graph.getPartition(graph.getPartitionId(maxId)).getVertexValue(graph.getNodePositionInPart(maxId));
             if (maxDist > diameter) {
                 diameter = maxDist;
@@ -185,7 +190,7 @@ public class DIAMDriver {
             DIAMPartition partition = graph.getPartition(i);
             for (int j = 0; j < partition.getSize(); j++) {
                 int value = partition.getVertexValue(j);
-                if (value > max) {
+                if (value != Integer.MAX_VALUE && value > max) {
                     max = value;
                     maxId = (i * (1 << graph.getExpOfPartitionSize())) + j;
                 }
@@ -227,8 +232,10 @@ public class DIAMDriver {
 
     public void reset() {
         for (int i = 0; i < graph.getNumPartitions(); i++) {
-            graph.getPartition(i).reset();
+            DIAMPartition partition = graph.getPartition(i);
+            partition.reset();
         }
+
         lightIsDone = false;
         bucketIdx = 0;
         innerIdx = 1;

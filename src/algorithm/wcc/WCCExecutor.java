@@ -12,11 +12,13 @@ public class WCCExecutor implements GraphAlgorithmInterface {
     final int offset;
     final int partitionSize;
     final int threshold;
+    final int numCheck;
     static boolean isFront;
 
-    public WCCExecutor(int partitionId, Graph<WCCPartition> graph, int numPart) {
+    public WCCExecutor(int partitionId, Graph<WCCPartition> graph, int numPart, int numCheck) {
         this.partitionId = partitionId;
         this.graph = graph;
+        this.numCheck = numCheck;
         partition = graph.getPartition(partitionId);
         offset = partitionId << graph.getExpOfPartitionSize();
         partitionSize = partition.getSize();
@@ -28,7 +30,7 @@ public class WCCExecutor implements GraphAlgorithmInterface {
     @Override
     public void execute() {
         int epoch = WCCDriver.getCurrentEpoch();
-        if (epoch == 1) System.out.println("[DEBUG] Threshold : " + threshold);
+//        if (epoch == 1) System.out.println("[DEBUG] Threshold : " + threshold);
 
         for (int i = 0; i < partitionSize; i++) {
             int srcId = offset + i;
@@ -57,32 +59,28 @@ public class WCCExecutor implements GraphAlgorithmInterface {
 
             int neighborListSize = srcNode.neighborListSize();
 
+            boolean updateFlag = false;
+            int check = 0;
             for (int j = 0; j < neighborListSize; j++) {
-//                WCCDriver.incBefore();
-                int destId = srcNode.getNeighbor(j);
+                int destId = srcNode.getNeighbor(j);                                            // 3% (256)     4% (4096)   4%(65536)
                 if( destId <= nextCompId ) continue;
 
-                WCCPartition destPart = graph.getPartition(graph.getPartitionId(destId));
-                int destPos = graph.getNodePositionInPart(destId);
-                /*
-                int destNext = destPart.getNextCompId(destPos);
+                WCCPartition destPart = graph.getPartition(graph.getPartitionId(destId));       // 7% (256)     8% (4096)   8%(65536)
+                int destPos = graph.getNodePositionInPart(destId);                              // 14% (256)    6% (4096)   3%(65536)
 
-                if (destNext <= nextCompId) {
-                    continue;
-                }
-                */
-
-                /*
-                int destPartitionId = graph.getPartitionId(destId);
-
-                WCCPartition destPartition = graph.getPartition(destPartitionId);
-                int destPosition = graph.getNodePositionInPart(destId);
-                */
-
+//                WCCDriver.incBefore();
                 if (destPart.update(destPos, nextCompId)) { //destPartition.update(destPosition, nextCompId)) {
+                    updateFlag = true;
                     destPart.setUpdatedEpoch(epoch);
 //                    WCCDriver.incAfter();
 //                    destPartition.setUpdatedEpoch(epoch);
+                } else {
+                    if(numCheck != -1 && !updateFlag) {
+                        check++;
+                        if (check >= numCheck) {
+                            break;
+                        }
+                    }
                 }
             }
         }

@@ -14,8 +14,8 @@ public class DIAMMain {
         final boolean isDirected = false;
         final boolean isWeighted = true;
 
-        if(args.length != 5) {
-            System.err.println("Arguments : <InputFile> <numThreads> <sync> <numCheck> <expOfPartitionSize>");
+        if(args.length != 6) {
+            System.err.println("Arguments : <InputFile> <numThreads> <delta> <sync> <numCheck> <expOfPartitionSize>");
             System.exit(1);
         }
 
