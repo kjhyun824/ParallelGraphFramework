@@ -1,10 +1,9 @@
-import algorithm.pagerank.PageRankDriver;
+import algorithm.pagerank.original.PageRankDriver;
 import graph.Graph;
 import graph.partition.PageRankPartition;
 import graph.GraphUtil;
 
 import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.TimeUnit;
 
 public class PageRankMain
 {
@@ -36,11 +35,11 @@ public class PageRankMain
         PageRankDriver driver = new PageRankDriver(graph, dampingFactor, iteration, numThreads);
 
         /**     PageRank Start      **/
-        long[] elapsedTime = new long[20];
         double timeSum = 0;
 
         System.err.println("PageRank Running ... ");
-        final int numRun = 20;
+        final int numRun = 15;
+        long[] elapsedTime = new long[numRun];
         for (int i = 0; i < numRun; i++) {
             driver.reset();
             start = System.currentTimeMillis();
@@ -48,7 +47,7 @@ public class PageRankMain
             elapsedTime[i] = System.currentTimeMillis() - start;
             System.err.println("elapsed time for iteration" + i + " : " + ((elapsedTime[i]) / (1000.0)));
 
-            if (i >= 10) {
+            if (i >= 5) {
                 timeSum += (elapsedTime[i] / 1000.0);
             }
         }

@@ -16,8 +16,8 @@ public class SSSPMain
         int delta = Integer.parseInt(args[2]);
         int sync = Integer.parseInt(args[3]);
 
-        int expOfPartitionSize = 16; // 1 << 16;
-        int asyncRangeSize = ((1 << 16) * sync); // 1 for async, 0 for sync
+        int expOfPartitionSize = Integer.parseInt(args[4]); // 1 << 16;
+        int asyncRangeSize = ((1 << expOfPartitionSize) * sync); // 1 for async, 0 for sync
 
         long start = System.currentTimeMillis();
 
@@ -48,8 +48,8 @@ public class SSSPMain
             }
         }
         System.err.println("SSSP Complete : ");
-        System.err.println("File Write ...");
-        driver.print();
+//        System.err.println("File Write ...");
+//        driver.print();
 
         String averageTime = String.format("%.3f", (timeSum / 10));
         System.out.println(averageTime);

@@ -36,7 +36,12 @@ public class PersonalPageRankExecutor implements GraphAlgorithmInterface
             }
 
             int neighborListSize = srcNode.neighborListSize();
-            double scatterPageRank = dampingFactor * (partition.getVertexValue(i) / (double) neighborListSize);
+            double curPageRank = partition.getVertexValue(i);
+            if (curPageRank == 0) {
+                continue;
+            }
+            double scatterPageRank = dampingFactor * (curPageRank / (double) neighborListSize);
+
 
             for (int j = 0; j < neighborListSize; j++) {
                 int destId = srcNode.getNeighbor(j);

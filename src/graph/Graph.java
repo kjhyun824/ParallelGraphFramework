@@ -2,6 +2,7 @@ package graph;
 
 import graph.partition.PageRankPartition;
 import graph.partition.IntegerPartition;
+import graph.partition.PersonalPageRankPartition;
 import graph.partition.SSSPPartition;
 import graph.partition.WCCPartition;
 
@@ -51,6 +52,7 @@ public class Graph<T>
     public int getSelfCount() {
         return selfCount;
     }
+
     public boolean addEdge(int srcNodeId, int destNodeId) {
         if (srcNodeId == destNodeId) {
 //            selfCount++;
@@ -163,6 +165,11 @@ public class Graph<T>
         else if (partitionClass == PageRankPartition.class) {
             for (int i = 0; i < numPartitions; i++) {
                 partitions[i] = (T) new PageRankPartition(i, maxNodeId, partitionCapacity, asyncRangeSize);
+            }
+        }
+        else if (partitionClass == PersonalPageRankPartition.class) {
+            for (int i = 0; i < numPartitions; i++) {
+                partitions[i] = (T) new PersonalPageRankPartition(i, maxNodeId, partitionCapacity, asyncRangeSize);
             }
         }
         else if (partitionClass == SSSPPartition.class) {

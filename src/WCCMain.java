@@ -34,7 +34,7 @@ public class WCCMain
 
         System.err.println("Loading Time : " + ((double) loadingTime / 1000.0));
 
-        WCCDriver driver = new WCCDriver(graph, numThreads);
+        WCCDriver driver = new WCCDriver(graph, numThreads, 20);
 
         final int numRun = 20;
         long[] elapsedTime = new long[numRun];

@@ -53,7 +53,7 @@ public class PersonalizedPageRankMain
             }
         }
         System.err.println("Personalized_PageRank Complete ");
-        System.err.println("numActiveNodes : " + driver.getNumActiveNodes());
+//        System.err.println("numActiveNodes : " + driver.getNumActiveNodes());
         String averageTime = String.format("%.3f", (timeSum / 10));
         System.out.println(driver._printPageRankSum() + "/" + averageTime);
 

@@ -1,6 +1,7 @@
 package graph.partition;
 
 import atomic.AtomicDoubleArray;
+
 import java.util.function.DoubleBinaryOperator;
 
 public class PersonalPageRankPartition extends Partition
@@ -12,7 +13,7 @@ public class PersonalPageRankPartition extends Partition
     }
 
     AtomicDoubleArray[] tables;
-    byte[] actives;
+    byte[] seedCheckArray;
 
     int tablePos = 0;
 
@@ -21,10 +22,16 @@ public class PersonalPageRankPartition extends Partition
     }
 
     public final void initializeTable() {
-        actives = new byte[partitionSize];
+        seedCheckArray = new byte[partitionSize];
         tables = new AtomicDoubleArray[2];
         for (int i = 0; i < tables.length; i++) {
             tables[i] = new AtomicDoubleArray(partitionSize);
+        }
+
+        for (int i = 0; i < tables.length; i++) {
+            for (int j = 0; j < partitionSize; j++) {
+                tables[i].set(j,0);
+            }
         }
     }
 
@@ -32,24 +39,12 @@ public class PersonalPageRankPartition extends Partition
         swapConsecutiveTwoTables();
     }
 
-    public void setActive(int pos) {
-        if (actives[pos] == 0) {
-            actives[pos] = 1;
-        }
+    public void setSeedNode(int pos) {
+        seedCheckArray[pos] = 1;
     }
 
-    public boolean isNodeActive(int pos) {
-        return actives[pos] == 1;
-    }
-
-    public final int getActiveNumNodes() {
-        int activeNumNodes = 0;
-        for (int i = 0; i < actives.length; i++) {
-            if (actives[i] == 1) {
-                activeNumNodes++;
-            }
-        }
-        return activeNumNodes;
+    public boolean isNodeSeed(int pos) {
+        return seedCheckArray[pos] == 1;
     }
 
     public final void setVertexValue(int entry, double value) {

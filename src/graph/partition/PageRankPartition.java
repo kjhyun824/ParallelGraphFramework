@@ -12,6 +12,7 @@ public class PageRankPartition extends Partition {
     }
 
     AtomicDoubleArray[] tables;
+
     int tablePos = 0;
 
     public PageRankPartition(int partitionId, int maxNodeId, int partitionSize, int asyncRangeSize) {
@@ -78,4 +79,5 @@ public class PageRankPartition extends Partition {
         tables[tablePos] = tables[tablePos + 1];
         tables[tablePos + 1] = tmp;
     }
+
 }

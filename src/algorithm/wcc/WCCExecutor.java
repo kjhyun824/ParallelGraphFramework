@@ -1,6 +1,5 @@
 package algorithm.wcc;
 
-import function.PredicateFunction;
 import graph.Graph;
 import graph.GraphAlgorithmInterface;
 import graph.Node;
@@ -13,29 +12,26 @@ public class WCCExecutor implements GraphAlgorithmInterface
     final int partitionId;
     final int offset;
     final int partitionSize;
-    static int threshold;
-    static PredicateFunction predicate;
+    final int threshold;
+    static boolean isFront;
 
-
-    public static void setThreshold(int value) {
-        threshold = value;
-    }
-
-    public static void setPredicateFunction(PredicateFunction predicateFunction) {
-        predicate = predicateFunction;
-    }
-
-    public WCCExecutor(int partitionId, Graph<WCCPartition> graph) {
+    public WCCExecutor(int partitionId, Graph<WCCPartition> graph, int numPart) {
         this.partitionId = partitionId;
         this.graph = graph;
         partition = graph.getPartition(partitionId);
         offset = partitionId << graph.getExpOfPartitionSize();
         partitionSize = partition.getSize();
+
+        isFront = true;
+        threshold = numPart * partitionSize;
     }
 
     @Override
     public void execute() {
         int epoch = WCCDriver.getCurrentEpoch();
+        if (epoch == 1) {
+            System.out.println("[DEBUG] Threshold : " + threshold);
+        }
 
         for (int i = 0; i < partitionSize; i++) {
             int srcId = offset + i;
@@ -48,9 +44,18 @@ public class WCCExecutor implements GraphAlgorithmInterface
             int curCompId = partition.getCurCompId(i);
             int nextCompId = partition.getNextCompId(i);
 
-//            if (predicate.test(nextCompId, threshold)) {
-//                continue;
-//            }
+            if (isFront) {
+                if (nextCompId != 0) {
+                    continue;
+                }
+//                if (nextCompId > threshold) continue;
+            }
+            else {
+                if (nextCompId == 0) {
+                    continue;
+                }
+//                if (nextCompId <= threshold) continue;
+            }
 
             if (curCompId == nextCompId) {
                 continue;
@@ -61,20 +66,33 @@ public class WCCExecutor implements GraphAlgorithmInterface
             int neighborListSize = srcNode.neighborListSize();
 
             for (int j = 0; j < neighborListSize; j++) {
-                int destId = srcNode.getNeighbor(j);
-
+//                WCCDriver.incBefore();
+                int destId = srcNode.getNeighbor(j);                                        // 3% (256) , 4% (4096) , 4% (65536)
                 if (destId <= nextCompId) {
                     continue;
                 }
 
+                WCCPartition destPart = graph.getPartition(graph.getPartitionId(destId));   // 7% (256) , 8% (4096) , 8% (4096)
+                int destPos = graph.getNodePositionInPart(destId);                          // 14% (256), 6% (4096) , 3% (65536)
+                /*
+                int destNext = destPart.getNextCompId(destPos);
+
+                if (destNext <= nextCompId) {
+                    continue;
+                }
+                */
+
+                /*
                 int destPartitionId = graph.getPartitionId(destId);
+
                 WCCPartition destPartition = graph.getPartition(destPartitionId);
                 int destPosition = graph.getNodePositionInPart(destId);
+                */
 
-//                partition.incrementTryUpdated();
-                if (destPartition.update(destPosition, nextCompId)) {
-                    destPartition.setUpdatedEpoch(epoch);
-//                    partition.incrementActualUpdated();
+                if (destPart.update(destPos, nextCompId)) { //destPartition.update(destPosition, nextCompId)) {
+                    destPart.setUpdatedEpoch(epoch);
+//                    WCCDriver.incAfter();
+//                    destPartition.setUpdatedEpoch(epoch);
                 }
             }
         }
@@ -82,5 +100,10 @@ public class WCCExecutor implements GraphAlgorithmInterface
 
     @Override
     public void reset() {
+
+    }
+
+    public static void setIsFront(boolean value) {
+        isFront = value;
     }
 }
