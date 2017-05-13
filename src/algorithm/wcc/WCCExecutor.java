@@ -3,46 +3,44 @@ package algorithm.wcc;
 import graph.Graph;
 import graph.GraphAlgorithmInterface;
 import graph.Node;
-import graph.partition.WCCPartition;
+import graph.sharedData.WCCSharedData;
 
 public class WCCExecutor implements GraphAlgorithmInterface
 {
-    final Graph<WCCPartition> graph;
-    final WCCPartition partition;
-    final int partitionId;
-    final int offset;
-    final int partitionSize;
-    final int threshold;
+    final Graph<WCCSharedData> graph;
+    final WCCSharedData sharedDataObject;
+    final int beginRange;
+    final int endRange;
+//    final int threshold;
+    final int numCheck;
     static boolean isFront;
 
-    public WCCExecutor(int partitionId, Graph<WCCPartition> graph, int numPart) {
-        this.partitionId = partitionId;
+    public WCCExecutor(int beginRange, int endRange, Graph<WCCSharedData> graph, int numPart, int numCheck) {
         this.graph = graph;
-        partition = graph.getPartition(partitionId);
-        offset = partitionId << graph.getExpOfPartitionSize();
-        partitionSize = partition.getSize();
+        this.beginRange = beginRange;
+        this.endRange = endRange;
+        this.numCheck = numCheck;
+        sharedDataObject = graph.getSharedDataObject();
 
         isFront = true;
-        threshold = numPart * partitionSize;
+//        threshold = numPart * partitionSize;
     }
 
     @Override
     public void execute() {
         int epoch = WCCDriver.getCurrentEpoch();
-        if (epoch == 1) {
-            System.out.println("[DEBUG] Threshold : " + threshold);
-        }
+//        if (epoch == 1) System.out.println("[DEBUG] Threshold : " + threshold);
 
-        for (int i = 0; i < partitionSize; i++) {
-            int srcId = offset + i;
-            Node srcNode = graph.getNode(srcId);
+        for (int i = beginRange; i < endRange; i++) {
+            Node srcNode = graph.getNode(i);
 
             if (srcNode == null) {
                 continue;
             }
+            int srcInDegree = srcNode.getInDegree();
 
-            int curCompId = partition.getCurCompId(i);
-            int nextCompId = partition.getNextCompId(i);
+            int curCompId = sharedDataObject.getCurCompId(i);
+            int nextCompId = sharedDataObject.getNextCompId(srcInDegree, i);
 
             if (isFront) {
                 if (nextCompId != 0) {
@@ -61,38 +59,35 @@ public class WCCExecutor implements GraphAlgorithmInterface
                 continue;
             }
 
-            partition.setCurComponentId(i, nextCompId);
+            sharedDataObject.setCurComponentId(i, nextCompId);
 
             int neighborListSize = srcNode.neighborListSize();
 
+            boolean updateFlag = false;
+            int check = 0;
             for (int j = 0; j < neighborListSize; j++) {
-//                WCCDriver.incBefore();
-                int destId = srcNode.getNeighbor(j);                                        // 3% (256) , 4% (4096) , 4% (65536)
+                int destId = srcNode.getNeighbor(j);                                            // 3% (256)     4% (4096)   4%(65536)
+                int destTaskId = graph.getTaskId(destId); // bit remain operation
+
                 if (destId <= nextCompId) {
                     continue;
                 }
 
-                WCCPartition destPart = graph.getPartition(graph.getPartitionId(destId));   // 7% (256) , 8% (4096) , 8% (4096)
-                int destPos = graph.getNodePositionInPart(destId);                          // 14% (256), 6% (4096) , 3% (65536)
-                /*
-                int destNext = destPart.getNextCompId(destPos);
-
-                if (destNext <= nextCompId) {
-                    continue;
-                }
-                */
-
-                /*
-                int destPartitionId = graph.getPartitionId(destId);
-
-                WCCPartition destPartition = graph.getPartition(destPartitionId);
-                int destPosition = graph.getNodePositionInPart(destId);
-                */
-
-                if (destPart.update(destPos, nextCompId)) { //destPartition.update(destPosition, nextCompId)) {
-                    destPart.setUpdatedEpoch(epoch);
+//                WCCDriver.incBefore();
+                int destInDegree = graph.getNode(destId).getInDegree();
+                if (sharedDataObject.update(destInDegree, destId, nextCompId)) { //destPartition.update(destPosition, nextCompId)) {
+                    updateFlag = true;
+                    sharedDataObject.setUpdatedEpoch(destTaskId, epoch);
 //                    WCCDriver.incAfter();
 //                    destPartition.setUpdatedEpoch(epoch);
+                }
+                else {
+                    if (numCheck != -1 && !updateFlag) {
+                        check++;
+                        if (check >= numCheck) {
+                            break;
+                        }
+                    }
                 }
             }
         }

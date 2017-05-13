@@ -1,63 +1,43 @@
 package graph;
 
-import graph.partition.PageRankPartition;
-import graph.partition.IntegerPartition;
-import graph.partition.PersonalPageRankPartition;
-import graph.partition.SSSPPartition;
-import graph.partition.WCCPartition;
-
-import java.lang.reflect.Array;
+import graph.sharedData.PageRankSharedData;
+import graph.sharedData.BFSSharedData;
+import graph.sharedData.PersonalPageRankSharedData;
+import graph.sharedData.SSSPSharedData;
+import graph.sharedData.WCCSharedData;
 
 public class Graph<T>
 {
     final static int defaultSize = 10;
     static Graph instance = null;
+    T sharedDataObject = null;
 
-    boolean isDirected;
-    boolean isWeighted;
+    final int expOfTaskSize;
+    final boolean isDirected;
+    final boolean isWeighted;
 
-    //    Node[] tmpNodes;
     Node[] nodes;
 
     int numNodes;
     int numEdges;
     int maxNodeId;
-    int selfCount = 0;
+    int numTasks;
 
-    // related to partition
-    T[] partitions;
-    final int expOfPartitionSize;
-    final int partitionCapacity;
-    final int bitMaskForRemain;
-
-    int numPartitions;
-
-    Graph(int expOfPartitionSize, boolean isDirected, boolean isWeighted) {
-        this.expOfPartitionSize = expOfPartitionSize;
+    Graph(int expOfTaskSize, boolean isDirected, boolean isWeighted) {
+        this.expOfTaskSize = expOfTaskSize;
         this.isDirected = isDirected;
         this.isWeighted = isWeighted;
-        partitionCapacity = 1 << expOfPartitionSize;
-        bitMaskForRemain = (1 << expOfPartitionSize) - 1;
-
         nodes = new Node[defaultSize];
     }
 
-    public static Graph getInstance(int expOfPartitionSize, boolean isDirected, boolean isWeighted) {
+    public static Graph getInstance(int expOfTaskSize, boolean isDirected, boolean isWeighted) {
         if (instance == null) {
-            instance = new Graph(expOfPartitionSize, isDirected, isWeighted);
+            instance = new Graph(expOfTaskSize, isDirected, isWeighted);
         }
         return instance;
     }
 
-    public int getSelfCount() {
-        return selfCount;
-    }
-
-    public boolean addEdge(int srcNodeId, int destNodeId) {
-        if (srcNodeId == destNodeId) {
-//            selfCount++;
-            return false;
-        }
+    boolean addEdge(int srcNodeId, int destNodeId) {
         checkAndCreateNodes(srcNodeId, destNodeId);
 
         Node srcNode = nodes[srcNodeId];
@@ -82,7 +62,7 @@ public class Graph<T>
         return isAdded;
     }
 
-    public boolean addEdge(int srcNodeId, int destNodeId, int weight) {
+    boolean addEdge(int srcNodeId, int destNodeId, int weight) {
         checkAndCreateNodes(srcNodeId, destNodeId);
 
         Node srcNode = nodes[srcNodeId];
@@ -142,7 +122,7 @@ public class Graph<T>
         return numNodes;
     }
 
-    public void setMaxNodeId(int nodeId) {
+    void setMaxNodeId(int nodeId) {
         this.maxNodeId = nodeId;
     }
 
@@ -150,68 +130,44 @@ public class Graph<T>
         return maxNodeId;
     }
 
-    // The following part is related to Partiton
+    // The following part is related to SharedData
 
-    public void generatePartition(int asyncRangeSize, Class<T> partitionClass) {
-        int nodeCapacity = maxNodeId + 1; // TODO : Change Capacity to the number of node
-        numPartitions = (nodeCapacity + (partitionCapacity - 1)) / partitionCapacity;
-        partitions = (T[]) Array.newInstance(partitionClass, numPartitions);
+    public void loadFinalize(int asyncThreshold, Class<T> sharedDatasObjectClass) {
+        int nodeCapacity = maxNodeId + 1;
+        int taskSize = 1 << expOfTaskSize;
+        numTasks = (nodeCapacity + taskSize - 1) / taskSize;
 
-        if (partitionClass == IntegerPartition.class) {
-            for (int i = 0; i < numPartitions; i++) {
-                partitions[i] = (T) new IntegerPartition(i, maxNodeId, partitionCapacity, asyncRangeSize);
-            }
+        if (sharedDatasObjectClass == BFSSharedData.class) {
+            sharedDataObject = (T) new BFSSharedData(nodeCapacity, asyncThreshold);
         }
-        else if (partitionClass == PageRankPartition.class) {
-            for (int i = 0; i < numPartitions; i++) {
-                partitions[i] = (T) new PageRankPartition(i, maxNodeId, partitionCapacity, asyncRangeSize);
-            }
+        else if (sharedDatasObjectClass == PageRankSharedData.class) {
+            sharedDataObject = (T) new PageRankSharedData(nodeCapacity, asyncThreshold);
         }
-        else if (partitionClass == PersonalPageRankPartition.class) {
-            for (int i = 0; i < numPartitions; i++) {
-                partitions[i] = (T) new PersonalPageRankPartition(i, maxNodeId, partitionCapacity, asyncRangeSize);
-            }
+        else if (sharedDatasObjectClass == PersonalPageRankSharedData.class) {
+            sharedDataObject = (T) new PersonalPageRankSharedData(nodeCapacity, asyncThreshold);
         }
-        else if (partitionClass == SSSPPartition.class) {
-            for (int i = 0; i < numPartitions; i++) {
-                partitions[i] = (T) new SSSPPartition(i, maxNodeId, partitionCapacity, asyncRangeSize);
-            }
+        else if (sharedDatasObjectClass == SSSPSharedData.class) {
+            sharedDataObject = (T) new SSSPSharedData(nodeCapacity, numTasks, asyncThreshold);
         }
-        else if (partitionClass == WCCPartition.class) {
-            for (int i = 0; i < numPartitions; i++) {
-                partitions[i] = (T) new WCCPartition(i, maxNodeId, partitionCapacity, asyncRangeSize);
-            }
+        else if (sharedDatasObjectClass == WCCSharedData.class) {
+            sharedDataObject = (T) new WCCSharedData(nodeCapacity, numTasks, asyncThreshold);
         }
     }
 
-    public T[] getPartitions() {
-        return partitions;
+    public int getExpOfTaskSize() {
+        return expOfTaskSize;
     }
 
-    public T getPartition(int partitionId) {
-        return partitions[partitionId];
+    public T getSharedDataObject () {
+        return sharedDataObject;
     }
 
-    public int getExpOfPartitionSize() {
-        return expOfPartitionSize;
+    public int getTaskId(int nodeId) {
+        return nodeId >> expOfTaskSize;
     }
 
-    public int getNumPartitions() {
-        return partitions.length;
-    }
-
-    public int getPartitionId(int nodeId) {
-        //  = nodeNumber / partitionCapacity
-        return nodeId >> expOfPartitionSize;
-    }
-
-    public int getNodePositionInPart(int nodeId) {
-        //  = nodeNumber % partitionCapacity
-        return nodeId & bitMaskForRemain;
-    }
-
-    public int getNodeNumberInPart(int partitionNumber, int position) {
-        return (partitionNumber << expOfPartitionSize) + position;
+    public int getNumTasks() {
+        return numTasks;
     }
 
     public boolean isDirected() {

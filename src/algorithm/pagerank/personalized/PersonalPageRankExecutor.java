@@ -3,40 +3,37 @@ package algorithm.pagerank.personalized;
 import graph.Graph;
 import graph.GraphAlgorithmInterface;
 import graph.Node;
-import graph.partition.PersonalPageRankPartition;
+import graph.sharedData.PersonalPageRankSharedData;
 
 public class PersonalPageRankExecutor implements GraphAlgorithmInterface
 {
-    Graph<PersonalPageRankPartition> graph;
-    PersonalPageRankPartition partition;
+    Graph<PersonalPageRankSharedData> graph;
+    PersonalPageRankSharedData sharedDataObject;
     Node srcNode;
 
-    int partitionId;
-    int partitionSize;
-    int offset;
+    final int beginRange;
+    final int endRange;
+    final double dampingFactor;
 
-    double dampingFactor;
-
-    PersonalPageRankExecutor(int partitionId, Graph<PersonalPageRankPartition> graph, double dampingFactor) {
-        this.partitionId = partitionId;
+    PersonalPageRankExecutor(int beginRange, int endRange, Graph<PersonalPageRankSharedData> graph, double dampingFactor) {
         this.graph = graph;
+        this.beginRange = beginRange;
+        this.endRange = endRange;
         this.dampingFactor = dampingFactor;
-        partition = graph.getPartition(partitionId);
-        partitionSize = partition.getSize();
-        offset = partitionId << graph.getExpOfPartitionSize();
+        sharedDataObject = graph.getSharedDataObject();
     }
 
     @Override
     public void execute() {
-        for (int i = 0; i < partitionSize; i++) {
-            srcNode = graph.getNode(offset + i);
+        for (int i = beginRange; i < endRange; i++) {
+            srcNode = graph.getNode(i);
 
             if (srcNode == null) {
                 continue;
             }
 
             int neighborListSize = srcNode.neighborListSize();
-            double curPageRank = partition.getVertexValue(i);
+            double curPageRank = sharedDataObject.getVertexValue(srcNode.getInDegree(), i);
             if (curPageRank == 0) {
                 continue;
             }
@@ -45,41 +42,12 @@ public class PersonalPageRankExecutor implements GraphAlgorithmInterface
 
             for (int j = 0; j < neighborListSize; j++) {
                 int destId = srcNode.getNeighbor(j);
-                int destPartitionId = graph.getPartitionId(destId);
-
-                PersonalPageRankPartition destPartition = graph.getPartition(destPartitionId);
-                int destPosition = graph.getNodePositionInPart(destId);
-                destPartition.updateNextTable(destPosition, scatterPageRank);
+                Node dest = graph.getNode(destId);
+                sharedDataObject.updateNextTable(dest.getInDegree(), destId, scatterPageRank);
             }
         }
     }
 
-/*
-// Active Node Check version
-    @Override
-    public void execute() {
-        for (int i = 0; i < partitionSize; i++) {
-            srcNode = graph.getNode(offset + i);
-
-            if (srcNode == null || !partition.isNodeSeed(i)) {
-                continue;
-            }
-
-            int neighborListSize = srcNode.neighborListSize();
-            double scatterPageRank = dampingFactor * (partition.getVertexValue(i) / (double) neighborListSize);
-
-            for (int j = 0; j < neighborListSize; j++) {
-                int dest = srcNode.getNeighbor(j);
-                int destPartitionId = graph.getPartitionId(dest);
-
-                PersonalPageRankPartition destPartition = graph.getPartition(destPartitionId);
-                int destPosition = graph.getNodePositionInPart(dest);
-                // need active Check
-                destPartition.updateNextTable(destPosition, scatterPageRank);
-            }
-        }
-    }
-*/
     @Override
     public void reset() {
 

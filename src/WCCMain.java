@@ -1,46 +1,51 @@
 import algorithm.wcc.WCCDriver;
 import graph.Graph;
 import graph.GraphUtil;
-import graph.partition.WCCPartition;
+import graph.sharedData.WCCSharedData;
 
-import java.io.IOException;
 import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.TimeUnit;
 
-public class WCCMain
-{
-    public static void main(String[] args) throws BrokenBarrierException, InterruptedException, IOException {
+public class WCCMain {
+    public static void main(String[] args)
+            throws BrokenBarrierException, InterruptedException {
 
         final boolean isDirected = false;
         final boolean isWeighted = false;
         String inputFile = args[0];
         int numThreads = Integer.parseInt(args[1]);
-        double asyncPercent = Double.parseDouble(args[2]);
-        int expOfPartitionSize = Integer.parseInt(args[3]);
+        int asyncThreshold = Integer.parseInt(args[2]);
+        int expOfTaskSize = Integer.parseInt(args[3]);
+        int seed = Integer.parseInt(args[4]);
+        int numCheck = Integer.parseInt(args[5]);
 
-        System.err.println("NUM_THREAD : " + numThreads);
-        System.err.println("EXP_OF_PARTITION_SIZE : " + expOfPartitionSize);
+        System.out.println("[DEBUG] Input File : " + inputFile);
+        System.out.println("[DEBUG] NUM_THREAD : " + numThreads);
+        System.out.println("[DEBUG] EXP_OF_PARTITION_SIZE : " + expOfTaskSize);
 
-        int asyncRangeSize = (int) ((1 << expOfPartitionSize) * asyncPercent);
-        System.err.println("ASYNC_SIZE : " + asyncRangeSize);
-
-        Graph<WCCPartition> graph = Graph.getInstance(expOfPartitionSize, isDirected, isWeighted);
+        System.out.println("[DEBUG] ASYNC_THREASHOLD : " + asyncThreshold);
+        if (asyncThreshold <= 0) {
+            System.out.println("[DEBUG] ASYNC");
+        } else {
+            System.out.println("[DEBUG] ATOMIC");
+        }
+        Graph<WCCSharedData> graph = Graph.getInstance(expOfTaskSize, isDirected, isWeighted);
 
         long start = System.currentTimeMillis();
-        System.err.println("Graph Loading ... ");
+        System.out.println("[DEBUG] Graph Loading ... ");
         GraphUtil.load(graph, inputFile);
-        graph.generatePartition(asyncRangeSize, WCCPartition.class);
+        graph.loadFinalize(asyncThreshold, WCCSharedData.class);
         long loadingTime = System.currentTimeMillis() - start;
 
-        System.err.println("Loading Time : " + ((double) loadingTime / 1000.0));
+        System.out.println("[DEBUG] Loading Time : " + ((double) loadingTime / 1000.0));
+        System.out.println("[DEBUG] Num Partitions : " + graph.getNumTasks());
 
-        WCCDriver driver = new WCCDriver(graph, numThreads, 20);
+        WCCDriver driver = new WCCDriver(graph, numThreads, seed, numCheck);
 
         final int numRun = 20;
         long[] elapsedTime = new long[numRun];
         double timeSum = 0;
 
-        System.err.println("WCC Running ... ");
+        System.out.println("[DEBUG] WCC Running ... ");
         for (int i = 0; i < numRun; i++) {
             driver.reset();
 
@@ -48,25 +53,29 @@ public class WCCMain
             driver.run();
             elapsedTime[i] = System.currentTimeMillis() - start;
 
-            System.err.println("elapsed time for iteration" + i + " : " + ((elapsedTime[i]) / (1000.0)));
-            System.err.println("Nodes in Largest WCC : " + driver.getLargestWCC());
+            System.out.println("[DEBUG] elapsed time for iteration" + i + " : " + ((elapsedTime[i]) / (1000.0)));
+            System.out.println("[DEBUG] Number of WCC : " + driver.getNumWCC());
+
+/*
+            if (i == 9) {
+                System.out.println("[DEBUG] Garbage Collecting");
+                System.gc();
+                System.gc();
+                System.gc();
+            }
+*/
 
             if (i >= 10) {
                 timeSum += (elapsedTime[i] / 1000.0);
             }
         }
-        System.err.println("");
-        if (asyncPercent == 1) {
-            System.err.println("ASYNC");
-        }
-        else {
-            System.err.println("ATOMIC");
-        }
-        System.err.println("");
-        System.err.println("WCC Complete : " + driver.getLargestWCC());
+
+        System.out.println("");
 
         String averageTime = String.format("%.3f", (timeSum / 10));
-        System.out.println(driver.getLargestWCC() + "/" + averageTime);
+        System.out.println("[DEBUG] Average Elapsed time : " + averageTime);
+        System.out.println("[DEBUG] File Write...");
+        driver.print();
 
         System.exit(1);
     }

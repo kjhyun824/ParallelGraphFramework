@@ -3,48 +3,42 @@ package algorithm.pagerank.original;
 import graph.Graph;
 import graph.GraphAlgorithmInterface;
 import graph.Node;
-import graph.partition.PageRankPartition;
+import graph.sharedData.PageRankSharedData;
 
 public class PageRankExecutor implements GraphAlgorithmInterface
 {
-    Graph<PageRankPartition> graph;
-    PageRankPartition partition;
+    Graph<PageRankSharedData> graph;
+    PageRankSharedData sharedDataObject;
     Node srcNode;
 
-    int partitionId;
-    int partitionSize;
-    int offset;
-
+    int beginRange;
+    int endRange;
     double dampingFactor;
 
-    PageRankExecutor(int partitionId, Graph<PageRankPartition> graph, double dampingFactor) {
-        this.partitionId = partitionId;
+    PageRankExecutor(int beginRange, int endRange, Graph<PageRankSharedData> graph, double dampingFactor) {
         this.graph = graph;
         this.dampingFactor = dampingFactor;
-        partition = graph.getPartition(partitionId);
-        partitionSize = partition.getSize();
-        offset = partitionId << graph.getExpOfPartitionSize();
+        this.beginRange = beginRange;
+        this.endRange = endRange;
+        sharedDataObject = graph.getSharedDataObject();
     }
 
     @Override
     public void execute() {
-        for (int i = 0; i < partitionSize; i++) {
-            srcNode = graph.getNode(offset + i);
+        for (int i = beginRange; i < endRange; i++) {
+            srcNode = graph.getNode(i);
 
             if (srcNode == null) {
                 continue;
             }
 
             int neighborListSize = srcNode.neighborListSize();
-            double scatterPageRank = dampingFactor * (partition.getVertexValue(i) / (double) neighborListSize);
+            double scatterPageRank = dampingFactor * (sharedDataObject.getVertexValue(srcNode.getInDegree(), i) / (double) neighborListSize);
 
             for (int j = 0; j < neighborListSize; j++) {
-                int dest = srcNode.getNeighbor(j);
-                int destPartitionId = graph.getPartitionId(dest);
-
-                PageRankPartition destPartition = graph.getPartition(destPartitionId);
-                int destPosition = graph.getNodePositionInPart(dest);
-                destPartition.updateNextTable(destPosition, scatterPageRank);
+                int destId = srcNode.getNeighbor(j);
+                Node dest = graph.getNode(destId);
+                sharedDataObject.updateNextTable(dest.getInDegree(), destId, scatterPageRank);
             }
         }
     }

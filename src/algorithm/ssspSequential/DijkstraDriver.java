@@ -2,7 +2,7 @@ package algorithm.ssspSequential;
 
 import graph.Graph;
 import graph.Node;
-import graph.partition.SSSPPartition;
+import graph.sharedData.SSSPSharedData;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -13,14 +13,14 @@ import java.util.PriorityQueue;
 
 public class DijkstraDriver
 {
-    Graph<SSSPPartition> graph;
+    Graph<SSSPSharedData> graph;
     PriorityQueue<Integer> activeQueue;
     int [] dist;
 
     final int source;
     final int maxNodeId;
 
-    public DijkstraDriver(Graph<SSSPPartition> graph, int source) {
+    public DijkstraDriver(Graph<SSSPSharedData> graph, int source) {
         this.graph = graph;
         activeQueue = new PriorityQueue<>(new Comparator<Integer>()
         {

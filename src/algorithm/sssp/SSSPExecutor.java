@@ -1,19 +1,21 @@
 package algorithm.sssp;
 
-import gnu.trove.list.array.TDoubleArrayList;
 import gnu.trove.list.array.TIntArrayList;
 import graph.Graph;
 import graph.GraphAlgorithmInterface;
 import graph.Node;
-import graph.partition.SSSPPartition;
+import graph.sharedData.SSSPSharedData;
 
 public class SSSPExecutor implements GraphAlgorithmInterface
 {
 
-    Graph<SSSPPartition> graph;
-    SSSPPartition partition;
-    int offset;
-    int delta;
+    Graph<SSSPSharedData> graph;
+    SSSPSharedData sharedDataObject;
+
+    final int beginRange;
+    final int endRange;
+    final int delta;
+    final int numCheck;
     static volatile boolean isHeavy;
 
     TIntArrayList[] lightEdges;
@@ -23,30 +25,27 @@ public class SSSPExecutor implements GraphAlgorithmInterface
     TIntArrayList edges = null;
     TIntArrayList weights = null;
 
-    final int partitionId;
-
-    SSSPExecutor(int partitionId, Graph<SSSPPartition> graph, int delta) {
-        this.partitionId = partitionId;
+    SSSPExecutor(int beginRange, int endRange, Graph<SSSPSharedData> graph, int delta, int numCheck) {
         this.graph = graph;
+        this.beginRange = beginRange;
+        this.endRange = endRange;
         this.delta = delta;
+        this.numCheck = numCheck;
         this.lightEdges = SSSPDriver.getLightEdges();
         this.heavyEdges = SSSPDriver.getHeavyEdges();
         this.lightWeights = SSSPDriver.getLightWeights();
         this.heavyWeights = SSSPDriver.getHeavyWeights();
-        this.offset = this.partitionId << graph.getExpOfPartitionSize();
     }
 
     @Override
     public void execute() {
-        partition = graph.getPartition(partitionId);
-        int partitionSize = partition.getSize();
         int bucketIdx = SSSPDriver.getBucketIdx();
 
-        for (int i = 0; i < partitionSize; i++) {
-            int nodeId = offset + i;
-            int currBucket = partition.getBucketId(i);
+        for (int i = beginRange; i < endRange; i++) {
+            int srcNodeInDegree = graph.getNode(i).getInDegree();
+            int currBucket = sharedDataObject.getBucketId(srcNodeInDegree, i);
             if (currBucket == bucketIdx) {
-                Node srcNode = graph.getNode(nodeId);
+                Node srcNode = graph.getNode(i);
 
                 if (srcNode == null) {
                     continue;
@@ -57,36 +56,48 @@ public class SSSPExecutor implements GraphAlgorithmInterface
         }
     }
 
-    public void update(Node srcNode, int srcNodeIdInPart, int bucketIdx) {
+    public void update(Node srcNode, int nodeId, int bucketIdx) {
         if (!isHeavy) {
-            edges = lightEdges[offset + srcNodeIdInPart];
-            weights = lightWeights[offset + srcNodeIdInPart];
+            edges = lightEdges[nodeId];
+            weights = lightWeights[nodeId];
         }
         else {
-            edges = heavyEdges[offset + srcNodeIdInPart];
-            weights = heavyWeights[offset + srcNodeIdInPart];
+            edges = heavyEdges[nodeId];
+            weights = heavyWeights[nodeId];
         }
 
         int neighborListSize = edges.size();
         int InnerIdx = SSSPDriver.getInnerIdx();
 
-        int mydist = graph.getPartition(partitionId).getVertexValue(srcNodeIdInPart);
+        int myDist = sharedDataObject.getVertexValue(graph.getNode(nodeId).getInDegree(), nodeId);
+        boolean updateFlag = false;
+        int check = 0;
 
-        for (int j = 0; j < neighborListSize; j++) {
-            int destId = edges.getQuick(j);
-            int destPartitionId = graph.getPartitionId(destId);
-            SSSPPartition destPartition = graph.getPartition(destPartitionId);
-            int destPosition = graph.getNodePositionInPart(destId);
+        for (int i = 0; i < neighborListSize; i++) {
+            int destId = edges.getQuick(i);
+            int destTaskId = graph.getTaskId(destId);
+            int destInDegree = graph.getNode(destId).getInDegree();
+            int newDist = myDist + weights.getQuick(i);
+            boolean updated = sharedDataObject.update(destInDegree,destId, newDist);
 
-            int newDist = mydist + weights.getQuick(j);
-            boolean updated = destPartition.update(destPosition, newDist);
-
+            //            SSSPDriver.incBefore();
             if (updated) {
+//                SSSPDriver.incAfter();
+                updateFlag = true;
                 int newBucketId = newDist >> delta;
-                destPartition.setBucketId(destPosition, newBucketId);
-                destPartition.setCurrMaxBucket(newBucketId);
+                sharedDataObject.setBucketId(destInDegree, destId, newBucketId);
+                sharedDataObject.setCurrMaxBucket(destTaskId, newBucketId);
                 if (newBucketId == bucketIdx) {
-                    destPartition.setInnerIdx(InnerIdx);
+                    sharedDataObject.setInnerIdx(destTaskId, InnerIdx);
+                }
+            }
+            else {
+                if (numCheck != -1 && !updateFlag) {
+                    check++;
+                    if (check >= numCheck) {
+//                        SSSPDriver.incKillAfterFive();
+                        break;
+                    }
                 }
             }
         }

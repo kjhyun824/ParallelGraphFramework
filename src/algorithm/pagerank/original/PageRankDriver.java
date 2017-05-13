@@ -1,16 +1,12 @@
 package algorithm.pagerank.original;
 
 import graph.Graph;
-import graph.partition.PageRankPartition;
+import graph.Node;
+import graph.sharedData.PageRankSharedData;
 import task.*;
 import thread.TaskWaitingRunnable;
 import thread.ThreadUtil;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.concurrent.BrokenBarrierException;
@@ -24,10 +20,14 @@ import java.util.function.DoubleBinaryOperator;
 public class PageRankDriver
 {
     int numThreads;
+    int numTasks;
+    int taskSize;
     int iteration;
+    int nodeCapacity;
     double dampingFactor;
 
-    Graph<PageRankPartition> graph;
+    Graph<PageRankSharedData> graph;
+    PageRankSharedData sharedDataObject;
     DoubleBinaryOperator updateFunction;
     LinkedBlockingQueue<Task> taskQueue;
     TaskWaitingRunnable runnable;
@@ -39,22 +39,24 @@ public class PageRankDriver
     Task[] barrierTasks;
     Task[] exitBarrierTasks;
 
-    public PageRankDriver(Graph<PageRankPartition> graph, double dampingFactor, int iteration, int numThreads) {
+    public PageRankDriver(Graph<PageRankSharedData> graph, double dampingFactor, int numThreads, int iteration) {
         this.graph = graph;
         this.dampingFactor = dampingFactor;
-        this.iteration = iteration;
         this.numThreads = numThreads;
+        this.taskSize = 1 << graph.getExpOfTaskSize();
+        this.iteration = iteration;
+        sharedDataObject = graph.getSharedDataObject();
+        nodeCapacity = graph.getMaxNodeId() + 1;
+        numTasks = (nodeCapacity + taskSize - 1) / taskSize;
         init();
     }
 
     public void init() {
-        int numPartitions = graph.getNumPartitions();
-
         updateFunction = (prev, value) -> prev + value;
-        PageRankPartition.setUpdateFunction(updateFunction);
+        PageRankSharedData.setUpdateFunction(updateFunction);
 
-        initTasks = new Task[numPartitions];
-        workTasks = new Task[numPartitions];
+        initTasks = new Task[numTasks];
+        workTasks = new Task[numTasks];
         barrierTasks = new Task[numThreads];
         exitBarrierTasks = new Task[numThreads];
 
@@ -66,9 +68,16 @@ public class PageRankDriver
 
         ThreadUtil.createAndStartThreads(numThreads, runnable);
 
-        for (int i = 0; i < numPartitions; i++) {
-            initTasks[i] = new Task(new PageRankInit(i, graph, dampingFactor));
-            workTasks[i] = new Task(new PageRankExecutor(i, graph, dampingFactor));
+        for (int i = 0; i < numTasks; i++) {
+            int beginRange = i * taskSize;
+            int endRange = beginRange + taskSize;
+
+            if (endRange > nodeCapacity) {
+                endRange = nodeCapacity;
+            }
+
+            initTasks[i] = new Task(new PageRankInit(beginRange, endRange, graph, dampingFactor));
+            workTasks[i] = new Task(new PageRankExecutor(beginRange, endRange, graph, dampingFactor));
         }
 
         for (int i = 0; i < numThreads; i++) {
@@ -78,11 +87,17 @@ public class PageRankDriver
     }
 
     public void run() throws BrokenBarrierException, InterruptedException {
+        boolean isFirst = true;
         for (int i = 0; i < iteration; i++) {
             pushTasks(initTasks);
-            pushTasks(barrierTasks);
+            pushTasks(exitBarrierTasks);
+            exitBarriers.await();
+            if (!isFirst) {
+                sharedDataObject.initializedCallback();
+            }
             pushTasks(workTasks);
             pushTasks(barrierTasks);
+            isFirst = false;
         }
         pushTasks(exitBarrierTasks);
         exitBarriers.await();
@@ -99,27 +114,26 @@ public class PageRankDriver
         for (int i = 0; i < initTasks.length; i++) {
             initTasks[i].reset();
         }
+        sharedDataObject.reset();
     }
 
-
-
     public String _printPageRankSum() {
-        PageRankPartition[] partitions = graph.getPartitions();
         ArrayList<Double> pageRankValues = new ArrayList<>();
         double sum = 0.0d;
 
-        for (int i = 0; i < partitions.length; i++) {
-            partitions[i].initializedCallback();
-            int partitionSize = partitions[i].getSize();
-            for (int j = 0; j < partitionSize; j++) {
-                pageRankValues.add(partitions[i].getVertexValue(j));
-                sum += partitions[i].getVertexValue(j);
+        sharedDataObject.initializedCallback();
+        for (int j = 0; j < nodeCapacity; j++) {
+            Node node = graph.getNode(j);
+            if (node == null) {
+                continue;
             }
+            pageRankValues.add(sharedDataObject.getVertexValue(node.getInDegree(), j));
+            sum += sharedDataObject.getVertexValue(node.getInDegree(), j);
         }
 
         Collections.sort(pageRankValues, Collections.reverseOrder());
 
-//        for (int i = 0; i < 10; i++) {
+        //        for (int i = 0; i < 10; i++) {
 //            System.out.println("[DEBUG] pageRank " + i + " : " + pageRankValues.get(i));
 //        }
         String pageRanksum = String.format("%.3f", sum);
@@ -131,12 +145,8 @@ public class PageRankDriver
         double[] pageRank = new double[sampleData.length];
 
         for (int i = 0; i < sampleData.length; i++) {
-            int node = sampleData[i];
-            int partitionNumber = graph.getPartitionId(node);
-            int nodePosition = graph.getNodePositionInPart(node);
-
-            PageRankPartition doublePartition = graph.getPartition(partitionNumber);
-            pageRank[i] = doublePartition.getVertexValue(nodePosition);
+            int nodeId = sampleData[i];
+            pageRank[i] = sharedDataObject.getVertexValue(graph.getNode(nodeId).getInDegree(), nodeId);
 
 //            System.out.println(sampleData[i] + " : " + graph.getNode(node).getInDegree() + " : " + graph.getNode(node).getOutDegree());
         }

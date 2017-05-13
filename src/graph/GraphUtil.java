@@ -27,6 +27,11 @@ public class GraphUtil {
             String[] nodeId = line.trim().split("\t");
             int srcNodeId = Integer.parseInt(nodeId[0]);
             int destNodeId = Integer.parseInt(nodeId[1]);
+
+            if (srcNodeId == destNodeId) {      // remove selfEdge count
+                continue;
+            }
+
             if (graph.isWeighted()) {
                 int weight = Integer.parseInt(nodeId[2]);
                 graph.addEdge(srcNodeId, destNodeId, weight);

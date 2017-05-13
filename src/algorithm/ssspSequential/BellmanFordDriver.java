@@ -2,7 +2,7 @@ package algorithm.ssspSequential;
 
 import graph.Graph;
 import graph.Node;
-import graph.partition.SSSPPartition;
+import graph.sharedData.SSSPSharedData;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -11,13 +11,13 @@ import java.io.PrintWriter;
 
 public class BellmanFordDriver
 {
-    Graph<SSSPPartition> graph;
+    Graph<SSSPSharedData> graph;
     double[] dist;
 
     final int source;
     final int maxNodeId;
 
-    public BellmanFordDriver(Graph<SSSPPartition> graph, int source) {
+    public BellmanFordDriver(Graph<SSSPSharedData> graph, int source) {
         this.graph = graph;
 
         this.source = source;

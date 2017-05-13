@@ -1,13 +1,13 @@
 import algorithm.ssspSequential.DijkstraDriver;
 import graph.Graph;
 import graph.GraphUtil;
-import graph.partition.SSSPPartition;
+import graph.sharedData.SSSPSharedData;
 
 public class DijkstraMain {
     public static void main(String[] args) {
         String inputFile = args[0];
 
-        Graph<SSSPPartition> graph = Graph.getInstance(0,true,true);
+        Graph<SSSPSharedData> graph = Graph.getInstance(0,true,true);
         System.out.println("[DEBUG] Graph Loading ...");
         GraphUtil.load(graph, inputFile);
         System.out.println("[DEBUG] Graph Complete");

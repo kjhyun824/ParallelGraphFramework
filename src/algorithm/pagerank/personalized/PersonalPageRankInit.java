@@ -3,32 +3,30 @@ package algorithm.pagerank.personalized;
 import graph.Graph;
 import graph.GraphAlgorithmInterface;
 import graph.Node;
-import graph.partition.PersonalPageRankPartition;
+import graph.sharedData.PersonalPageRankSharedData;
 
 public class PersonalPageRankInit implements GraphAlgorithmInterface
 {
-    Graph<PersonalPageRankPartition> graph;
-    PersonalPageRankPartition partition;
+    Graph<PersonalPageRankSharedData> graph;
+    PersonalPageRankSharedData sharedDataObject;
 
+    final int beginRange;
+    final int endRange;
     final int numSeeds;
-    final int partitionId;
-    final int partitionSize;
-    final int offset;
     final double dampingFactor;
 
     double initialValue;
     double randomTeleportValue;
     boolean isFirst;
 
-    PersonalPageRankInit(int partitionId, Graph<PersonalPageRankPartition> graph, double dampingFactor, int numSeeds) {
-        this.numSeeds = numSeeds;
-        this.partitionId = partitionId;
+    PersonalPageRankInit(int beginRange, int endRange, Graph<PersonalPageRankSharedData> graph, double dampingFactor, int numSeeds) {
         this.graph = graph;
         this.dampingFactor = dampingFactor;
+        this.beginRange = beginRange;
+        this.endRange = endRange;
+        this.numSeeds = numSeeds;
 
-        partition = graph.getPartition(partitionId);
-        partitionSize = partition.getSize();
-        offset = partitionId << graph.getExpOfPartitionSize();
+        sharedDataObject = graph.getSharedDataObject();
         initialValue = getInitPageRankValue(numSeeds, 0); //initial PageRank Value
         randomTeleportValue = getInitPageRankValue(numSeeds, dampingFactor);
         isFirst = true;
@@ -43,32 +41,32 @@ public class PersonalPageRankInit implements GraphAlgorithmInterface
             initNextTable();
         }
 
-        for (int i = 0; i < partitionSize; i++) {
-            Node node = graph.getNode(offset + i);
+        for (int i = beginRange; i < endRange; i++) {
+            Node node = graph.getNode(i);
             if (node == null) {
                 continue;
             }
 
-            if (partition.isNodeSeed(i)) {
-                partition.setVertexValue(i, initialValue);
+            if (sharedDataObject.isNodeSeed(i)) {
+                sharedDataObject.setVertexValue(node.getInDegree(), i, initialValue);
             } else {
-                partition.setVertexValue(i, 0);
+                sharedDataObject.setVertexValue(node.getInDegree(), i, 0);
             }
         }
 
         if (!isFirst) {
-            partition.initializedCallback();
+            sharedDataObject.initializedCallback();
         }
         isFirst = false;
     }
 
     public void initNextTable() {
-        for (int i = 0; i < partitionSize; i++) {
-            Node node = graph.getNode(offset + i);
-            if (node == null || !partition.isNodeSeed(i)) {
+        for (int i = beginRange; i < endRange; i++) {
+            Node node = graph.getNode(i);
+            if (node == null || !sharedDataObject.isNodeSeed(i)) {
                 continue;
             }
-            partition.setNextVertexValue(i, randomTeleportValue);
+            sharedDataObject.setNextVertexValue(node.getInDegree(),i, randomTeleportValue);
         }
     }
 
@@ -79,8 +77,5 @@ public class PersonalPageRankInit implements GraphAlgorithmInterface
     public void reset() {
         isFirst = true;
         initialValue = getInitPageRankValue(numSeeds, 0);
-        if (partition != null) {
-            partition.reset();
-        }
     }
 }

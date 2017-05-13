@@ -1,6 +1,6 @@
 import algorithm.pagerank.original.PageRankDriver;
 import graph.Graph;
-import graph.partition.PageRankPartition;
+import graph.sharedData.PageRankSharedData;
 import graph.GraphUtil;
 
 import java.util.concurrent.BrokenBarrierException;
@@ -17,22 +17,21 @@ public class PageRankMain
 
         String inputFile = args[0];
         int numThreads = Integer.parseInt(args[1]);
-        double asyncPercentage = Double.parseDouble(args[2]);
+        int asyncThreshold = Integer.parseInt(args[2]);
 
         double dampingFactor = 0.85;
         int iteration = 10;
-        int expOfPartitionSize = 16;//1 << 12;      // 2 ^ n     For PartitionSize
-        int asyncRangeSize = (int) ((1 << expOfPartitionSize) * asyncPercentage);
+        int expOfTaskSize = 18;
 
-        Graph<PageRankPartition> graph = Graph.getInstance(expOfPartitionSize, isDirected, isWeighted);
+        Graph<PageRankSharedData> graph = Graph.getInstance(expOfTaskSize, isDirected, isWeighted);
 
         long start = System.currentTimeMillis();
         System.err.println("Graph Loading... ");
         GraphUtil.load(graph, inputFile);
+        graph.loadFinalize(asyncThreshold, PageRankSharedData.class);
         System.err.println("Loading Time : " + (System.currentTimeMillis() - start) / 1000.0);
-        graph.generatePartition(asyncRangeSize, PageRankPartition.class);
 
-        PageRankDriver driver = new PageRankDriver(graph, dampingFactor, iteration, numThreads);
+        PageRankDriver driver = new PageRankDriver(graph, dampingFactor, numThreads, iteration);
 
         /**     PageRank Start      **/
         double timeSum = 0;
